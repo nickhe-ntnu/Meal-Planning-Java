@@ -60,6 +60,10 @@ public class Storage {
         .forEach(ingredient -> System.out.println("Ingredient " + ingredientName + " is in storage: " + storage)));
   }
 
+  public HashMap<String, HashSet<Ingredient>> getAllStorage() {
+    return namedStorages;
+  }
+
   public void printAllInventory() {
     namedStorages.forEach((keys, collections) -> {
       System.out.println(keys);

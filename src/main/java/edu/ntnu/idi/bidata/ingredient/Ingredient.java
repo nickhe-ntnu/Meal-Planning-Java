@@ -83,9 +83,4 @@ public class Ingredient {
         "amount=" + amount + '}';
   }
 
-  public static void main(String[] args) {
-    Ingredient ingredient = new Ingredient("Sugar", "g", 100);
-    System.out.println(ingredient.toString());
-  }
-
 }
