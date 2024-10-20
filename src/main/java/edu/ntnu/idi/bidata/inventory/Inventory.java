@@ -40,12 +40,6 @@ public class Inventory {
     namedStorages.put(storage, new HashSet<>());
   }
 
-  /**
-   * Add an ingredient to a collection.
-   *
-   * @param storage    The name of the storage.
-   * @param ingredient The ingredient to add.
-   */
   public void addIngredient() {
   }
 
