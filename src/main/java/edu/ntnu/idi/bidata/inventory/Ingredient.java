@@ -1,4 +1,4 @@
-package edu.ntnu.idi.bidata.ingredient;
+package edu.ntnu.idi.bidata.inventory;
 
 /**
  * Represents an ingredient with a name, unit and amount.

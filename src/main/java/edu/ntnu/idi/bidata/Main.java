@@ -1,7 +1,6 @@
 package edu.ntnu.idi.bidata;
 
-import edu.ntnu.idi.bidata.ingredient.Ingredient;
-import edu.ntnu.idi.bidata.inventory.Storage;
+import edu.ntnu.idi.bidata.inventory.Inventory;
 
 import java.util.*;
 
@@ -10,103 +9,66 @@ import java.util.*;
  * instance of your main-class that starts your application.
  */
 public class Main {
-  private Scanner inputScanner;
-  private int userInput;
-  private ArrayList<String> listOfOutput;
+
+  private final Scanner inputScanner;
 
   private String userName;
-  private Storage userStorage;
+  private Inventory userInventory;
 
+
+  /**
+   * Constructor for the Main class.
+   */
   public Main() {
     inputScanner = new Scanner(System.in);
-    userStorage = new Storage();
-    listOfOutput = new ArrayList<>();
-    userStorage.createCollection("Refrigerator");
-    Ingredient apple = new Ingredient("Apple", "g", 200);
-    Ingredient bannana = new Ingredient("Banana", "kg", 2);
-    userStorage.addIngredient("Refrigerator", apple);
-    userStorage.addIngredient("Refrigerator", bannana);
+    userInventory = new Inventory();
+    userInventory.addStorage("Refrigerator");
   }
 
-  public void printList(String message, ArrayList<String> arrayList) {
-    Iterator<String> it = arrayList.iterator();
-    System.out.println("###############################\n" + message);
-    while (it.hasNext()) {
-      System.out.println("  * " + it.next());
-    }
-    System.out.println("################################");
-    listOfOutput.clear();
+  public Main(Scanner scanner) {
+    this.inputScanner = scanner;
+    userInventory = new Inventory();
+    userInventory.addStorage("Refrigerator");
   }
 
-  public void printListV2(String message, HashMap<String, HashSet<Ingredient>> storageMap) {
-    Iterator<String> stringIterator = storageMap.keySet().iterator();
-    System.out.println("###############################\n" + message);
-    while (stringIterator.hasNext()) {
-      String itString= stringIterator.next();
-      System.out.println("  * "+ itString);
-      Iterator<Ingredient> ingredientIterator = storageMap.get(itString).iterator();
-      while (ingredientIterator.hasNext()) {
-        Ingredient ingredient = ingredientIterator.next();
-        System.out.println("    - " + ingredient.getName() + ", " + ingredient.getAmount() + " " + ingredient.getUnit());
-      }
-    }
-    System.out.println("################################");
-  }
-
-  public void userSetup(Scanner scanner) {
-    while (getUserName() == null || getUserName().isBlank()) {
-      try {
-        System.out.println("Please setup your username:");
-        setUserName(scanner);
-      } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
-      }
-    }
-    System.out.println("Welcome " + getUserName() + ", hope you enjoy using the app!");
-  }
-
-  public void setUserName(Scanner scanner) {
-    String scannedInput = scanner.nextLine();
-    if (scannedInput == null || scannedInput.isBlank()) {
-      throw new IllegalArgumentException("Username cannot be blank.");
-    }
-    this.userName = scannedInput.replaceAll("\\s", "");
-  }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public String getUserInput(Scanner scanner) {
-    String scannedInput = scanner.nextLine().replaceAll("\\s", "");
+  public String scanUserInput() {
+    String scannedInput = inputScanner.nextLine().trim();
     if (scannedInput.isBlank()) {
       throw new IllegalArgumentException("Input cannot be blank, please try again.");
     }
     return scannedInput;
   }
 
-  public void setUserInput(Scanner scanner) {
-    String scannedInput = scanner.nextLine().replaceAll("\\s", "");
+  public int getUserAction() {
+    int userAction;
+    String scannedInput = inputScanner.nextLine().replaceAll("\\s", "");
     if (scannedInput.isBlank()) {
       throw new IllegalArgumentException("Input cannot be blank, please try again.");
     }
 
     try {
-      userInput = Integer.parseInt(scannedInput);
+      userAction = Integer.parseInt(scannedInput);
     } catch (NumberFormatException e) {
-      throw new NumberFormatException("Input is not an integer, please try again.");
+      throw new NumberFormatException("Input '" + scannedInput + "'is not an integer, please try again.");
     }
 
-    if (userInput < 0 || userInput > 9) {
-      throw new IllegalArgumentException("Input is out of valid range (0-9), please try again.");
+    if (userAction < 0 || userAction > 6) {
+      throw new IllegalArgumentException("Input '" + userAction + "' is out of valid range (0-6), please try again.");
     }
+
+    return userAction;
   }
 
-  public int getUserInput() {
-    return this.userInput;
+  public static void formatPrint(String message, Runnable task) {
+    System.out.println("###############################\n" + message);
+    task.run();
+    System.out.println("################################");
   }
 
-  public void listMenu() {
+  /**
+   * List the menu for the user to select from.
+   */
+  public int printAction() {
     System.out.println("""
         Please select an operation:
         1. List all inventory
@@ -116,81 +78,87 @@ public class Main {
         5. Create an recipe
         6. Available recipe
         0. Exit the program.""");
+    int userAction = -1; // Set = -1 to satisfy the compiler.
     boolean inputChanged = false;
     while (!inputChanged) {
       try {
-        setUserInput(inputScanner);
+        userAction = getUserAction();
         inputChanged = true;
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
       }
     }
+    return userAction;
   }
 
-  public void listStorages() {
-    HashMap<String, HashSet<Ingredient>> storageMap = userStorage.getAllStorage();
-    printListV2("List of all storage place: ", storageMap);
+  public void userSetup() {
+    while (getUserName() == null || getUserName().isBlank()) {
+      try {
+        System.out.println("Please setup your username:");
+        setUserName();
+      } catch (IllegalArgumentException e) {
+        System.out.println(e.getMessage());
+      }
+    }
+    System.out.println("Welcome " + getUserName() + ", hope you enjoy using the app!");
   }
 
-  public void listIngredients() {
-
+  public void setUserName() {
+    String scannedString = scanUserInput();
+    if (scannedString == null || scannedString.isBlank()) {
+      throw new IllegalArgumentException("Username cannot be blank.");
+    }
+    this.userName = scannedString.replaceAll("\\s", "");
   }
 
-/*
-  public void addIngredient() {
-    System.out.println("Enter ingredient name: ");
-    String name = userInput.nextLine();
-    System.out.println("Enter ingredient unit: ");
-    String unit = userInput.nextLine();
-    System.out.println("Enter ingredient amount: ");
-    float amount = Float.valueOf(userInput.nextLine());
-    Ingredient newIngredient = new Ingredient(name, unit, amount);
-    System.out.println("Added ingredient: " + newIngredient.toString());
+  public String getUserName() {
+    return userName;
   }
-*/
 
   public void addStorage() {
-    System.out.println("###############################\n" +
-        "Please enter the new storage name:");
     boolean validInput = false;
     while (!validInput) {
       try {
-        String scannedInput = getUserInput(inputScanner);
-        userStorage.createCollection(scannedInput);
-        System.out.println(scannedInput + " was successfully added.");
+        String scannedString = scanUserInput();
+        userInventory.addStorage(scannedString);
+        System.out.println(scannedString + " was successfully added.");
         validInput = true;
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
       }
     }
-    System.out.println("###############################");
-  }
-
-  public void removeStorage() {
-
-  }
-
-  public void removeIngredient() {
-
   }
 
 
+  public void printInventory() {
+    formatPrint("List of all inventory:", () -> userInventory.printInventory());
+  }
+
+
+  public void printAddStorage() {
+    formatPrint("Please enter the new storage name:", this::addStorage);
+  }
+
+  /**
+   * The main application loop.
+   */
   public void app() {
     System.out.println("""
         Thank you for using the meal planning app! Earth thank you for taking care of her.
         Welcome new user""");
-    userSetup(inputScanner);
+    userSetup();
     boolean appRunning = true;
     while (appRunning) {
-      listMenu();
-      switch (getUserInput()) {
-        case 1 -> listStorages();
-        case 4 -> addStorage();
+      int userAction = printAction();
+      switch (userAction) {
+        case 1 -> printInventory();
+        case 4 -> printAddStorage();
         case 0 -> {
           System.out.println("Program Exiting...");
           appRunning = false;
         }
-        default -> System.out.println("Sorry, we don't have option: " + getUserInput() + ", please try again.");
+        default -> System.out.println("Sorry, option "
+            + userAction + " isn't available right now, please try again later.");
       }
     }
   }
