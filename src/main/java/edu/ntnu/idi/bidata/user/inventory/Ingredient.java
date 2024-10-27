@@ -1,4 +1,6 @@
-package edu.ntnu.idi.bidata.inventory;
+package edu.ntnu.idi.bidata.user.inventory;
+
+import edu.ntnu.idi.bidata.util.ValidUnit;
 
 /**
  * Represents an ingredient with a name, unit and amount.
@@ -6,8 +8,8 @@ package edu.ntnu.idi.bidata.inventory;
 public class Ingredient {
   // Instance variables
   private String name;
-  private String unit;
-  private float amount;
+  private int amount;
+  private ValidUnit unit;
 
   /**
    * Create a new ingredient with a name, unit and amount.
@@ -18,10 +20,10 @@ public class Ingredient {
    * @throws IllegalArgumentException if the name is null or empty, the unit is null or empty, or the
    *                                  amount is negative or NaN
    */
-  public Ingredient(String name, String unit, float amount) {
+  public Ingredient(String name, int amount, ValidUnit unit) {
     setName(name);
-    setUnit(unit);
     setAmount(amount);
+    setUnit(unit);
   }
 
   /**
@@ -43,11 +45,12 @@ public class Ingredient {
    * @param unit the unit of the ingredient
    * @throws IllegalArgumentException if the unit is null or empty
    */
-  public void setUnit(String unit) {
-    if (unit == null || unit.isBlank()) {
+  public void setUnit(ValidUnit unit) {
+    if (unit == null) {
       throw new IllegalArgumentException("Unit cannot be null or empty");
+    } else {
+      this.unit = unit;
     }
-    this.unit = unit;
   }
 
   /**
@@ -56,31 +59,32 @@ public class Ingredient {
    * @param amount the amount of the ingredient
    * @throws IllegalArgumentException if the amount is negative or NaN
    */
-  public void setAmount(float amount) {
-    if (amount < 0 || Float.isNaN(amount)) {
+  public void setAmount(int amount) {
+    if (amount < 0) {
       throw new IllegalArgumentException("Amount cannot be negative");
+    } else {
+      this.amount = amount;
     }
-    this.amount = amount;
   }
 
   public String getName() {
     return name;
   }
 
-  public String getUnit() {
-    return unit;
-  }
-
   public double getAmount() {
     return amount;
   }
 
+  public ValidUnit getUnit() {
+    return unit;
+  }
+
   @Override
   public String toString() {
-    return "Ingredient{" +
-        "name='" + name + '\'' + ", " +
-        "unit='" + unit + '\'' + ", " +
-        "amount=" + amount + '}';
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(name).append(": ")
+        .append(amount).append(" ").append(unit).append(".");
+    return stringBuilder.toString();
   }
 
 }

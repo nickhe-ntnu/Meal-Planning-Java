@@ -1,4 +1,4 @@
-package edu.ntnu.idi.bidata.inventory;
+package edu.ntnu.idi.bidata.user.inventory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,13 +8,14 @@ import java.util.HashSet;
  */
 public class Inventory {
 
-  private HashMap<String, HashSet<Ingredient>> namedStorages;
+  private final HashMap<String, HashSet<Ingredient>> storageMap;
+  private HashSet<Ingredient> currentStorage;
 
   /**
    * Constructor for the Storage class.
    */
   public Inventory() {
-    namedStorages = new HashMap<>();
+    storageMap = new HashMap<>();
   }
 
   /**
@@ -24,7 +25,7 @@ public class Inventory {
    * @return True if the collection exists, false otherwise.
    */
   public boolean collectionExists(String storage) {
-    return namedStorages.keySet().stream()
+    return storageMap.keySet().stream()
         .anyMatch(keyName -> keyName.equalsIgnoreCase(storage));
   }
 
@@ -33,14 +34,13 @@ public class Inventory {
    *
    * @param storage The name of the storage.
    */
-  public void addStorage(String storage) {
-    if (collectionExists(storage)) {
-      throw new IllegalArgumentException("Storage already exists");
+  public boolean addStorage(String storage) {
+    boolean success = false;
+    if (!collectionExists(storage)) {
+      storageMap.put(storage, new HashSet<>());
+      success = true;
     }
-    namedStorages.put(storage, new HashSet<>());
-  }
-
-  public void addIngredient() {
+    return success;
   }
 
   /**
@@ -53,7 +53,7 @@ public class Inventory {
     if (!collectionExists(storage)) {
       throw new IllegalArgumentException("Collection does not exist");
     }
-    namedStorages.get(storage).remove(ingredient);
+    storageMap.get(storage).remove(ingredient);
   }
 
   /**
@@ -67,8 +67,8 @@ public class Inventory {
     if (!collectionExists(storage)) {
       throw new IllegalArgumentException("Collection does not exist");
     }
-    return namedStorages.get(storage).stream()
-        .map(Ingredient::getName)
+    return storageMap.get(storage).stream()
+        .map(edu.ntnu.idi.bidata.user.inventory.Ingredient::getName)
         .anyMatch(name -> name.equals(ingredientName));
   }
 
@@ -80,7 +80,7 @@ public class Inventory {
    * @return The ingredient if it exists, null otherwise.
    */
   public void getIngredientFromStorage(String ingredientName) {
-    namedStorages.forEach((storage, ingredients) -> ingredients.stream()
+    storageMap.forEach((storage, ingredients) -> ingredients.stream()
         .filter(ingredient -> ingredient.getName().equals(ingredientName))
         .forEach(ingredient -> System.out.println("Ingredient " + ingredientName + " is in storage: " + storage)));
   }
@@ -92,18 +92,24 @@ public class Inventory {
    * @return The ingredients in the collection.
    */
   public HashMap<String, HashSet<Ingredient>> getAllStorage() {
-    return namedStorages;
+    return storageMap;
   }
 
   /**
    * Print all the ingredients in the storage.
+   * @return String of everything storage in the inventory.
    */
-  public void printInventory() {
-    namedStorages.forEach((nameOfStorage, storageList) -> {
-      System.out.println("  * " + nameOfStorage);
-      storageList.forEach(ingredient -> System.out.println("    - " + ingredient.getName() + " "
-          + ingredient.getAmount() + " " + ingredient.getUnit()));
+  public String getInventoryString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("List of all inventory:");
+    storageMap.forEach((storageName, storageSet) -> {
+      stringBuilder.append("\n  * " + storageName);
+      storageSet.forEach(ingredient -> stringBuilder.append("\n    - ")
+          .append(ingredient.getName()).append(" ")
+          .append(ingredient.getAmount()).append(" ")
+          .append(ingredient.getUnit()));
     });
+    return stringBuilder.toString();
   }
 
 }
