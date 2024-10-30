@@ -1,10 +1,12 @@
 package edu.ntnu.idi.bidata.util;
 
+import edu.ntnu.idi.bidata.user.UserInput;
+
 import java.util.Scanner;
 
 public class InputScanner {
   private UnitTypes unitTypes;
-  private CommandWord commands;
+  private final CommandWord commands;
   private Scanner scanner;
 
   /**
@@ -25,23 +27,17 @@ public class InputScanner {
     return inputLine;
   }
 
-  public Command getCommand() {
+  public UserInput getCommand() {
     System.out.print("> ");
     String inputLine = scanner.nextLine().toLowerCase();
-    String command = null;
-    String subcommand = null;
+    String[] tokens = inputLine.split("\\s+"); // Split on whitespace
 
-    Scanner tokenizer = new Scanner(inputLine);
-    if (tokenizer.hasNext()) {
-      command = tokenizer.next();
-      if (tokenizer.hasNext()) {
-        subcommand = tokenizer.next();
-      }
-    }
-    return new Command(commands.getCommandWord(command), subcommand);
+    String command = tokens.length > 0 ? tokens[0] : null;
+    String subcommand = tokens.length > 1 ? tokens[1] : null;
+
+    return new UserInput(commands.getCommandWord(command), subcommand);
   }
-
-  public String getCommandString() {
+  public String getHelpString() {
     return commands.getCommandString();
   }
 }

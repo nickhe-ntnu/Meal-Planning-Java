@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- * Represents a storage of ingredients.
+ * The Inventory class manages collections of ingredients
+ * stored in various named collections.
+ * @author Nick Heggø
+ * @version 2024-10-30
  */
 public class Inventory {
 
@@ -19,24 +22,25 @@ public class Inventory {
   }
 
   /**
-   * Check if a collection exists.
+   * Checks if a collection is present in the storage.
    *
-   * @param storage The name of the storage.
-   * @return True if the collection exists, false otherwise.
+   * @param storage The name of the storage to check.
+   * @return True if the collection is present, false otherwise.
    */
-  public boolean collectionExists(String storage) {
+  public boolean isCollectionPresent(String storage) {
     return storageMap.keySet().stream()
         .anyMatch(keyName -> keyName.equalsIgnoreCase(storage));
   }
 
   /**
-   * Create a new collection.
+   * Adds a new collection to the storage if it is not already present.
    *
-   * @param storage The name of the storage.
+   * @param storage The name of the storage to add.
+   * @return True if the new collection was added successfully, false otherwise.
    */
-  public boolean addStorage(String storage) {
+  public boolean addNewCollection(String storage) {
     boolean success = false;
-    if (!collectionExists(storage)) {
+    if (!isCollectionPresent(storage)) {
       storageMap.put(storage, new HashSet<>());
       success = true;
     }
@@ -50,7 +54,7 @@ public class Inventory {
    * @param ingredient The ingredient to remove.
    */
   public void removeIngredient(String storage, Ingredient ingredient) {
-    if (!collectionExists(storage)) {
+    if (!isCollectionPresent(storage)) {
       throw new IllegalArgumentException("Collection does not exist");
     }
     storageMap.get(storage).remove(ingredient);
@@ -64,7 +68,7 @@ public class Inventory {
    * @return True if the collection contains the ingredient, false otherwise.
    */
   public boolean collectionContainsIngredient(String storage, String ingredientName) {
-    if (!collectionExists(storage)) {
+    if (!isCollectionPresent(storage)) {
       throw new IllegalArgumentException("Collection does not exist");
     }
     return storageMap.get(storage).stream()
@@ -75,7 +79,6 @@ public class Inventory {
   /**
    * Get an ingredient from a collection.
    *
-   * @param storage        The name of the storage.
    * @param ingredientName The name of the ingredient.
    * @return The ingredient if it exists, null otherwise.
    */
@@ -86,30 +89,26 @@ public class Inventory {
   }
 
   /**
-   * Get all the ingredients in a collection.
-   *
-   * @param storage The name of the storage.
-   * @return The ingredients in the collection.
-   */
-  public HashMap<String, HashSet<Ingredient>> getAllStorage() {
-    return storageMap;
-  }
-
-  /**
    * Print all the ingredients in the storage.
+   *
    * @return String of everything storage in the inventory.
    */
   public String getInventoryString() {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append("List of all inventory:");
     storageMap.forEach((storageName, storageSet) -> {
-      stringBuilder.append("\n  * " + storageName);
-      storageSet.forEach(ingredient -> stringBuilder.append("\n    - ")
-          .append(ingredient.getName()).append(" ")
-          .append(ingredient.getAmount()).append(" ")
-          .append(ingredient.getUnit()));
+      stringBuilder.append("\n  * ").append(storageName);
+      storageSet.forEach(ingredient -> stringBuilder.append("\n    - ").append(ingredient.toString()));
     });
     return stringBuilder.toString();
   }
 
+  /**
+   * Get all the ingredients in a collection.
+   *
+   * @return The ingredients in the collection.
+   */
+  public HashMap<String, HashSet<Ingredient>> getAllStorage() {
+    return storageMap;
+  }
 }

@@ -1,45 +1,61 @@
 package edu.ntnu.idi.bidata.util;
 
 import edu.ntnu.idi.bidata.user.User;
+import edu.ntnu.idi.bidata.user.UserInput;
 
 /**
- * The main starting point of your application. Let this class create the
- * instance of your main-class that starts your application.
+ * The Application class represents the main execution for the meal planning application.
+ * It initializes user data, including storage, and manages user inputs to process commands.
+ *
  * @author Nick Heggø
- * @version 0.0.1
+ * @version 2024-10-30
  */
 public class Application {
-  InputScanner inputScanner;
+
   User user;
+  InputScanner inputScanner;
+  OutputHandler outputHandler;
 
   public Application() {
-    inputScanner = new InputScanner();
     user = new User("test");
+    inputScanner = new InputScanner();
+    outputHandler = new OutputHandler();
     user.addStorage("Refrigerator");
   }
 
   /**
-   * Print welcome text
+   * Starts the application by displaying the help string and entering a loop to process user commands.
+   * The loop continues until a command causes the application to exit.
+   * It handles any exceptions by printing the error messages.
    */
-  private void printWelcome() {
-    System.out.println("""
-        Thank you for using the meal planning app!
-        Earth thanks you for taking care of her.""");
+  public void startApplication() {
+    outputHandler.printWelcomeMessage();
+    outputHandler.printHelpMessage();
+    engine();
   }
 
   /**
-   * Print output with custom linebreak
+   * Runs the main loop of the application, continually processing user commands until
+   * a termination command is received. The method fetches user input through an input scanner,
+   * processes the command, and prints any exceptions encountered.
    */
-  private void printOutput(Runnable task) {
-    task.run();
-    System.out.println("########################");
+  public void engine() {
+    boolean running = true;
+    do {
+      try {
+        UserInput userInput = inputScanner.getCommand();
+        running = processUserCommand(userInput);
+      } catch (Exception e) {
+        outputHandler.printOutput(e.getMessage());
+      }
+    } while (running);
   }
 
   /**
-   * Method to try - catch error
-   * Print exceptions
+   * Loop until get a valid input from the user.
+   * Prints exception.
    *
-   * @return valid input
+   * @return none empty String.
    */
   private String getString() {
     StringBuilder stringBuilder = new StringBuilder();
@@ -56,34 +72,50 @@ public class Application {
     return stringBuilder.toString();
   }
 
+  /**
+   * Set up the current
+   *
+   * @return the newly created user object.
+   */
   private User userSetUp() {
     return new User(getString().replaceAll("\\s", ""));
   }
 
-  private boolean processCommand(Command command) {
+  /**
+   * Processes the user command and redirects to the appropriate function based on the command word.
+   * Catches and handles IllegalArgumentExceptions that may occur during execution.
+   *
+   * @param userInput The command entered by the user.
+   * @return The running condition of the application. Returning false will cause the application to exit.
+   */
+  private boolean processUserCommand(UserInput userInput) {
     boolean running = true;
 
-    ValidCommand validCommand = command.getCommandWord();
+    ValidCommand validCommand = userInput.getCommandWord();
     try {
       switch (validCommand) {
         case UNKNOWN -> System.out.println("I don't know what you mean...");
         case EXIT -> running = exit();
-        case GO -> go(command);
-        case HELP -> help(command);
-        case LIST -> list(command);
-        case ADD -> add(command);
+        case GO -> go(userInput);
+        case HELP -> help(userInput);
+        case LIST -> list(userInput);
+        case ADD -> add(userInput);
+        default -> throw new IllegalArgumentException("Unexpected command: " + validCommand);
       }
-    } catch (IllegalArgumentException e) {
+    } catch (Exception e) {
       System.out.println(e.getMessage());
     }
     return running;
   }
 
-  private void add(Command command) {
-    switch (command.getSubcommand()) {
-      case null -> System.out.println();
+  /**
+   * @param userInput
+   */
+  private void add(UserInput userInput) {
+    switch (userInput.getSubcommand()) {
+      case null -> outputHandler.printOutput("Add what?");
       case "storage" -> {
-        printOutput(() -> {
+        outputHandler.printOutputWithLineBreak(() -> {
           System.out.println("Please enter the name of new storage:");
           String storageName = getString();
           boolean success = user.addStorage(storageName);
@@ -91,50 +123,61 @@ public class Application {
             System.out.println(storageName + " was successfully added.");
           } else {
             System.out.println("Failed to add " + storageName + " to the inventory.");
+            System.out.println("failed to add new item");
           }
         });
       }
-      default -> throw new IllegalArgumentException("Unexpected value: " + command.getSubcommand());
+      default -> throw new IllegalArgumentException("Unexpected subcommand: " + userInput.getSubcommand());
     }
   }
 
+  /**
+   * Lists items based on the given subcommand of the provided command.
+   *
+   * @param userInput The command entered by the user, containing a subcommand.
+   */
+  private void list(UserInput userInput) {
+    String subcommand = userInput.getSubcommand();
+    switch (subcommand) {
+      case null -> outputHandler.printOutput("List what?");
+      case "inventory" -> outputHandler.printOutputWithLineBreak(() -> user.getInventoryString());
+      default -> throw new IllegalArgumentException("Unexpected command:  list " + subcommand);
+    }
+  }
+
+  /**
+   * Executes the "go" command, printing a message if no subcommand is provided.
+   *
+   * @param userInput The command entered by the user.
+   */
+  private void go(UserInput userInput) {
+    if (!userInput.hasSubcommand()) {
+      outputHandler.printOutput("Where we going");
+    }
+  }
+
+  /**
+   * Provides help messages to the user based on the given subcommand.
+   *
+   * @param userInput The command entered by the user, which may contain a subcommand.
+   */
+  private void help(UserInput userInput) {
+    String subcommand = userInput.getSubcommand();
+    if (subcommand == null) {
+      outputHandler.printHelpMessage();
+    } else {
+      outputHandler.printHelpMessage(subcommand);
+    }
+  }
+
+  /**
+   * Method to exit the endless loop.
+   *
+   * @return the running condition of the application will cause the app to exit.
+   */
   private boolean exit() {
-    System.out.println("Thank you for using the app, goodbye!");
+    outputHandler.printGoodbyeMessage();
     return false;
   }
 
-  private void list(Command command) {
-    String subcommand = command.getSubcommand();
-    switch (subcommand) {
-      case null -> System.out.println("List what?");
-      case "inventory" -> printOutput(() -> System.out.println(user.getInventoryString()));
-      default -> throw new IllegalArgumentException("Unexpected value: " + subcommand);
-    }
-  }
-
-  private void go(Command command) {
-    if (!command.hasSubcommand()) {
-      System.out.println("Where we going?");
-    }
-  }
-
-  private void help(Command command) {
-    String subcommand = command.getSubcommand();
-    switch (subcommand) {
-      case null -> printOutput(() -> System.out.println(inputScanner.getCommandString()));
-      case "list" -> printOutput(() -> System.out.println("list inventory, list cookbook, list expired, "
-          + "list recipe, list value"));
-
-      default -> throw new IllegalArgumentException("Unexpected value: " + subcommand);
-    }
-  }
-
-  public void run() {
-    printWelcome();
-    boolean running = true;
-    while (running) {
-      Command command = inputScanner.getCommand();
-      running = processCommand(command);
-    }
-  }
 }

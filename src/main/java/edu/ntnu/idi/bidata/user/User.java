@@ -28,7 +28,7 @@ public class User {
   }
 
   public boolean addStorage(String storageName) {
-    return inventory.addStorage(storageName);
+    return inventory.addNewCollection(storageName);
   }
 
 

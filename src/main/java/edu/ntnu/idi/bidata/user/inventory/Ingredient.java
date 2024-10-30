@@ -4,6 +4,8 @@ import edu.ntnu.idi.bidata.util.ValidUnit;
 
 /**
  * Represents an ingredient with a name, unit and amount.
+ * @author Nick Heggø
+ * @version 2024-10-30
  */
 public class Ingredient {
   // Instance variables
@@ -81,10 +83,9 @@ public class Ingredient {
 
   @Override
   public String toString() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(name).append(": ")
-        .append(amount).append(" ").append(unit).append(".");
-    return stringBuilder.toString();
+    return this.getName() + ": " +
+        this.getAmount() + " " +
+        this.getUnit() + ".";
   }
 
 }
