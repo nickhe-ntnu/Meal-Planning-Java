@@ -7,7 +7,7 @@ import java.util.HashSet;
  * The Inventory class manages collections of ingredients
  * stored in various named collections.
  * @author Nick Heggø
- * @version 2024-10-30
+ * @version 2024-10-31
  */
 public class Inventory {
 
@@ -46,6 +46,12 @@ public class Inventory {
     }
     return success;
   }
+
+
+//  public HashSet<Ingredient> getStorage(String storage) {
+//
+//  }
+
 
   /**
    * Remove an ingredient from a collection.
@@ -95,12 +101,15 @@ public class Inventory {
    */
   public String getInventoryString() {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("List of all inventory:");
     storageMap.forEach((storageName, storageSet) -> {
       stringBuilder.append("\n  * ").append(storageName);
       storageSet.forEach(ingredient -> stringBuilder.append("\n    - ").append(ingredient.toString()));
     });
     return stringBuilder.toString();
+  }
+
+  public boolean addIngredient(Ingredient ingredient) {
+    return storageMap.get("Fridge").add(ingredient);
   }
 
   /**

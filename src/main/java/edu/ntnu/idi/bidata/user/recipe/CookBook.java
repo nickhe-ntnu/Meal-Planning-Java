@@ -2,6 +2,10 @@ package edu.ntnu.idi.bidata.user.recipe;
 
 import java.util.HashSet;
 
+/**
+ * @author Nick Heggø
+ * @version 2024-10-31
+ */
 public class CookBook {
   HashSet<Recipe> recipes;
 
@@ -47,9 +51,12 @@ public class CookBook {
    * Lists all recipes in the cookbook.
    * This method iterates over the recipes stored in the CookBook instance
    * and prints out details of each recipe, such as their names.
+   *
+   * @return
    */
-  public void listRecipes() {
+  public String listRecipes() {
 
+    return null;
   }
 
   /**

@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.UserInput;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-10-30
+ * @version 2024-10-31
  */
 public class Application {
 
@@ -17,10 +17,9 @@ public class Application {
   OutputHandler outputHandler;
 
   public Application() {
-    user = new User("test");
+    user = new User("testUser");
     inputScanner = new InputScanner();
     outputHandler = new OutputHandler();
-    user.addStorage("Refrigerator");
   }
 
   /**
@@ -102,7 +101,7 @@ public class Application {
         case ADD -> add(userInput);
         default -> throw new IllegalArgumentException("Unexpected command: " + validCommand);
       }
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
     }
     return running;
@@ -115,17 +114,15 @@ public class Application {
     switch (userInput.getSubcommand()) {
       case null -> outputHandler.printOutput("Add what?");
       case "storage" -> {
-        outputHandler.printOutputWithLineBreak(() -> {
-          System.out.println("Please enter the name of new storage:");
-          String storageName = getString();
-          boolean success = user.addStorage(storageName);
-          if (success) {
-            System.out.println(storageName + " was successfully added.");
-          } else {
-            System.out.println("Failed to add " + storageName + " to the inventory.");
-            System.out.println("failed to add new item");
-          }
-        });
+        outputHandler.printOutputWithLineBreak("Please enter the name of new storage:");
+        String storageName = getString();
+        boolean success = user.addStorage(user.getCurrentDirectory().toString(), storageName);
+        if (success) {
+          System.out.println(storageName + " was successfully added.");
+        } else {
+          System.out.println("Failed to add " + storageName + " to the inventory.");
+          System.out.println("failed to add new item");
+        }
       }
       default -> throw new IllegalArgumentException("Unexpected subcommand: " + userInput.getSubcommand());
     }
@@ -139,8 +136,7 @@ public class Application {
   private void list(UserInput userInput) {
     String subcommand = userInput.getSubcommand();
     switch (subcommand) {
-      case null -> outputHandler.printOutput("List what?");
-      case "inventory" -> outputHandler.printOutputWithLineBreak(() -> user.getInventoryString());
+      case "inventory" -> outputHandler.printOutputWithLineBreak("tets");
       default -> throw new IllegalArgumentException("Unexpected command:  list " + subcommand);
     }
   }
@@ -151,9 +147,7 @@ public class Application {
    * @param userInput The command entered by the user.
    */
   private void go(UserInput userInput) {
-    if (!userInput.hasSubcommand()) {
-      outputHandler.printOutput("Where we going");
-    }
+    user.go(userInput);
   }
 
   /**
@@ -181,3 +175,7 @@ public class Application {
   }
 
 }
+
+
+
+

@@ -6,7 +6,7 @@ import java.lang.System;
  * The OutputHandler class is responsible for displaying various messages
  * to the user, including a welcome message that encourages environmental responsibility.
  * @author Nick Heggø
- * @version 2024-10-30
+ * @version 2024-10-31
  */
 public class OutputHandler {
 
@@ -23,12 +23,12 @@ public class OutputHandler {
   }
 
   /**
-   * Executes the given task and prints a line break for separation.
+   * Prints the specified message to the console and follows it with a line of separator characters.
    *
-   * @param task the task to be executed before printing the line break
+   * @param outputMessage the message to be printed to the console
    */
-  public void printOutputWithLineBreak(Runnable task) {
-    task.run();
+  public void printOutputWithLineBreak(String outputMessage) {
+    printOutput(outputMessage);
     System.out.println("########################");
   }
 
@@ -51,7 +51,7 @@ public class OutputHandler {
 
 
   public void printHelpMessage() {
-
+    String helpString = "";
   }
   public void printHelpMessage(String command) {
 

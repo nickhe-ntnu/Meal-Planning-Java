@@ -8,9 +8,16 @@ package edu.ntnu.idi.bidata.util;
  * FIND - search if an ingredient/recipe exist with in the collection.
  * LIST - currently two use cases, list expired, list available recipe
  * HELP - list of all commands.
- * @version 0.0.1
+ *
  * @author Nick Heggø
+ * @version 2024-10-31
  */
 public enum ValidCommand {
-  UNKNOWN, ADD, GO, FIND, LIST, HELP, EXIT
+  EXIT,
+  ADD,
+  GO,
+  FIND,
+  LIST,
+  HELP,
+  UNKNOWN;
 }
