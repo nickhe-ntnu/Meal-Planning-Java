@@ -3,11 +3,13 @@ package edu.ntnu.idi.bidata.util;
 import edu.ntnu.idi.bidata.user.UserInput;
 
 import java.util.Scanner;
-import java.util.SimpleTimeZone;
 
 /**
+ * The InputScanner class is responsible for reading and interpreting user input from the terminal window.
+ * It is designed to parse input into predefined commands, subcommands, and additional input strings.
+ *
  * @author Nick Heggø
- * @version 2024-10-31
+ * @version 2024-11-01
  */
 public class InputScanner {
   private UnitTypes unitTypes;
@@ -23,7 +25,14 @@ public class InputScanner {
     unitTypes = new UnitTypes();
   }
 
-  public String getString() {
+  /**
+   * Reads a line of input from the user, trims any leading and trailing whitespace,
+   * and returns the resulting non-blank string.
+   *
+   * @return the trimmed non-blank user input string.
+   * @throws IllegalArgumentException if the user input is blank.
+   */
+  public String getUserInput() {
     System.out.print("> ");
     String inputLine = scanner.nextLine().trim();
     if (inputLine.isBlank()) {
@@ -32,7 +41,13 @@ public class InputScanner {
     return inputLine;
   }
 
-  public UserInput getCommand() {
+  /**
+   * Reads a line of input from the user, parses it into a command, subcommand, and input string,
+   * and returns a UserInput object containing these components.
+   *
+   * @return a UserInput object containing the parsed command, subcommand, and input string from the user's input.
+   */
+  public UserInput readUserInput() {
     System.out.print("> ");
     String inputLine = scanner.nextLine();
     String[] tokens = inputLine.split("\\s+"); // Split on whitespace

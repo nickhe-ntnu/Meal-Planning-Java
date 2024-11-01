@@ -2,6 +2,14 @@ package edu.ntnu.idi.bidata.util;
 
 import java.util.HashMap;
 
+/**
+ * The CommandWord class is used to manage valid command words for the application.
+ * It initializes a collection of valid commands and provides methods to check
+ * the validity of a command word and to retrieve all the valid commands as a string.
+ *
+ * @author Nick Heggø
+ * @version 2024-11-01
+ */
 public class CommandWord {
   private HashMap<String, ValidCommand> validCommands;
 

@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.UserInput;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-10-31
+ * @version 2024-11-01
  */
 public class Application {
 
@@ -42,33 +42,12 @@ public class Application {
     boolean running = true;
     do {
       try {
-        UserInput userInput = inputScanner.getCommand();
+        UserInput userInput = inputScanner.readUserInput();
         running = processUserCommand(userInput);
-      } catch (Exception e) {
+      } catch (IllegalArgumentException e) {
         outputHandler.printOutput(e.getMessage());
       }
     } while (running);
-  }
-
-  /**
-   * Loop until get a valid input from the user.
-   * Prints exception.
-   *
-   * @return none empty String.
-   */
-  private String getString() {
-    StringBuilder stringBuilder = new StringBuilder();
-
-    boolean validInput = false;
-    while (!validInput) {
-      try {
-        stringBuilder.append(inputScanner.getString());
-        validInput = true;
-      } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
-      }
-    }
-    return stringBuilder.toString();
   }
 
   /**
@@ -77,7 +56,7 @@ public class Application {
    * @return the newly created user object.
    */
   private User userSetUp() {
-    return new User(getString().replaceAll("\\s", ""));
+    return new User(inputScanner.getUserInput().replaceAll("\\s", ""));
   }
 
   /**
@@ -89,43 +68,38 @@ public class Application {
    */
   private boolean processUserCommand(UserInput userInput) {
     boolean running = true;
-
     ValidCommand validCommand = userInput.getCommandWord();
-    try {
-      switch (validCommand) {
-        case UNKNOWN -> System.out.println("I don't know what you mean...");
-        case EXIT -> running = exit();
-        case GO -> go(userInput);
-        case HELP -> help(userInput);
-        case LIST -> list(userInput);
-        case ADD -> add(userInput);
-        default -> throw new IllegalArgumentException("Unexpected command: " + validCommand);
-      }
-    } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+    switch (validCommand) {
+      case UNKNOWN -> processUnknownCommand();
+      case GO -> processGoCommand(userInput);
+      case HELP -> processHelpCommand(userInput);
+      case LIST -> processListCommand(userInput);
+      case ADD -> processAddCommand(userInput);
+      case EXIT -> running = exitApplication();
+      default -> throw new IllegalArgumentException("Unexpected command: " + validCommand);
     }
     return running;
+  }
+
+  private void processUnknownCommand() {
+    outputHandler.printOutput("I don't know what you mean...");
   }
 
   /**
    * @param userInput
    */
-  private void add(UserInput userInput) {
-    switch (userInput.getSubcommand()) {
+  private void processAddCommand(UserInput userInput) {
+    switch (userInput.getSubcommand().toLowerCase()) {
       case null -> outputHandler.printOutput("Add what?");
-      case "storage" -> {
-        outputHandler.printOutputWithLineBreak("Please enter the name of new storage:");
-        String storageName = getString();
-        boolean success = user.addStorage(user.getCurrentDirectory().toString(), storageName);
-        if (success) {
-          System.out.println(storageName + " was successfully added.");
-        } else {
-          System.out.println("Failed to add " + storageName + " to the inventory.");
-          System.out.println("failed to add new item");
-        }
-      }
+      case "storage" -> addStorage();
       default -> throw new IllegalArgumentException("Unexpected subcommand: " + userInput.getSubcommand());
     }
+  }
+
+  private void addStorage() {
+    outputHandler.printAddInstructions();
+    String storageName = inputScanner.getUserInput();
+    user.addStorage(storageName);
   }
 
   /**
@@ -133,11 +107,18 @@ public class Application {
    *
    * @param userInput The command entered by the user, containing a subcommand.
    */
-  private void list(UserInput userInput) {
-    String subcommand = userInput.getSubcommand();
-    switch (subcommand) {
-      case "inventory" -> outputHandler.printOutputWithLineBreak("tets");
-      default -> throw new IllegalArgumentException("Unexpected command:  list " + subcommand);
+  private void processListCommand(UserInput userInput) {
+    if (!userInput.hasSubcommand()) {
+      if (user.isInDirectory()) {
+        outputHandler.printOutputWithLineBreak(user.listInventory());
+      }
+    } else {
+      String subcommand = userInput.getSubcommand();
+      if (subcommand.equals("inventory")) {
+        outputHandler.printOutputWithLineBreak("tets");
+      } else {
+        throw new IllegalArgumentException("Unexpected command:  list " + subcommand);
+      }
     }
   }
 
@@ -146,8 +127,13 @@ public class Application {
    *
    * @param userInput The command entered by the user.
    */
-  private void go(UserInput userInput) {
-    user.go(userInput);
+  private void processGoCommand(UserInput userInput) {
+    // TODO need to print when only write go
+    if (!userInput.hasSubcommand()) {
+      outputHandler.printHelpMessage(userInput.getCommandWord());
+    }
+    String directoryName = userInput.getSubcommand();
+    user.goDir(directoryName);
   }
 
   /**
@@ -155,12 +141,12 @@ public class Application {
    *
    * @param userInput The command entered by the user, which may contain a subcommand.
    */
-  private void help(UserInput userInput) {
+  private void processHelpCommand(UserInput userInput) {
     String subcommand = userInput.getSubcommand();
     if (subcommand == null) {
       outputHandler.printHelpMessage();
     } else {
-      outputHandler.printHelpMessage(subcommand);
+      outputHandler.printHelpMessage(userInput.getCommandWord());
     }
   }
 
@@ -169,7 +155,7 @@ public class Application {
    *
    * @return the running condition of the application will cause the app to exit.
    */
-  private boolean exit() {
+  private boolean exitApplication() {
     outputHandler.printGoodbyeMessage();
     return false;
   }

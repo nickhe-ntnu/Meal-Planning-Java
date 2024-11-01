@@ -1,26 +1,15 @@
 package edu.ntnu.idi.bidata.util;
 
-import java.lang.System;
-
 /**
  * The OutputHandler class is responsible for displaying various messages
  * to the user, including a welcome message that encourages environmental responsibility.
+ *
  * @author Nick Heggø
- * @version 2024-10-31
+ * @version 2024-11-01
  */
 public class OutputHandler {
 
   public OutputHandler() {}
-
-  /**
-   * Prints a welcome message to the user indicating the application has started
-   * and encourages environmental responsibility.
-   */
-  public void printWelcomeMessage() {
-    System.out.println("""
-        Thank you for using the meal planning app!
-        Earth thanks you for taking care of her.""");
-  }
 
   /**
    * Prints the specified message to the console and follows it with a line of separator characters.
@@ -42,6 +31,16 @@ public class OutputHandler {
   }
 
   /**
+   * Prints a welcome message to the user indicating the application has started
+   * and encourages environmental responsibility.
+   */
+  public void printWelcomeMessage() {
+    System.out.println("""
+        Thank you for using the meal planning app!
+        Earth thanks you for taking care of her.""");
+  }
+
+  /**
    * Prints a farewell message to the user indicating the application
    * has ended and thanking them for usage.
    */
@@ -53,8 +52,13 @@ public class OutputHandler {
   public void printHelpMessage() {
     String helpString = "";
   }
-  public void printHelpMessage(String command) {
+  public void printHelpMessage(ValidCommand command) {
 
+  }
+
+  public void printAddInstructions() {
+    System.out.println("""
+        """);
   }
 
 

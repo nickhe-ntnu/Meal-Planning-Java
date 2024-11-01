@@ -3,13 +3,12 @@ package edu.ntnu.idi.bidata.user.inventory;
 import edu.ntnu.idi.bidata.util.ValidUnit;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 /**
- * Represents an ingredient with a name, unit and amount.
+ * Represents an ingredient with a name, unit, and amount.
  *
  * @author Nick Heggø
- * @version 2024-10-31
+ * @version 2024-11-01
  */
 public class Ingredient {
   // Instance variables
@@ -20,7 +19,7 @@ public class Ingredient {
   private int pricePerKilogram;
 
   /**
-   * Create a new ingredient with a name, unit and amount.
+   * Create a new ingredient with a name, unit, and amount.
    *
    * @param name   the name of the ingredient
    * @param unit   the unit of the ingredient
