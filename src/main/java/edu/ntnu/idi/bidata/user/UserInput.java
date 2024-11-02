@@ -7,7 +7,7 @@ import edu.ntnu.idi.bidata.util.ValidCommand;
  * an optional sub-command, and the complete input string.
  *
  * @author Nick Heggø
- * @version 2024-10-31
+ * @version 2024-11-02
  */
 public class UserInput {
   private ValidCommand command;
@@ -31,7 +31,7 @@ public class UserInput {
    *
    * @param command The main command word represented by the ValidCommand enum.
    */
-  public void setCommand(ValidCommand command) {
+  private void setCommand(ValidCommand command) {
     this.command = command;
   }
 
@@ -40,7 +40,7 @@ public class UserInput {
    *
    * @param subcommand The optional sub-command as a string.
    */
-  public void setSubcommand(String subcommand) {
+  private void setSubcommand(String subcommand) {
     this.subcommand = subcommand;
   }
 
@@ -49,7 +49,7 @@ public class UserInput {
    *
    * @param inputString the input string representing the entire user input.
    */
-  public void setInputString(String inputString) {
+  private void setInputString(String inputString) {
     this.inputString = inputString;
   }
 

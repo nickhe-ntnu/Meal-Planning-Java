@@ -1,5 +1,6 @@
 package edu.ntnu.idi.bidata.util;
 
+import edu.ntnu.idi.bidata.command.*;
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.UserInput;
 
@@ -8,7 +9,7 @@ import edu.ntnu.idi.bidata.user.UserInput;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-11-01
+ * @version 2024-11-02
  */
 public class Application {
 
@@ -27,10 +28,19 @@ public class Application {
    * The loop continues until a command causes the application to exit.
    * It handles any exceptions by printing the error messages.
    */
-  public void startApplication() {
+  public void initialize() {
     outputHandler.printWelcomeMessage();
     outputHandler.printHelpMessage();
     engine();
+  }
+
+  /**
+   * Set up the current
+   *
+   * @return the newly created user object.
+   */
+  private User userSetUp() {
+    return new User(inputScanner.getUserInput().replaceAll("\\s", ""));
   }
 
   /**
@@ -42,21 +52,12 @@ public class Application {
     boolean running = true;
     do {
       try {
-        UserInput userInput = inputScanner.readUserInput();
-        running = processUserCommand(userInput);
+        this.user.setUserInput(inputScanner.fetchUserInput());
+        running = processUserCommand(user.getUserInput());
       } catch (IllegalArgumentException e) {
         outputHandler.printOutput(e.getMessage());
       }
     } while (running);
-  }
-
-  /**
-   * Set up the current
-   *
-   * @return the newly created user object.
-   */
-  private User userSetUp() {
-    return new User(inputScanner.getUserInput().replaceAll("\\s", ""));
   }
 
   /**
@@ -70,84 +71,26 @@ public class Application {
     boolean running = true;
     ValidCommand validCommand = userInput.getCommandWord();
     switch (validCommand) {
-      case UNKNOWN -> processUnknownCommand();
-      case GO -> processGoCommand(userInput);
-      case HELP -> processHelpCommand(userInput);
-      case LIST -> processListCommand(userInput);
-      case ADD -> processAddCommand(userInput);
+      case UNKNOWN -> processUnknownCommand(userInput);
+      case HELP -> new HelpCommand(this.user);
+      case LIST -> new ListCommand(this.user);
+      case GO -> new GoCommand(this.user);
+      case ADD -> new AddCommand(this.user);
+      case REMOVE -> new RemoveCommand(this.user);
+      case FIND -> new FindCommand(this.user);
       case EXIT -> running = exitApplication();
       default -> throw new IllegalArgumentException("Unexpected command: " + validCommand);
     }
     return running;
   }
 
-  private void processUnknownCommand() {
-    outputHandler.printOutput("I don't know what you mean...");
-  }
-
   /**
-   * @param userInput
-   */
-  private void processAddCommand(UserInput userInput) {
-    switch (userInput.getSubcommand().toLowerCase()) {
-      case null -> outputHandler.printOutput("Add what?");
-      case "storage" -> addStorage();
-      default -> throw new IllegalArgumentException("Unexpected subcommand: " + userInput.getSubcommand());
-    }
-  }
-
-  private void addStorage() {
-    outputHandler.printAddInstructions();
-    String storageName = inputScanner.getUserInput();
-    user.addStorage(storageName);
-  }
-
-  /**
-   * Lists items based on the given subcommand of the provided command.
-   *
-   * @param userInput The command entered by the user, containing a subcommand.
-   */
-  private void processListCommand(UserInput userInput) {
-    if (!userInput.hasSubcommand()) {
-      if (user.isInDirectory()) {
-        outputHandler.printOutputWithLineBreak(user.listInventory());
-      }
-    } else {
-      String subcommand = userInput.getSubcommand();
-      if (subcommand.equals("inventory")) {
-        outputHandler.printOutputWithLineBreak("tets");
-      } else {
-        throw new IllegalArgumentException("Unexpected command:  list " + subcommand);
-      }
-    }
-  }
-
-  /**
-   * Executes the "go" command, printing a message if no subcommand is provided.
+   * Processes an unknown command by printing a help message specific to the command word.
    *
    * @param userInput The command entered by the user.
    */
-  private void processGoCommand(UserInput userInput) {
-    // TODO need to print when only write go
-    if (!userInput.hasSubcommand()) {
-      outputHandler.printHelpMessage(userInput.getCommandWord());
-    }
-    String directoryName = userInput.getSubcommand();
-    user.goDir(directoryName);
-  }
-
-  /**
-   * Provides help messages to the user based on the given subcommand.
-   *
-   * @param userInput The command entered by the user, which may contain a subcommand.
-   */
-  private void processHelpCommand(UserInput userInput) {
-    String subcommand = userInput.getSubcommand();
-    if (subcommand == null) {
-      outputHandler.printHelpMessage();
-    } else {
-      outputHandler.printHelpMessage(userInput.getCommandWord());
-    }
+  private void processUnknownCommand(UserInput userInput) {
+    outputHandler.printHelpMessage(userInput.getCommandWord().name().toLowerCase());
   }
 
   /**

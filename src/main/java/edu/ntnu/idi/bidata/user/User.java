@@ -12,13 +12,14 @@ import java.util.Stack;
  * methods to interact with and manage these attributes.
  *
  * @author Nick Heggø
- * @version 2024-11-01
+ * @version 2024-11-02
  */
 public class User {
   private String name;
   private HashMap<String, Inventory> userInventory;
   private CookBook cookBook;
   private Inventory currentDirectory;
+  private UserInput userInput;
   private Stack<Inventory> historyDirectory;
 
   /**
@@ -31,15 +32,22 @@ public class User {
     userInventory = new HashMap<>();
     cookBook = new CookBook();
     historyDirectory = new Stack<>();
-    addInventory("Home");
-    addInventory("Office");
-    goDir("Home");
+    addLocation("Home");
+    addLocation("Office");
+    goToLocation("Home");
     addStorage("Fridge");
     addStorage("Cold Room");
-    goDir("Office");
+    goToLocation("Office");
     addStorage("Office Fridge");
   }
 
+  public void setUserInput(UserInput userInput) {
+    this.userInput = userInput;
+  }
+
+  public UserInput getUserInput() {
+    return this.userInput;
+  }
   /**
    * Sets the current directory for the User instance.
    *
@@ -68,7 +76,7 @@ public class User {
 
   public void addIngredient() {
     if (this.currentDirectory == null) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("You're currently not in a directory, use go command");
     }
 //    TODO
   }
@@ -77,21 +85,34 @@ public class User {
    * Changes the current directory of the user to the specified directory name if it exists in the user's inventory.
    * Throws an IllegalArgumentException if the specified directory name is not found in the user's inventory.
    *
-   * @param directoryName The name of the directory to switch to.
+   * @param locationName The name of the directory to switch to.
    * @throws IllegalArgumentException if the specified directory name is not found in the user's inventory.
    */
-  public void goDir(String directoryName) {
-    // TODO missing string "You are currently in the directory name"
-    if (userInventory.containsKey(directoryName)) {
-
-      currentDirectory = userInventory.get(directoryName);
+  public String goToLocation(String locationName) {
+    String returnString = "";
+    if (userInventory.containsKey(locationName)) {
+      currentDirectory = userInventory.get(locationName);
+      returnString = returnCurrentLocationString(locationName);
     } else {
-      throw new IllegalArgumentException("No directory name found with: " + directoryName);
+      throw new IllegalArgumentException("No directory name found with: " + locationName);
     }
+    return returnString;
+  }
+
+  /**
+   * Constructs a string indicating the user's current location along with the inventory details.
+   *
+   * @param locationName The name of the current location of the user.
+   * @return A string describing the user's current location and the inventory details in the directory.
+   */
+  public String returnCurrentLocationString(String locationName) {
+    String returnString = "You are currently at " + locationName;
+    returnString += this.currentDirectory.getInventoryString();
+    return returnString;
   }
 
 
-  public void addInventory(String name, Inventory inventory) {
+  public void addLocation(String name, Inventory inventory) {
     this.userInventory.put(name, inventory);
   }
 
@@ -112,7 +133,7 @@ public class User {
     return stringBuilder.toString();
   }
 
-  public boolean addInventory(String name) {
+  public boolean addLocation(String name) {
     return userInventory.putIfAbsent(name, new Inventory()) == null;
   }
 

@@ -10,11 +10,12 @@ package edu.ntnu.idi.bidata.util;
  * HELP - list of all commands.
  *
  * @author Nick Heggø
- * @version 2024-10-31
+ * @version 2024-11-02
  */
 public enum ValidCommand {
   EXIT,
   ADD,
+  REMOVE,
   GO,
   FIND,
   LIST,
