@@ -1,10 +1,12 @@
-package edu.ntnu.idi.bidata.command;
+package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.UserInput;
+import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
-import edu.ntnu.idi.bidata.util.ValidCommand;
+
+import java.util.Stack;
 
 /**
  * The abstract Command class provides a template for creating commands that
@@ -12,7 +14,7 @@ import edu.ntnu.idi.bidata.util.ValidCommand;
  * process commands and subcommands.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public abstract class Command {
   User user;
@@ -22,6 +24,7 @@ public abstract class Command {
 
   OutputHandler outputHandler;
   InputScanner inputScanner;
+  Stack<IngredientStorage> history;
 
   /**
    * Constructs a new Command object, initializes various components, and processes the command.
@@ -32,6 +35,7 @@ public abstract class Command {
     inputScanner = new InputScanner();
     outputHandler = new OutputHandler();
     init(user);
+    history = this.user.getHistory();
     processCommand();
   }
 
@@ -125,13 +129,17 @@ public abstract class Command {
   }
 
   /**
-   * Checks if the provided UserInput object contains an input string.
+   * Prompts the user for input by displaying a message if the user input string has not already been set.
    *
-   * @param userInput the UserInput object to be checked for an input string.
-   * @return true if the UserInput object contains an input string; false otherwise.
+   * @param message The message to be printed if the user input string is not set.
+   * @return The user's input string.
    */
-  protected boolean hasInputString(UserInput userInput) {
-    return userInput.getInputString() != null;
+  protected String getInputString(String message) {
+    if (userInputString == null) {
+      outputHandler.printOutput(message);
+      userInputString = inputScanner.getValidString();
+    }
+    return userInputString;
   }
 
   /**

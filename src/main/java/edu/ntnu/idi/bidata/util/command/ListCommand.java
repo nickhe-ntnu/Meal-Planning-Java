@@ -1,4 +1,4 @@
-package edu.ntnu.idi.bidata.command;
+package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
 
@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * recipes, ingredients, expired items, and available recipes.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public class ListCommand extends Command {
   public ListCommand(User user) {
@@ -37,7 +37,7 @@ public class ListCommand extends Command {
   protected void processSubcommand() {
     switch (userInputSubcommand) {
       case "inventory" -> listInventory();
-      case "location" -> listLocation();
+      case "storage" -> listStorage();
       case "recipe" -> listRecipe();
       case "ingredient" -> listIngredient();
       case "expired" -> listExpired();
@@ -47,12 +47,13 @@ public class ListCommand extends Command {
   }
 
   private void listInventory() {
-    outputHandler.printOutput(user.getInventoryString());
+    outputHandler.printOutputWithLineBreak(user.getAllStorageString());
   }
 
-  private void listLocation() {
-    // TODO
+  private void listStorage() {
+
   }
+
 
   private void listRecipe() {
     // TODO

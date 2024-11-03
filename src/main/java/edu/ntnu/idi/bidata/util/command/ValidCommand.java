@@ -1,4 +1,4 @@
-package edu.ntnu.idi.bidata.util;
+package edu.ntnu.idi.bidata.util.command;
 
 /**
  * Holds the every valid command.
@@ -10,7 +10,7 @@ package edu.ntnu.idi.bidata.util;
  * HELP - list of all commands.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public enum ValidCommand {
   EXIT,

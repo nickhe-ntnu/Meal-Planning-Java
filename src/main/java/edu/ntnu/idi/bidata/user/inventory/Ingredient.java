@@ -1,22 +1,23 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
-import edu.ntnu.idi.bidata.util.ValidUnit;
+import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Represents an ingredient with a name, unit, and amount.
  *
  * @author Nick Heggø
- * @version 2024-11-01
+ * @version 2024-11-03
  */
 public class Ingredient {
   // Instance variables
   private String name;
-  private int amount;
+  private float amount;
   private ValidUnit unit;
   private LocalDate expiryDate;
-  private int pricePerKilogram;
+  private float unitPrice;
 
   /**
    * Create a new ingredient with a name, unit, and amount.
@@ -27,21 +28,51 @@ public class Ingredient {
    * @throws IllegalArgumentException if the name is null or empty, the unit is null or empty, or the
    *                                  amount is negative or NaN
    */
-  public Ingredient(String name, int amount, ValidUnit unit, int pricePerKilogram, int daysToExpiry) {
+  public Ingredient(String name, float amount, ValidUnit unit, float unitPrice, int daysToExpiry) {
     setName(name);
     setAmount(amount);
     setUnit(unit);
-    setPricePerKilogram(pricePerKilogram);
+    setUnitPrice(unitPrice);
     setExpiryDate(daysToExpiry);
   }
 
-  public void setPricePerKilogram(int pricePerKilogram) {
-    if (pricePerKilogram < 0) {
-      throw new IllegalArgumentException("Price cannot be negative");
-    } else if (pricePerKilogram > 1000) {
-      throw new IllegalArgumentException("Please enter a more reasonable price (max 1000");
+  public static Ingredient merge(Ingredient firstI, Ingredient secondI) {
+    if (isValidToMerge(firstI, secondI)) {
+      String mergedName = firstI.name != null ? firstI.name : secondI.name;
+      float mergedAmount = firstI.amount + secondI.amount;
+      ValidUnit mergedUnit = firstI.unit;
+      float mergedPricePerUnit = Math.max(firstI.unitPrice, secondI.unitPrice);
+      int mergedExpiryDate = (int) ChronoUnit.DAYS.between(LocalDate.now(), firstI.expiryDate);
+      return new Ingredient(mergedName, mergedAmount, mergedUnit, mergedPricePerUnit, mergedExpiryDate);
+    } else {
+      return null;
     }
-    this.pricePerKilogram = pricePerKilogram;
+  }
+
+  private static boolean isValidToMerge(Ingredient firstI, Ingredient secondI) {
+    // Null check first to prevent null pointer exceptions
+    if (firstI == null || secondI == null) {
+      return false;
+    }
+    if (firstI.name == null || secondI.name == null) {
+      return false;
+    }
+    if (!firstI.name.equals(secondI.name)) {
+      return false;
+    }
+    if (!firstI.expiryDate.isEqual(secondI.expiryDate)) {
+      return false;
+    }
+    return true;
+  }
+
+  public void setUnitPrice(float unitPrice) {
+    if (unitPrice < 0) {
+      throw new IllegalArgumentException("Price cannot be negative");
+    } else if (unitPrice > 1000) {
+      throw new IllegalArgumentException("Please enter a more reasonable unit price (max 1000");
+    }
+    this.unitPrice = unitPrice;
   }
 
   /**
@@ -76,7 +107,7 @@ public class Ingredient {
    * @param amount the amount of the ingredient
    * @throws IllegalArgumentException if the amount is negative or NaN
    */
-  public void setAmount(int amount) {
+  public void setAmount(float amount) {
     if (amount < 0) {
       throw new IllegalArgumentException("Amount cannot be negative");
     }
@@ -95,7 +126,7 @@ public class Ingredient {
     return name;
   }
 
-  public double getAmount() {
+  public float getAmount() {
     return amount;
   }
 
@@ -105,9 +136,7 @@ public class Ingredient {
 
   @Override
   public String toString() {
-    return this.getName() + ": " +
-        this.getAmount() + " " +
-        this.getUnit() + ".";
+    return "\n  * " + name + ": " + amount + " " + unit + " - Best before: " + expiryDate;
   }
 
 }

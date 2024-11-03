@@ -1,4 +1,4 @@
-package edu.ntnu.idi.bidata.util;
+package edu.ntnu.idi.bidata.util.command;
 
 import java.util.HashMap;
 
@@ -8,15 +8,15 @@ import java.util.HashMap;
  * the validity of a command word and to retrieve all the valid commands as a string.
  *
  * @author Nick Heggø
- * @version 2024-11-01
+ * @version 2024-11-03
  */
-public class CommandWord {
+public class CommandRegistry {
   private HashMap<String, ValidCommand> validCommands;
 
   /**
    * Constructor - initialise the command words.
    */
-  public CommandWord() {
+  public CommandRegistry() {
     validCommands = new HashMap<>();
     for (ValidCommand command : ValidCommand.values()) {
       if (command != ValidCommand.UNKNOWN) {

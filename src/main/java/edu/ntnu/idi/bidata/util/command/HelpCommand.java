@@ -1,4 +1,4 @@
-package edu.ntnu.idi.bidata.command;
+package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
 
@@ -7,7 +7,7 @@ import edu.ntnu.idi.bidata.user.User;
  * This command provides help messages based on the presence of a subcommand or the main command itself.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public class HelpCommand extends Command {
 

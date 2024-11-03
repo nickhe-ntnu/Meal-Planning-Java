@@ -1,4 +1,4 @@
-package edu.ntnu.idi.bidata.command;
+package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
 
@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * delegates the removal operation to the appropriate method.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public class RemoveCommand extends Command {
   public RemoveCommand(User user) {
@@ -16,17 +16,9 @@ public class RemoveCommand extends Command {
   }
 
   /**
-   * Processes the user input subcommand and delegates the removal operation
-   * to the appropriate method based on the subcommand.
-   * This method overrides the abstract method in the Command class and defines
-   * the specific behavior for handling "remove" subcommands. Depending on the
-   * value of {@code userInputSubcommand}, it will call one of the following methods:
-   * <ul>
-   *   <li>{@code removeLocation} for subcommand "location"</li>
-   *   <li>{@code removeStorage} for subcommand "storage"</li>
-   *   <li>{@code removeIngredient} for subcommand "ingredient"</li>
-   *   <li>{@code removeRecipe} for subcommand "recipe"</li>
-   * </ul>
+   * Handles the processing of subcommands specific to the "remove" command.
+   * Based on the provided subcommand, this method delegates the removal
+   * operation to the appropriate private method.
    */
   @Override
   protected void processSubcommand() {

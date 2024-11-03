@@ -1,6 +1,9 @@
 package edu.ntnu.idi.bidata.util;
 
+import edu.ntnu.idi.bidata.util.command.CommandRegistry;
 import edu.ntnu.idi.bidata.user.UserInput;
+import edu.ntnu.idi.bidata.util.unit.UnitRegistry;
+import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.Scanner;
 
@@ -9,20 +12,20 @@ import java.util.Scanner;
  * It is designed to parse input into predefined commands, subcommands, and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public class InputScanner {
   private final Scanner scanner;
-  private final CommandWord commands;
-  private final UnitTypes unitTypes;
+  private final CommandRegistry commandRegistry;
+  private final UnitRegistry unitRegistry;
 
   /**
    * Create an input scanner to read from the terminal window.
    */
   public InputScanner() {
     scanner = new Scanner(System.in);
-    commands = new CommandWord();
-    unitTypes = new UnitTypes();
+    commandRegistry = new CommandRegistry();
+    unitRegistry = new UnitRegistry();
   }
 
   /**
@@ -33,13 +36,65 @@ public class InputScanner {
    * @return the trimmed user input line.
    * @throws IllegalArgumentException if the input is blank.
    */
-  public String getUserInput() {
+  public String getInputString() {
     System.out.print("> ");
+    if (!scanner.hasNextLine()) {
+      throw new IllegalArgumentException("Input cannot be blank.");
+    }
     String inputLine = scanner.nextLine().trim();
     if (inputLine.isBlank()) {
       throw new IllegalArgumentException("Input cannot be blank.");
     }
     return inputLine;
+  }
+
+  /**
+   * Continuously prompts the user for input until valid input is provided.
+   * The input is validated using the getUserInput method, and if invalid,
+   * the user is re-prompted until a valid input is entered.
+   *
+   * @return the valid input string provided by the user.
+   */
+  public String getValidString() {
+    String inputString = "";
+    boolean validInput = false;
+    do {
+      try {
+        inputString = getInputString();
+        validInput = true;
+      } catch (IllegalArgumentException e) {
+        System.out.println(e.getMessage());
+      }
+    } while (!validInput);
+    return inputString;
+  }
+
+  public float getValidFloat() {
+    float inputFloat = 0f;
+    boolean validInput = false;
+    do {
+      try {
+        inputFloat = getInputFloat();
+        validInput = true;
+      } catch (IllegalArgumentException e) {
+        System.out.println(e.getMessage());
+        // TODO check if there are error when input is none float.
+      }
+
+    } while (!validInput);
+    return inputFloat;
+  }
+
+  public float getInputFloat() {
+    System.out.print("> ");
+    if (!scanner.hasNextLine()) {
+      throw new IllegalArgumentException("Input cannot be blank.");
+    }
+    float inputFloat = Float.parseFloat(scanner.nextLine());
+    if (inputFloat == 0.0f) {
+      throw new IllegalArgumentException("Input cannot be blank.");
+    }
+    return inputFloat;
   }
 
   /**
@@ -55,6 +110,11 @@ public class InputScanner {
     return setUserInput(tokens);
   }
 
+  public ValidUnit fetchInputUnit() {
+    String inputString = getValidString();
+    return unitRegistry.getUnitType(inputString);
+  }
+
   /**
    * Processes user input tokens and sets up a UserInput object based on those tokens.
    *
@@ -64,9 +124,9 @@ public class InputScanner {
    * @return a UserInput object containing the parsed command, subcommand, and input string.
    */
   private UserInput setUserInput(String[] tokens) {
-    String command = tokens.length > 0 ? tokens[0] : null;
-    String subcommand = tokens.length > 1 ? tokens[1] : null;
+    String command = tokens.length > 0 ? tokens[0].toLowerCase() : null;
+    String subcommand = tokens.length > 1 ? tokens[1].toLowerCase() : null;
     String inputString = tokens.length > 2 ? tokens[2] : null;
-    return new UserInput(commands.getCommandWord(command), subcommand, inputString);
+    return new UserInput(commandRegistry.getCommandWord(command), subcommand, inputString);
   }
 }

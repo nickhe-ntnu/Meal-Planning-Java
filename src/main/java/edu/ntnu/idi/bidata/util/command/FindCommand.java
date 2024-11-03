@@ -1,4 +1,4 @@
-package edu.ntnu.idi.bidata.command;
+package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
 
@@ -9,7 +9,7 @@ import edu.ntnu.idi.bidata.user.User;
  * "find" subcommands.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public class FindCommand extends Command {
 

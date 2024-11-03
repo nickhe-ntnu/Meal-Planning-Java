@@ -1,9 +1,12 @@
 package edu.ntnu.idi.bidata.user;
 
-import edu.ntnu.idi.bidata.user.inventory.Inventory;
+import edu.ntnu.idi.bidata.user.inventory.Ingredient;
+import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
 import edu.ntnu.idi.bidata.user.recipe.CookBook;
+import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.HashMap;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Stack;
 
 /**
@@ -12,15 +15,16 @@ import java.util.Stack;
  * methods to interact with and manage these attributes.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public class User {
   private String name;
-  private HashMap<String, Inventory> userInventory;
+  private HashMap<String, IngredientStorage> storageMap;
   private CookBook cookBook;
-  private Inventory currentDirectory;
+
   private UserInput userInput;
-  private Stack<Inventory> historyDirectory;
+  private Stack<IngredientStorage> history;
+  private IngredientStorage currentStorage;
 
   /**
    * Constructs a new User object with the given name, initializes various components and default inventory.
@@ -29,92 +33,34 @@ public class User {
    */
   public User(String name) {
     setName(name);
-    userInventory = new HashMap<>();
+    storageMap = new HashMap<>();
     cookBook = new CookBook();
-    historyDirectory = new Stack<>();
-    addLocation("Home");
-    addLocation("Office");
-    goToLocation("Home");
+    history = new Stack<>();
+
     addStorage("Fridge");
+    setCurrentStorage(getStorage("fridge"));
+    addIngredient(new Ingredient("Chocolate", 3, ValidUnit.KG, 300, 200));
     addStorage("Cold Room");
-    goToLocation("Office");
     addStorage("Office Fridge");
   }
 
-  public void setUserInput(UserInput userInput) {
-    this.userInput = userInput;
+  public void setCurrentStorage(IngredientStorage storage) {
+    currentStorage = storage;
   }
 
-  public UserInput getUserInput() {
-    return this.userInput;
-  }
-  /**
-   * Sets the current directory for the User instance.
-   *
-   * @param currentDirectory the directory object to set as the current directory
-   */
-  public void setCurrentDirectory(Inventory currentDirectory) {
-    this.currentDirectory = currentDirectory;
+  public IngredientStorage getCurrentStorage() {
+    return currentStorage;
   }
 
-  public Inventory getCurrentDirectory() {
-    if (this.currentDirectory == null) {
-      throw new IllegalArgumentException("You are not at a inventory, please the the go command");
-    }
-    return this.currentDirectory;
+  public IngredientStorage getStorage(String storageName) {
+    return storageMap.get(storageName);
   }
 
-  public String listInventory() {
-    getCurrentDirectory();
-    // TODO missing string "inventory name has storages such as..."
-    return this.currentDirectory.getInventoryString();
-  }
-
-  public boolean isInDirectory() {
-    return currentDirectory != null;
-  }
-
-  public void addIngredient() {
-    if (this.currentDirectory == null) {
-      throw new IllegalArgumentException("You're currently not in a directory, use go command");
-    }
-//    TODO
-  }
-
-  /**
-   * Changes the current directory of the user to the specified directory name if it exists in the user's inventory.
-   * Throws an IllegalArgumentException if the specified directory name is not found in the user's inventory.
-   *
-   * @param locationName The name of the directory to switch to.
-   * @throws IllegalArgumentException if the specified directory name is not found in the user's inventory.
-   */
-  public String goToLocation(String locationName) {
-    String returnString = "";
-    if (userInventory.containsKey(locationName)) {
-      currentDirectory = userInventory.get(locationName);
-      returnString = returnCurrentLocationString(locationName);
-    } else {
-      throw new IllegalArgumentException("No directory name found with: " + locationName);
-    }
-    return returnString;
-  }
-
-  /**
-   * Constructs a string indicating the user's current location along with the inventory details.
-   *
-   * @param locationName The name of the current location of the user.
-   * @return A string describing the user's current location and the inventory details in the directory.
-   */
-  public String returnCurrentLocationString(String locationName) {
-    String returnString = "You are currently at " + locationName;
-    returnString += this.currentDirectory.getInventoryString();
-    return returnString;
+  public void addIngredient(Ingredient ingredient) {
+    currentStorage.addIngredient(ingredient);
   }
 
 
-  public void addLocation(String name, Inventory inventory) {
-    this.userInventory.put(name, inventory);
-  }
 
   public void setName(String name) {
     this.name = name;
@@ -124,22 +70,57 @@ public class User {
     return name;
   }
 
-  public String getInventoryString() {
+  public String getAllStorageString() {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("Inventory:");
-    userInventory.values().forEach(
-        inventory -> stringBuilder.append(inventory.getInventoryString())
-    );
+    stringBuilder.append("###### Inventory #######");
+    storageMap.values().forEach(storage -> stringBuilder.append(storage.getStorageString()));
     return stringBuilder.toString();
   }
 
-  public boolean addLocation(String name) {
-    return userInventory.putIfAbsent(name, new Inventory()) == null;
-  }
-
+  /**
+   * Adds a new storage to the user's storage map if it is not already present.
+   *
+   * @param storageName The name of the storage to be added.
+   * @return true if the storage was successfully added; false otherwise.
+   */
   public boolean addStorage(String storageName) {
-    return currentDirectory.addNewCollection(storageName);
+    boolean success = !isStoragePresent(storageName);
+    if (success) {
+      putToMap(storageName);
+    }
+    return success;
   }
 
+  /**
+   * Checks if a storage with the specified name is present in the storage map.
+   * The storage name is case-insensitive.
+   *
+   * @param storageName The name of the storage to check for.
+   * @return true if the storage is present; false otherwise.
+   */
+  private boolean isStoragePresent(String storageName) {
+    return storageMap.containsKey(storageName.toLowerCase());
+  }
 
+  /**
+   * Adds a new ingredient storage to the storage map with the provided name.
+   * The storage name is converted to lowercase before being used as the key in the map.
+   *
+   * @param storageName The name of the storage to be added.
+   */
+  private void putToMap(String storageName) {
+    storageMap.put(storageName.toLowerCase(), new IngredientStorage(storageName));
+  }
+
+  public void setUserInput(UserInput userInput) {
+    this.userInput = userInput;
+  }
+
+  public UserInput getUserInput() {
+    return this.userInput;
+  }
+
+  public Stack<IngredientStorage> getHistory() {
+    return history;
+  }
 }

@@ -1,15 +1,15 @@
 package edu.ntnu.idi.bidata.util;
 
-import edu.ntnu.idi.bidata.command.*;
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.UserInput;
+import edu.ntnu.idi.bidata.util.command.*;
 
 /**
  * The Application class represents the main execution for the meal planning application.
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public class Application {
 
@@ -40,7 +40,7 @@ public class Application {
    * @return the newly created user object.
    */
   private User userSetUp() {
-    return new User(inputScanner.getUserInput().replaceAll("\\s", ""));
+    return new User(inputScanner.getValidString().replaceAll("\\s", ""));
   }
 
   /**
@@ -102,9 +102,4 @@ public class Application {
     outputHandler.printGoodbyeMessage();
     return false;
   }
-
 }
-
-
-
-

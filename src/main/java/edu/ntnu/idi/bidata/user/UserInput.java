@@ -1,13 +1,13 @@
 package edu.ntnu.idi.bidata.user;
 
-import edu.ntnu.idi.bidata.util.ValidCommand;
+import edu.ntnu.idi.bidata.util.command.ValidCommand;
 
 /**
  * The UserInput class represents a user command consisting of a primary command,
  * an optional sub-command, and the complete input string.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public class UserInput {
   private ValidCommand command;

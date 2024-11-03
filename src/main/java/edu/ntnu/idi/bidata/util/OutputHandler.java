@@ -5,7 +5,7 @@ package edu.ntnu.idi.bidata.util;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-11-02
+ * @version 2024-11-03
  */
 public class OutputHandler {
 
@@ -36,7 +36,7 @@ public class OutputHandler {
    * and encourages environmental responsibility.
    */
   public void printWelcomeMessage() {
-    System.out.println("""
+    printOutput("""
         Thank you for using the meal planning app!
         Earth thanks you for taking care of her.""");
   }
@@ -47,6 +47,14 @@ public class OutputHandler {
    */
   public void printGoodbyeMessage() {
     printOutput("Thank you for using the application, goodbye!");
+  }
+
+  public void printOperationFailedMessage(String operation, String name) {
+    printOutputWithLineBreak("Failed to " + operation + " " + name);
+  }
+
+  public void printOperationSuccessMessage(String operation, String name) {
+    printOutputWithLineBreak("Successfully " + operation + " " + name);
   }
 
   public void printHelpMessage() {
@@ -83,7 +91,7 @@ public class OutputHandler {
   private void printListInstruction() {
     printOutput("""
         Valid list commands are:
-          list inventory, list location, list recipe, list ingredient, 
+          list ingredientStorage, list location, list recipe, list ingredient, 
           list expired, list available recipe""");
 
   }
@@ -91,7 +99,7 @@ public class OutputHandler {
   private void printGoInstruction() {
     printOutput("""
         Valid go commands are:
-          go "location", go "storage", go back""");
+          go location 'name', go storage 'name', go back""");
   }
 
   private void printAddInstruction() {

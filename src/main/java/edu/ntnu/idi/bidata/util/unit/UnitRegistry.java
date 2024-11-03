@@ -1,14 +1,21 @@
-package edu.ntnu.idi.bidata.util;
+package edu.ntnu.idi.bidata.util.unit;
 
 import java.util.HashMap;
 
-public class UnitTypes {
+/**
+ * The UnitRegistry class is used to manage valid measurement units within the application.
+ * It provides functionality to initialize, validate, and retrieve information about measurement units.
+ *
+ * @author Nick Heggø
+ * @version 2024-11-03
+ */
+public class UnitRegistry {
   private HashMap<String, ValidUnit> validUnits;
 
   /**
    * Constructor - initialise the valid unit.
    */
-  public UnitTypes() {
+  public UnitRegistry() {
     validUnits = new HashMap<>();
     for (ValidUnit unit : ValidUnit.values()) {
       validUnits.put(unit.name().toLowerCase(), unit);
