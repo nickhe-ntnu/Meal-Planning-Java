@@ -41,7 +41,7 @@ where it creates a `new Application` and run the `initialize()` method.
 ## References
 
 [//]: # (TODO: Include references here, if any. For example, if you have used code from the course book, include a reference to the chapter. Or if you have used code from a website or other source, include a link to the source.)
-[![Command design pattern](https://refactoring.guru/images/patterns/diagrams/command/problem2-2x.png)](https://refactoring.guru/design-patterns/command)
+[![Command design pattern](https://refactoring.guru/images/patterns/diagrams/command/example-2x.png)](https://refactoring.guru/design-patterns/command)
 
 Command design pattern helped me to fully understand the inheritance,
 abstract classes, and methods which are the core of this project.
