@@ -85,13 +85,13 @@ public class OutputHandler {
   private void printHelpInstruction() {
     printOutput("""
         Valid print commands are:
-          help, help "valid command" """);
+          help, help {valid command}""");
   }
 
   private void printListInstruction() {
     printOutput("""
         Valid list commands are:
-          list ingredientStorage, list location, list recipe, list ingredient, 
+          list inventory, list recipe, list ingredient,
           list expired, list available recipe""");
 
   }
@@ -99,28 +99,27 @@ public class OutputHandler {
   private void printGoInstruction() {
     printOutput("""
         Valid go commands are:
-          go location 'name', go storage 'name', go back""");
+          go to {storage name}, go back""");
   }
 
   private void printAddInstruction() {
     printOutput("""
         Valid add commands are:
-          add location, add storage, add ingredient, add recipe""");
+          add storage, add ingredient, add recipe""");
   }
 
   private void printRemoveInstruction() {
     printOutput("""
         Valid remove commands are:
-          remove location "location name"
-          remove storage "storage name"
-          remove ingredient "ingredient name"
-          remove recipe "recipe name" """);
+          remove storage {storage name}
+          remove ingredient {ingredient name}
+          remove recipe {recipe name}""");
   }
 
   private void printFindInstruction() {
     printOutput("""
         Valid find commands are:
-          find "ingredient name", find recipe "recipe name" """);
+          find ingredient {ingredient name}, find recipe {recipe name}""");
   }
 
 }

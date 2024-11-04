@@ -1,10 +1,9 @@
 package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
+import edu.ntnu.idi.bidata.user.UserInput;
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
-
-import java.time.LocalDate;
 
 /**
  * The AddCommand class extends the Command class and is responsible for handling
@@ -75,8 +74,9 @@ public class AddCommand extends Command {
     if (user.getCurrentStorage() == null) {
       throw new IllegalArgumentException("You are currently not in a directory, please use the 'go' command");
     }
-    user.addIngredient(addIngredientWizard());
-
+    Ingredient ingredient = addIngredientWizard();
+    user.addIngredient(ingredient);
+    outputHandler.printOutputWithLineBreak("Successfully added " + ingredient.getName());
   }
 
   private void addRecipe() {
@@ -88,10 +88,9 @@ public class AddCommand extends Command {
     outputHandler.printOutput("Please enter the ingredient name:");
     String name = inputScanner.getValidString();
     outputHandler.printOutput("Please enter the amount with unit:");
-    float amount = inputScanner.getValidFloat();
-    // TODO merge amoung and unit into a single input
-    outputHandler.printOutput("Please enter the valid unit");
-    ValidUnit unit = inputScanner.fetchInputUnit();
+    UserInput userInput = inputScanner.fetchInputUnit();
+    float amount = userInput.getUnitAmount();
+    ValidUnit unit = userInput.getValidUnit();
     outputHandler.printOutput("Please enter the unit price");
     float unitPrice = inputScanner.getValidFloat();
     outputHandler.printOutput("Please enter days until expiry date");

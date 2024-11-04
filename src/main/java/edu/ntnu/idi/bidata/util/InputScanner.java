@@ -1,9 +1,8 @@
 package edu.ntnu.idi.bidata.util;
 
-import edu.ntnu.idi.bidata.util.command.CommandRegistry;
 import edu.ntnu.idi.bidata.user.UserInput;
+import edu.ntnu.idi.bidata.util.command.CommandRegistry;
 import edu.ntnu.idi.bidata.util.unit.UnitRegistry;
-import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.Scanner;
 
@@ -97,6 +96,12 @@ public class InputScanner {
     return inputFloat;
   }
 
+  private String[] scanLineToToken() {
+    System.out.print("> ");
+    String inputLine = scanner.nextLine().trim();
+    return inputLine.split("\\s+", 3);
+  }
+
   /**
    * Fetches and processes user input from the terminal. The input is trimmed of leading and trailing whitespace,
    * and split into tokens based on whitespace. These tokens are then used to create a UserInput object.
@@ -104,15 +109,23 @@ public class InputScanner {
    * @return a UserInput object representing the parsed user input, including command, subcommand, and input string.
    */
   public UserInput fetchUserInput() {
-    System.out.print("> ");
-    String inputLine = scanner.nextLine().trim();
-    String[] tokens = inputLine.split("\\s+", 3); // Split on whitespace
-    return setUserInput(tokens);
+    String[] tokens = scanLineToToken();
+    return setCommandInput(tokens);
   }
 
-  public ValidUnit fetchInputUnit() {
-    String inputString = getValidString();
-    return unitRegistry.getUnitType(inputString);
+  public UserInput fetchInputUnit() {
+    String[] tokens = new String[3];
+    boolean success = false;
+    do {
+      try {
+        tokens = scanLineToToken();
+        success = true;
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input, please enter in the format:"
+            + "{number} {unit}");
+      }
+    } while (!success);
+    return setUnitInput(tokens);
   }
 
   /**
@@ -123,10 +136,16 @@ public class InputScanner {
    *               and the third token and beyond as additional input.
    * @return a UserInput object containing the parsed command, subcommand, and input string.
    */
-  private UserInput setUserInput(String[] tokens) {
+  private UserInput setCommandInput(String[] tokens) {
     String command = tokens.length > 0 ? tokens[0].toLowerCase() : null;
     String subcommand = tokens.length > 1 ? tokens[1].toLowerCase() : null;
-    String inputString = tokens.length > 2 ? tokens[2] : null;
+    String inputString = tokens.length > 2 ? tokens[2].toLowerCase() : null;
     return new UserInput(commandRegistry.getCommandWord(command), subcommand, inputString);
+  }
+
+  private UserInput setUnitInput(String[] tokens) {
+    float unitAmount = tokens.length > 0 ? Float.valueOf(tokens[0]) : null;
+    String unit = tokens.length > 1 ? tokens[1].toLowerCase() : null;
+    return new UserInput(unitAmount, unitRegistry.getUnitType(unit));
   }
 }

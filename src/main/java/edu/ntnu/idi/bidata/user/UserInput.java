@@ -1,6 +1,7 @@
 package edu.ntnu.idi.bidata.user;
 
 import edu.ntnu.idi.bidata.util.command.ValidCommand;
+import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 /**
  * The UserInput class represents a user command consisting of a primary command,
@@ -10,29 +11,37 @@ import edu.ntnu.idi.bidata.util.command.ValidCommand;
  * @version 2024-11-03
  */
 public class UserInput {
-  private ValidCommand command;
+  private ValidCommand validCommand;
   private String subcommand;
   private String inputString;
+
+  private ValidUnit validUnit;
+  private float unitAmount;
 
   /**
    * Constructs a Command object with the specified primary command word and an optional sub-command.
    *
-   * @param command    The main command word represented by the ValidCommand enum.
+   * @param validCommand    The main command word represented by the ValidCommand enum.
    * @param subcommand The optional sub-command as a string.
    */
-  public UserInput(ValidCommand command, String subcommand, String inputString) {
-    setCommand(command);
+  public UserInput(ValidCommand validCommand, String subcommand, String inputString) {
+    setValidCommand(validCommand);
     setSubcommand(subcommand);
     setInputString(inputString);
+  }
+
+  public UserInput(float unitAmount, ValidUnit unitType) {
+    setUnitAmount(unitAmount);
+    setValidUnit(unitType);
   }
 
   /**
    * Sets the primary command associated with this UserInput instance.
    *
-   * @param command The main command word represented by the ValidCommand enum.
+   * @param validCommand The main command word represented by the ValidCommand enum.
    */
-  private void setCommand(ValidCommand command) {
-    this.command = command;
+  private void setValidCommand(ValidCommand validCommand) {
+    this.validCommand = validCommand;
   }
 
   /**
@@ -53,13 +62,17 @@ public class UserInput {
     this.inputString = inputString;
   }
 
+  public ValidUnit getValidUnit() {
+    return validUnit;
+  }
+
   /**
    * Retrieves the main command word associated with this UserInput instance.
    *
    * @return The main command word represented by the ValidCommand enum.
    */
   public ValidCommand getCommandWord() {
-    return command;
+    return validCommand;
   }
 
   /**
@@ -80,13 +93,17 @@ public class UserInput {
     return inputString;
   }
 
+  public float getUnitAmount() {
+    return unitAmount;
+  }
+
   /**
    * Checks if the command associated with this UserCommand is of type UNKNOWN.
    *
    * @return true if the command is UNKNOWN, false otherwise.
    */
   public boolean isUnknown() {
-    return command == ValidCommand.UNKNOWN;
+    return validCommand == ValidCommand.UNKNOWN;
   }
 
   /**
@@ -96,5 +113,18 @@ public class UserInput {
    */
   public boolean hasSubcommand() {
     return subcommand != null;
+  }
+
+  /**
+   * Sets the valid measurement unit associated with this UserInput instance.
+   *
+   * @param validUnit The measurement unit represented by the ValidUnit enum.
+   */
+  private void setValidUnit(ValidUnit validUnit) {
+    this.validUnit = validUnit;
+  }
+
+  private void setUnitAmount(float unitAmount) {
+    this.unitAmount = unitAmount;
   }
 }

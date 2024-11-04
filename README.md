@@ -29,7 +29,7 @@ The project is divided into two parts, package `user` && `util`.
 
 [//]: # (TODO: Describe how to run your project here. What is the main class? What is the main method? What is the input and output of the program? What is the expected behaviour of the program?)
 The `main()` method is called from the class `Launcher`,
-where it creates a `new` `Application` and run the `initialize()` method.
+where it creates a `new Application` and run the `initialize()` method.
 
 
 

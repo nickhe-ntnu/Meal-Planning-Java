@@ -1,13 +1,14 @@
 package edu.ntnu.idi.bidata.util;
 
-import edu.ntnu.idi.bidata.util.command.ValidCommand;
 import edu.ntnu.idi.bidata.user.UserInput;
+import edu.ntnu.idi.bidata.util.command.ValidCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * The InputScannerTest class contains unit tests for the InputScanner class.
@@ -22,14 +23,14 @@ class InputScannerTest {
   @BeforeEach
   void beforeEach() {
     ByteArrayInputStream in;
-    in = new ByteArrayInputStream("testCommand   testSubcommand    test   user input string   ".getBytes());
+    in = new ByteArrayInputStream("lISt   testSuBcOmmand    test   uSEr iNput stRing   ".getBytes());
     System.setIn(in);
   }
 
   @Test
   void testGetUserInput() {
     InputScanner inputScanner = new InputScanner();
-    assertEquals("testCommand   testSubcommand    test   user input string", inputScanner.getValidString());
+    assertEquals("lISt   testSuBcOmmand    test   uSEr iNput stRing", inputScanner.getValidString());
   }
 
   @Test
@@ -57,8 +58,8 @@ class InputScannerTest {
   void testFetchUserInput() {
     InputScanner inputScanner = new InputScanner();
     UserInput userInput = inputScanner.fetchUserInput();
-    assertEquals(ValidCommand.UNKNOWN, userInput.getCommandWord());
-    assertEquals("unknown", userInput.getCommandWord().name().toLowerCase());
+    assertEquals(ValidCommand.LIST, userInput.getCommandWord());
+    assertEquals("list", userInput.getCommandWord().name().toLowerCase());
     assertEquals("testsubcommand", userInput.getSubcommand());
     assertEquals("test   user input string", userInput.getInputString());
   }

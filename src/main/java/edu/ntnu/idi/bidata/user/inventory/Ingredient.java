@@ -136,7 +136,8 @@ public class Ingredient {
 
   @Override
   public String toString() {
-    return "\n  * " + name + ": " + amount + " " + unit + " - Best before: " + expiryDate;
+    int dayTilExpiry = (int) ChronoUnit.DAYS.between(LocalDate.now(), expiryDate);
+    return "\n  * " + name + ": " + amount + " " + unit + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days)";
   }
 
 }
