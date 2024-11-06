@@ -9,7 +9,7 @@ import edu.ntnu.idi.bidata.util.command.*;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-07
  */
 public class Application {
 
@@ -52,7 +52,7 @@ public class Application {
     boolean running = true;
     do {
       try {
-        this.user.setUserInput(inputScanner.fetchUserInput());
+        this.user.setUserInput(inputScanner.fetchCommand());
         running = processUserCommand(user.getUserInput());
       } catch (IllegalArgumentException e) {
         outputHandler.printOutput(e.getMessage());

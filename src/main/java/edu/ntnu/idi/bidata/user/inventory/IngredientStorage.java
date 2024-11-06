@@ -8,12 +8,12 @@ import java.util.Map;
  * stored in various named collections.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-07
  */
 public class IngredientStorage {
 
-  private String storageName;
   private final Map<String, Ingredient> ingredientMap;
+  private String storageName;
 
   /**
    * Constructor for the Storage class.
@@ -36,7 +36,7 @@ public class IngredientStorage {
     if (isIngredientPresent(ingredientName)) {
       mergeIngredient(ingredientToAdd);
     } else {
-      saveIngredient(ingredientToAdd);
+      putToMap(ingredientToAdd);
     }
   }
 
@@ -55,27 +55,15 @@ public class IngredientStorage {
   }
 
   /**
-   * Print all the ingredients in the storage.
-   *
-   * @return String of everything storage in the inventory.
-   */
-  public String getStorageString() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("\n# ").append(storageName);
-    ingredientMap.values().forEach(ingredient -> stringBuilder.append(ingredient.toString()));
-    return stringBuilder.toString();
-  }
-
-  /**
    * Merges the given ingredient with the existing one in the storage if present.
    *
    * @param ingredientToMerge The ingredient to be merged with an existing one in the storage.
    */
   private void mergeIngredient(Ingredient ingredientToMerge) {
     Ingredient existingIngredient = ingredientMap.get(ingredientToMerge.getName().toLowerCase());
-    Ingredient mergedIngredient = Ingredient.merge(existingIngredient, ingredientToMerge);
-    if (mergedIngredient != null) {
-      saveIngredient(mergedIngredient);
+    boolean success = existingIngredient.merge(ingredientToMerge);
+    if (!success) {
+      putToMap(ingredientToMerge);
     }
   }
 
@@ -86,7 +74,7 @@ public class IngredientStorage {
    *
    * @param ingredientToPut the ingredient to be saved to the storage
    */
-  private void saveIngredient(Ingredient ingredientToPut) {
+  private void putToMap(Ingredient ingredientToPut) {
     ingredientMap.put(ingredientToPut.getName().toLowerCase(), ingredientToPut);
   }
 
@@ -110,15 +98,27 @@ public class IngredientStorage {
   }
 
   /**
+   * Print all the ingredients in the storage.
+   *
+   * @return String of everything storage in the inventory.
+   */
+  public String getStorageString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("\n# ").append(storageName);
+    ingredientMap.values().forEach(ingredient -> stringBuilder.append(ingredient.toString()));
+    return stringBuilder.toString();
+  }
+
+  public String getStorageName() {
+    return storageName;
+  }
+
+  /**
    * Sets the name of the storage.
    *
    * @param storageName the name of the storage to set
    */
   private void setStorageName(String storageName) {
     this.storageName = storageName;
-  }
-
-  public String getStorageName() {
-    return storageName;
   }
 }

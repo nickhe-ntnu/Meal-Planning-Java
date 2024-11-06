@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * from various input streams, ensuring correct functionality and handling of edge cases.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-07
  */
 class InputScannerTest {
 
@@ -57,7 +57,7 @@ class InputScannerTest {
   @Test
   void testFetchUserInput() {
     InputScanner inputScanner = new InputScanner();
-    UserInput userInput = inputScanner.fetchUserInput();
+    UserInput userInput = inputScanner.fetchCommand();
     assertEquals(ValidCommand.LIST, userInput.getCommandWord());
     assertEquals("list", userInput.getCommandWord().name().toLowerCase());
     assertEquals("testsubcommand", userInput.getSubcommand());

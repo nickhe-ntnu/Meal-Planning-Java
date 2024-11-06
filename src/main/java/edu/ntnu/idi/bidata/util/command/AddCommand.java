@@ -11,7 +11,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
  * such as locations and storage entries for a given user.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-07
  */
 public class AddCommand extends Command {
 
@@ -88,7 +88,12 @@ public class AddCommand extends Command {
     outputHandler.printOutput("Please enter the ingredient name:");
     String name = inputScanner.getValidString();
     outputHandler.printOutput("Please enter the amount with unit:");
-    UserInput userInput = inputScanner.fetchInputUnit();
+
+    UserInput userInput = inputScanner.fetchUnit();
+    while (userInput.getValidUnit() == ValidUnit.UNKNOWN) {
+      System.out.println("Type error, please ensure to use a valid unit");
+      userInput = inputScanner.fetchUnit();
+    }
     float amount = userInput.getUnitAmount();
     ValidUnit unit = userInput.getValidUnit();
     outputHandler.printOutput("Please enter the unit price");

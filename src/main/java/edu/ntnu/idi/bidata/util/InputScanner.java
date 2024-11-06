@@ -11,7 +11,7 @@ import java.util.Scanner;
  * It is designed to parse input into predefined commands, subcommands, and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-07
  */
 public class InputScanner {
   private final Scanner scanner;
@@ -108,12 +108,12 @@ public class InputScanner {
    *
    * @return a UserInput object representing the parsed user input, including command, subcommand, and input string.
    */
-  public UserInput fetchUserInput() {
+  public UserInput fetchCommand() {
     String[] tokens = scanLineToToken();
     return setCommandInput(tokens);
   }
 
-  public UserInput fetchInputUnit() {
+  public UserInput fetchUnit() {
     String[] tokens = new String[3];
     boolean success = false;
     do {
