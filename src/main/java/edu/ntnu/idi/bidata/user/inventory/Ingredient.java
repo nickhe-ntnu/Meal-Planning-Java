@@ -1,5 +1,6 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
+import edu.ntnu.idi.bidata.util.unit.UnitConverter;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.time.LocalDate;
@@ -10,7 +11,7 @@ import java.util.Arrays;
  * Represents an ingredient with a name, unit, and amount.
  *
  * @author Nick Heggø
- * @version 2024-11-07
+ * @version 2024-11-08
  */
 public class Ingredient {
   // Instance variables
@@ -39,6 +40,19 @@ public class Ingredient {
   }
 
   /**
+   * For the sake of demonstrating out of date scenario.
+   * TODO remove this backdoor constructor before production
+   */
+  public Ingredient(String password) {
+    if (password.equals("expiredDemo")) {
+      name = "Expired Milk";
+      amount = 2;
+      validUnit = ValidUnit.L;
+
+    }
+  }
+
+  /**
    * Returns a string representation of the ingredient, including its name, amount, unit, and expiry date.
    *
    * @return a string containing the ingredient's details and the number of days until its expiry.
@@ -47,6 +61,136 @@ public class Ingredient {
   public String toString() {
     int dayTilExpiry = getDaysBetween(this.getExpiryDate());
     return "\n  * " + name + ": " + amount + " " + validUnit + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days)";
+  }
+
+  public String getIngredientTypeString() {
+    return ingredientType.name();
+  }
+
+  /**
+   * Retrieves the expiry date of the ingredient.
+   * If the expiry date is not set, it returns a date 20 days before the current date.
+   *
+   * @return the expiry date of the ingredient, or a date 20 days before the current date if not set
+   */
+  public LocalDate getExpiryDate() {
+    return (expiryDate != null) ? expiryDate : LocalDate.now().minusDays(20);
+  }
+
+  /**
+   * Sets the expiry date of the ingredient based on the number of days from the current date.
+   *
+   * @param daysToExpiry the number of days from today until the ingredient expires
+   * @throws IllegalArgumentException if the number of days to expiry is negative
+   */
+  public void setExpiryDate(int daysToExpiry) {
+    if (daysToExpiry < 0) {
+      throw new IllegalArgumentException("Days to expiry cannot be negative");
+    }
+    this.expiryDate = LocalDate.now().plusDays(daysToExpiry);
+  }
+
+  /**
+   * Retrieves the name of the ingredient.
+   *
+   * @return the name of the ingredient if it is set, otherwise returns an empty string
+   */
+  public String getName() {
+    return (name != null) ? name : "";
+  }
+
+  /**
+   * Set the name of the ingredient.
+   *
+   * @param name the name of the ingredient
+   * @throws IllegalArgumentException if the name is null or empty
+   */
+  public void setName(String name) {
+    if (name == null || name.isBlank()) {
+      throw new IllegalArgumentException("Name cannot be null or empty");
+    }
+    this.name = name;
+  }
+
+  /**
+   * Retrieves the amount of the ingredient.
+   *
+   * @return the amount of the ingredient
+   */
+  public float getAmount() {
+    return amount;
+  }
+
+  /**
+   * Set the amount of the ingredient.
+   *
+   * @param amount the amount of the ingredient
+   * @throws IllegalArgumentException if the amount is negative or NaN
+   */
+  public void setAmount(float amount) {
+    if (amount < 0) {
+      throw new IllegalArgumentException("Amount cannot be negative");
+    }
+    this.amount = amount;
+  }
+
+  /**
+   * Retrieve the unit of the ingredient.
+   *
+   * @return the unit of the ingredient if it is set,
+   * otherwise returns {@code ValidUnit.UNKNOWN}
+   */
+  public ValidUnit getValidUnit() {
+    return (validUnit != null) ? validUnit : ValidUnit.UNKNOWN;
+  }
+
+  /**
+   * Sets the unit of the ingredient.
+   *
+   * @param validUnit the unit to be set for the ingredient
+   * @throws IllegalArgumentException if the unit is null or if the unit is
+   *                                  {@code ValidUnit.UNKNOWN}
+   */
+  public void setValidUnit(ValidUnit validUnit) {
+    if (validUnit == null) {
+      throw new IllegalArgumentException("Unit cannot be null.");
+    }
+    if (validUnit == ValidUnit.UNKNOWN) {
+      throw new IllegalArgumentException("Invalid unit, please try again.");
+    }
+    setIngredientType(getIngredientType(validUnit));
+    this.validUnit = validUnit;
+  }
+
+  /**
+   * Retrieves the unit price of the ingredient.
+   *
+   * @return the unit price of the ingredient
+   */
+  public float getUnitPrice() {
+    return unitPrice;
+  }
+
+  /**
+   * Sets the unit price of the ingredient.
+   *
+   * @param unitPrice the unit price of the ingredient
+   * @throws IllegalArgumentException if the unit price is negative or exceeds 1000
+   */
+  public void setUnitPrice(float unitPrice) {
+    if (unitPrice < 0) {
+      throw new IllegalArgumentException("Price cannot be negative");
+    } else if (unitPrice > 1000) {
+      throw new IllegalArgumentException("Please enter a more reasonable unit price (max 1000");
+    }
+    this.unitPrice = unitPrice;
+  }
+
+  private void setIngredientType(IngredientType ingredientType) {
+    if (ingredientType == null) {
+      throw new IllegalArgumentException("Ingredient type cannot be null.");
+    }
+    this.ingredientType = ingredientType;
   }
 
   /**
@@ -59,12 +203,16 @@ public class Ingredient {
    * @return true if the ingredients were successfully merged, false otherwise
    */
   public boolean merge(Ingredient ingredientToMerge) {
-    boolean isValidToMerge = isValidToMerge(ingredientToMerge);
-    if (isValidToMerge) {
+    if (isValidToMerge(ingredientToMerge)) {
+      UnitConverter unitConverter = new UnitConverter();
+      unitConverter.autoMergeUnit(this.validUnit, ingredientToMerge);
       float mergedAmount = this.getAmount() + ingredientToMerge.getAmount();
       float mergedPricePerUnit = Math.max(this.getUnitPrice(), ingredientToMerge.getUnitPrice());
       this.setAmount(mergedAmount);
       this.setUnitPrice(mergedPricePerUnit);
+      if (mergedAmount >= 1000) {
+        unitConverter.convertToStandard(this);
+      }
       return true;
     } else {
       return false;
@@ -114,136 +262,6 @@ public class Ingredient {
       return IngredientType.SOLID;
     }
     return null;
-  }
-
-  private void setIngredientType(IngredientType ingredientType) {
-    if (ingredientType == null) {
-      throw new IllegalArgumentException("Ingredient type cannot be null.");
-    }
-    this.ingredientType = ingredientType;
-  }
-
-  public String getIngredientTypeString() {
-    return ingredientType.name();
-  }
-
-  /**
-   * Retrieves the expiry date of the ingredient.
-   * If the expiry date is not set, it returns a date 20 days before the current date.
-   *
-   * @return the expiry date of the ingredient, or a date 20 days before the current date if not set
-   */
-  public LocalDate getExpiryDate() {
-    return expiryDate != null ? expiryDate : LocalDate.now().minusDays(20);
-  }
-
-  /**
-   * Sets the expiry date of the ingredient based on the number of days from the current date.
-   *
-   * @param daysToExpiry the number of days from today until the ingredient expires
-   * @throws IllegalArgumentException if the number of days to expiry is negative
-   */
-  public void setExpiryDate(int daysToExpiry) {
-    if (daysToExpiry < 0) {
-      throw new IllegalArgumentException("Days to expiry cannot be negative");
-    }
-    this.expiryDate = LocalDate.now().plusDays(daysToExpiry);
-  }
-
-  /**
-   * Retrieves the name of the ingredient.
-   *
-   * @return the name of the ingredient if it is set, otherwise returns an empty string
-   */
-  public String getName() {
-    return name != null ? name : "";
-  }
-
-  /**
-   * Set the name of the ingredient.
-   *
-   * @param name the name of the ingredient
-   * @throws IllegalArgumentException if the name is null or empty
-   */
-  public void setName(String name) {
-    if (name == null || name.isBlank()) {
-      throw new IllegalArgumentException("Name cannot be null or empty");
-    }
-    this.name = name;
-  }
-
-  /**
-   * Retrieves the amount of the ingredient.
-   *
-   * @return the amount of the ingredient
-   */
-  public float getAmount() {
-    return amount;
-  }
-
-  /**
-   * Set the amount of the ingredient.
-   *
-   * @param amount the amount of the ingredient
-   * @throws IllegalArgumentException if the amount is negative or NaN
-   */
-  public void setAmount(float amount) {
-    if (amount < 0) {
-      throw new IllegalArgumentException("Amount cannot be negative");
-    }
-    this.amount = amount;
-  }
-
-  /**
-   * Retrieve the unit of the ingredient.
-   *
-   * @return the unit of the ingredient if it is set,
-   * otherwise returns {@code ValidUnit.UNKNOWN}
-   */
-  public ValidUnit getValidUnit() {
-    return validUnit != null ? validUnit : ValidUnit.UNKNOWN;
-  }
-
-  /**
-   * Sets the unit of the ingredient.
-   *
-   * @param validUnit the unit to be set for the ingredient
-   * @throws IllegalArgumentException if the unit is null or if the unit is
-   *                                  {@code ValidUnit.UNKNOWN}
-   */
-  public void setValidUnit(ValidUnit validUnit) {
-    if (validUnit == null) {
-      throw new IllegalArgumentException("Unit cannot be null.");
-    }
-    if (validUnit == ValidUnit.UNKNOWN) {
-      throw new IllegalArgumentException("Invalid unit, please try again.");
-    }
-    setIngredientType(getIngredientType(validUnit));
-    this.validUnit = validUnit;
-  }
-
-  /**
-   * Retrieves the unit price of the ingredient.
-   *
-   * @return the unit price of the ingredient
-   */
-  public float getUnitPrice() {
-    return unitPrice;
-  }
-
-  /**
-   * Sets the unit price of the ingredient.
-   *
-   * @param unitPrice the unit price of the ingredient
-   * @throws IllegalArgumentException if the unit price is negative or exceeds 1000
-   */
-  public void setUnitPrice(float unitPrice) {
-    if (unitPrice < 0) {
-      throw new IllegalArgumentException("Price cannot be negative");
-    } else if (unitPrice > 1000) {
-      throw new IllegalArgumentException("Please enter a more reasonable unit price (max 1000");
-    }
-    this.unitPrice = unitPrice;
   }
 
   enum IngredientType {

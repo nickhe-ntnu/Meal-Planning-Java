@@ -11,7 +11,7 @@ import java.util.Scanner;
  * It is designed to parse input into predefined commands, subcommands, and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-11-07
+ * @version 2024-11-08
  */
 public class InputScanner {
   private final Scanner scanner;
@@ -96,12 +96,6 @@ public class InputScanner {
     return inputFloat;
   }
 
-  private String[] scanLineToToken() {
-    System.out.print("> ");
-    String inputLine = scanner.nextLine().trim();
-    return inputLine.split("\\s+", 3);
-  }
-
   /**
    * Fetches and processes user input from the terminal. The input is trimmed of leading and trailing whitespace,
    * and split into tokens based on whitespace. These tokens are then used to create a UserInput object.
@@ -128,6 +122,12 @@ public class InputScanner {
     return setUnitInput(tokens);
   }
 
+  private String[] scanLineToToken() {
+    System.out.print("> ");
+    String inputLine = scanner.nextLine().trim();
+    return inputLine.split("\\s+", 3);
+  }
+
   /**
    * Processes user input tokens and sets up a UserInput object based on those tokens.
    *
@@ -137,15 +137,15 @@ public class InputScanner {
    * @return a UserInput object containing the parsed command, subcommand, and input string.
    */
   private UserInput setCommandInput(String[] tokens) {
-    String command = tokens.length > 0 ? tokens[0].toLowerCase() : null;
-    String subcommand = tokens.length > 1 ? tokens[1].toLowerCase() : null;
-    String inputString = tokens.length > 2 ? tokens[2].toLowerCase() : null;
+    String command = (tokens.length > 0) ? tokens[0].toLowerCase() : null;
+    String subcommand = (tokens.length > 1) ? tokens[1].toLowerCase() : null;
+    String inputString = (tokens.length > 2) ? tokens[2].toLowerCase() : null;
     return new UserInput(commandRegistry.getCommandWord(command), subcommand, inputString);
   }
 
   private UserInput setUnitInput(String[] tokens) {
-    float unitAmount = tokens.length > 0 ? Float.valueOf(tokens[0]) : null;
-    String unit = tokens.length > 1 ? tokens[1].toLowerCase() : null;
+    float unitAmount = (tokens.length > 0) ? Float.valueOf(tokens[0]) : -1;
+    String unit = (tokens.length > 1) ? tokens[1].toLowerCase() : null;
     return new UserInput(unitAmount, unitRegistry.getUnitType(unit));
   }
 }

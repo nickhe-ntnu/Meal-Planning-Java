@@ -10,7 +10,7 @@ package edu.ntnu.idi.bidata.util.command;
  * HELP - list of all commands.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-08
  */
 public enum ValidCommand {
   EXIT,
@@ -20,5 +20,5 @@ public enum ValidCommand {
   FIND,
   LIST,
   HELP,
-  UNKNOWN;
+  UNKNOWN
 }

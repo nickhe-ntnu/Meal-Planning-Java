@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * from various input streams, ensuring correct functionality and handling of edge cases.
  *
  * @author Nick Heggø
- * @version 2024-11-07
+ * @version 2024-11-08
  */
 class InputScannerTest {
 

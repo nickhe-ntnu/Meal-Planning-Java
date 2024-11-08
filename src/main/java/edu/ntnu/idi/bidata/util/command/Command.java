@@ -14,7 +14,7 @@ import java.util.Stack;
  * process commands and subcommands.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-08
  */
 public abstract class Command {
   User user;
@@ -37,17 +37,6 @@ public abstract class Command {
     init(user);
     history = this.user.getHistory();
     processCommand();
-  }
-
-  /**
-   * Initializes the command with the given User object, setting up the necessary user input.
-   *
-   * @param user The User object which contains the necessary information and input for the command.
-   */
-  public void init(User user) {
-    setUser(user);
-    UserInput userInput = this.user.getUserInput();
-    setUserInput(userInput);
   }
 
   /**
@@ -98,25 +87,14 @@ public abstract class Command {
   }
 
   /**
-   * Processes the user command by determining if a subcommand is present. If a subcommand
-   * is present, the method delegates the processing to the abstract method processSubcommand.
-   * If no subcommand is present, it prints the instruction related to the command.
+   * Initializes the command with the given User object, setting up the necessary user input.
+   *
+   * @param user The User object which contains the necessary information and input for the command.
    */
-  private void processCommand() {
-    if (hasSubcommand()) {
-      processSubcommand();
-    } else {
-      printInstruction();
-    }
-  }
-
-  /**
-   * Prints the instruction related to the user's input command.
-   * This method converts the user input command to a lower case string
-   * and delegates the printing of the help message to the output handler.
-   */
-  private void printInstruction() {
-    outputHandler.printHelpMessage(userInputCommand.name().toLowerCase());
+  public void init(User user) {
+    setUser(user);
+    UserInput userInput = this.user.getUserInput();
+    setUserInput(userInput);
   }
 
   /**
@@ -148,5 +126,27 @@ public abstract class Command {
    * that occur when a subcommand is detected and needs to be processed.
    */
   protected abstract void processSubcommand();
+
+  /**
+   * Processes the user command by determining if a subcommand is present. If a subcommand
+   * is present, the method delegates the processing to the abstract method processSubcommand.
+   * If no subcommand is present, it prints the instruction related to the command.
+   */
+  private void processCommand() {
+    if (hasSubcommand()) {
+      processSubcommand();
+    } else {
+      printInstruction();
+    }
+  }
+
+  /**
+   * Prints the instruction related to the user's input command.
+   * This method converts the user input command to a lower case string
+   * and delegates the printing of the help message to the output handler.
+   */
+  private void printInstruction() {
+    outputHandler.printHelpMessage(userInputCommand.name().toLowerCase());
+  }
 
 }

@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * delegates the removal operation to the appropriate method.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-08
  */
 public class RemoveCommand extends Command {
   public RemoveCommand(User user) {
@@ -23,15 +23,10 @@ public class RemoveCommand extends Command {
   @Override
   protected void processSubcommand() {
     switch (userInputSubcommand) {
-      case "location" -> removeLocation();
       case "storage" -> removeStorage();
       case "ingredient" -> removeIngredient();
       case "recipe" -> removeRecipe();
     }
-  }
-
-  private void removeLocation() {
-    // TODO
   }
 
   private void removeStorage() {

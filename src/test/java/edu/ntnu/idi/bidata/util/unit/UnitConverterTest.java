@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * functionality of unit conversion methods within the UnitConverter class.
  *
  * @author Nick Heggø
- * @version 2024-11-07
+ * @version 2024-11-08
  */
 class UnitConverterTest {
 
@@ -31,8 +31,8 @@ class UnitConverterTest {
   void convertToStandard() {
     unitConverter.convertToStandard(solidIngredient);
     unitConverter.convertToStandard(liquidIngredient);
-    assertEquals(123456f, solidIngredient.getAmount());
-    assertEquals(ValidUnit.G, solidIngredient.getValidUnit());
+    assertEquals(123.46f, solidIngredient.getAmount());
+    assertEquals(ValidUnit.KG, solidIngredient.getValidUnit());
     assertEquals(12.35f, liquidIngredient.getAmount());
     assertEquals(ValidUnit.L, liquidIngredient.getValidUnit());
   }
@@ -57,15 +57,12 @@ class UnitConverterTest {
     assertEquals(12.35f, liquidIngredient.getAmount());
   }
 
-/*
   @Test
   void convertToDeciLiter() {
-    assertEquals(123.46f, liquidIngredient.getAmount());
     unitConverter.convertToDeciLiter(liquidIngredient);
     assertEquals(123.46f, liquidIngredient.getAmount());
     assertEquals(ValidUnit.DL, liquidIngredient.getValidUnit());
   }
-*/
 
   @Test
   void convertToMilliLiter() {

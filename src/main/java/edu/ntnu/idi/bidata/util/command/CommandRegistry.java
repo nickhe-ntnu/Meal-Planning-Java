@@ -8,10 +8,10 @@ import java.util.HashMap;
  * the validity of a command word and to retrieve all the valid commands as a string.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-08
  */
 public class CommandRegistry {
-  private HashMap<String, ValidCommand> validCommands;
+  private final HashMap<String, ValidCommand> validCommands;
 
   /**
    * Constructor - initialise the command words.
@@ -26,7 +26,20 @@ public class CommandRegistry {
   }
 
   /**
+   * Get all valid commands as a string.
+   */
+  public String getCommandString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("Available commands are:\n");
+    for (String command : validCommands.keySet()) {
+      stringBuilder.append(command).append(" ");
+    }
+    return stringBuilder.toString();
+  }
+
+  /**
    * Check for if command is valid
+   *
    * @param commandWord input string command
    * @return CommandWord enum, or UNKNOWN if it is not found.
    */
@@ -37,17 +50,5 @@ public class CommandRegistry {
     } else {
       return ValidCommand.UNKNOWN;
     }
-  }
-
-  /**
-   * Get all valid commands as a string.
-   */
-  public String getCommandString() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("Available commands are:\n");
-    for (String command : validCommands.keySet()) {
-      stringBuilder.append(command).append(" ");
-    }
-    return stringBuilder.toString();
   }
 }

@@ -1,6 +1,8 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
+import edu.ntnu.idi.bidata.util.unit.UnitConverter;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,17 +11,32 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Test class for the Ingredient class.
  *
  * @author Nick Heggø
- * @version 2024-11-07
+ * @version 2024-11-08
  */
 class IngredientTest {
+  Ingredient mergedIngredient;
+  Ingredient testIngredient;
+
+  @BeforeEach
+  void beforeEach() {
+    testIngredient = new Ingredient("test", 3, ValidUnit.KG, 30, 4);
+    mergedIngredient = new Ingredient("test", 300, ValidUnit.G, 40, 4);
+  }
 
   @Test
   void testMerge() {
-    Ingredient testIngredient = new Ingredient("test", 3, ValidUnit.G, 40, 4);
-    Ingredient ingredientToMerge = new Ingredient("test", 3, ValidUnit.KG, 30, 4);
-    Ingredient expectedMergeResult = new Ingredient("test", 6, ValidUnit.KG, 40, 4);
-    testIngredient.merge(ingredientToMerge);
-    assertEquals(testIngredient.getAmount(), expectedMergeResult.getAmount());
-    assertEquals(testIngredient.getUnitPrice(), expectedMergeResult.getUnitPrice());
+    testIngredient.merge(mergedIngredient);
+    Ingredient expectedMergeResult = new Ingredient("test", 3.3f, ValidUnit.KG, 40, 4);
+    assertEquals(expectedMergeResult.getName(), testIngredient.getName());
+    assertEquals(expectedMergeResult.getAmount(), testIngredient.getAmount());
+    assertEquals(expectedMergeResult.getValidUnit(), testIngredient.getValidUnit());
+    assertEquals(expectedMergeResult.getUnitPrice(), testIngredient.getUnitPrice());
+    assertEquals(expectedMergeResult.getExpiryDate(), testIngredient.getExpiryDate());
+  }
+
+  @Test
+  void testConvert() {
+    UnitConverter unitConverter = new UnitConverter();
+    unitConverter.convertToGrams(mergedIngredient);
   }
 }

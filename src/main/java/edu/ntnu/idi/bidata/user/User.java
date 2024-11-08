@@ -6,7 +6,6 @@ import edu.ntnu.idi.bidata.user.recipe.CookBook;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.HashMap;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Stack;
 
 /**
@@ -15,15 +14,14 @@ import java.util.Stack;
  * methods to interact with and manage these attributes.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-08
  */
 public class User {
+  private final HashMap<String, IngredientStorage> storageMap;
+  private final CookBook cookBook;
+  private final Stack<IngredientStorage> history;
   private String name;
-  private HashMap<String, IngredientStorage> storageMap;
-  private CookBook cookBook;
-
   private UserInput userInput;
-  private Stack<IngredientStorage> history;
   private IngredientStorage currentStorage;
 
   /**
@@ -39,17 +37,44 @@ public class User {
 
     addStorage("Fridge");
     setCurrentStorage(getStorage("fridge"));
-    addIngredient(new Ingredient("Chocolate", 3, ValidUnit.KG, 300, 200));
+    addIngredient(new Ingredient("Chocolate", 300, ValidUnit.G, 10, 4));
     addStorage("Cold Room");
     addStorage("Office Fridge");
+  }
+
+  public IngredientStorage getCurrentStorage() {
+    return currentStorage;
   }
 
   public void setCurrentStorage(IngredientStorage storage) {
     currentStorage = storage;
   }
 
-  public IngredientStorage getCurrentStorage() {
-    return currentStorage;
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getAllStorageString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("###### Inventory #######");
+    storageMap.values().forEach(storage -> stringBuilder.append(storage.getStorageString()));
+    return stringBuilder.toString();
+  }
+
+  public UserInput getUserInput() {
+    return this.userInput;
+  }
+
+  public void setUserInput(UserInput userInput) {
+    this.userInput = userInput;
+  }
+
+  public Stack<IngredientStorage> getHistory() {
+    return history;
   }
 
   public IngredientStorage getStorage(String storageName) {
@@ -58,23 +83,6 @@ public class User {
 
   public void addIngredient(Ingredient ingredient) {
     currentStorage.addIngredient(ingredient);
-  }
-
-
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getAllStorageString() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("###### Inventory #######");
-    storageMap.values().forEach(storage -> stringBuilder.append(storage.getStorageString()));
-    return stringBuilder.toString();
   }
 
   /**
@@ -110,17 +118,5 @@ public class User {
    */
   private void putToMap(String storageName) {
     storageMap.put(storageName.toLowerCase(), new IngredientStorage(storageName));
-  }
-
-  public void setUserInput(UserInput userInput) {
-    this.userInput = userInput;
-  }
-
-  public UserInput getUserInput() {
-    return this.userInput;
-  }
-
-  public Stack<IngredientStorage> getHistory() {
-    return history;
   }
 }

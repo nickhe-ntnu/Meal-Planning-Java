@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
  * an optional sub-command, and the complete input string.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-08
  */
 public class UserInput {
   private ValidCommand validCommand;
@@ -21,8 +21,8 @@ public class UserInput {
   /**
    * Constructs a Command object with the specified primary command word and an optional sub-command.
    *
-   * @param validCommand    The main command word represented by the ValidCommand enum.
-   * @param subcommand The optional sub-command as a string.
+   * @param validCommand The main command word represented by the ValidCommand enum.
+   * @param subcommand   The optional sub-command as a string.
    */
   public UserInput(ValidCommand validCommand, String subcommand, String inputString) {
     setValidCommand(validCommand);
@@ -35,35 +35,17 @@ public class UserInput {
     setValidUnit(unitType);
   }
 
-  /**
-   * Sets the primary command associated with this UserInput instance.
-   *
-   * @param validCommand The main command word represented by the ValidCommand enum.
-   */
-  private void setValidCommand(ValidCommand validCommand) {
-    this.validCommand = validCommand;
-  }
-
-  /**
-   * Sets the subcommand associated with this UserInput instance.
-   *
-   * @param subcommand The optional sub-command as a string.
-   */
-  private void setSubcommand(String subcommand) {
-    this.subcommand = subcommand;
-  }
-
-  /**
-   * Sets the full input string associated with this user command.
-   *
-   * @param inputString the input string representing the entire user input.
-   */
-  private void setInputString(String inputString) {
-    this.inputString = inputString;
-  }
-
   public ValidUnit getValidUnit() {
     return validUnit;
+  }
+
+  /**
+   * Sets the valid measurement unit associated with this UserInput instance.
+   *
+   * @param validUnit The measurement unit represented by the ValidUnit enum.
+   */
+  private void setValidUnit(ValidUnit validUnit) {
+    this.validUnit = validUnit;
   }
 
   /**
@@ -85,6 +67,15 @@ public class UserInput {
   }
 
   /**
+   * Sets the subcommand associated with this UserInput instance.
+   *
+   * @param subcommand The optional sub-command as a string.
+   */
+  private void setSubcommand(String subcommand) {
+    this.subcommand = subcommand;
+  }
+
+  /**
    * Retrieves the full input string associated with this user command.
    *
    * @return the input string representing the entire user input.
@@ -93,8 +84,21 @@ public class UserInput {
     return inputString;
   }
 
+  /**
+   * Sets the full input string associated with this user command.
+   *
+   * @param inputString the input string representing the entire user input.
+   */
+  private void setInputString(String inputString) {
+    this.inputString = inputString;
+  }
+
   public float getUnitAmount() {
     return unitAmount;
+  }
+
+  private void setUnitAmount(float unitAmount) {
+    this.unitAmount = unitAmount;
   }
 
   /**
@@ -107,24 +111,20 @@ public class UserInput {
   }
 
   /**
+   * Sets the primary command associated with this UserInput instance.
+   *
+   * @param validCommand The main command word represented by the ValidCommand enum.
+   */
+  private void setValidCommand(ValidCommand validCommand) {
+    this.validCommand = validCommand;
+  }
+
+  /**
    * Checks if the UserCommand object contains a subcommand.
    *
    * @return true if a subcommand is present, false otherwise.
    */
   public boolean hasSubcommand() {
     return subcommand != null;
-  }
-
-  /**
-   * Sets the valid measurement unit associated with this UserInput instance.
-   *
-   * @param validUnit The measurement unit represented by the ValidUnit enum.
-   */
-  private void setValidUnit(ValidUnit validUnit) {
-    this.validUnit = validUnit;
-  }
-
-  private void setUnitAmount(float unitAmount) {
-    this.unitAmount = unitAmount;
   }
 }

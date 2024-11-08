@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * recipes, ingredients, expired items, and available recipes.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-08
  */
 public class ListCommand extends Command {
   public ListCommand(User user) {
@@ -53,7 +53,6 @@ public class ListCommand extends Command {
   private void listStorage() {
 
   }
-
 
   private void listRecipe() {
     // TODO

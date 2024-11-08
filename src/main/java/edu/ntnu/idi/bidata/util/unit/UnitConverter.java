@@ -7,10 +7,9 @@ import edu.ntnu.idi.bidata.user.inventory.Ingredient;
  * The UnitConverter class provides methods to convert values from one
  * unit of measurement to another, using the defined ValidUnit
  * enumeration which includes units for weight (KG, G) and volume (L, DL, ML).
- * <h>Currently under development</h>
  *
  * @author Nick Heggø
- * @version 2024-11-07
+ * @version 2024-11-08
  */
 public class UnitConverter {
 
@@ -33,7 +32,7 @@ public class UnitConverter {
       ingredientType = ingredientToBeConverted.getIngredientTypeString();
     }
     if (ingredientType.equals("SOLID")) {
-      convertToGrams(ingredientToBeConverted);
+      convertToKG(ingredientToBeConverted);
     } else if (ingredientType.equals("LIQUID")) {
       convertToLiter(ingredientToBeConverted);
     }
@@ -54,7 +53,7 @@ public class UnitConverter {
    * @param ingredientToBeConverted the ingredient to be converted to kilograms
    */
   public void convertToKG(Ingredient ingredientToBeConverted) {
-    convertSolid(ingredientToBeConverted, ValidUnit.KG, 1, 1000);
+    convertSolid(ingredientToBeConverted, ValidUnit.KG, 1, 0.001f);
   }
 
   /**
@@ -82,6 +81,20 @@ public class UnitConverter {
    */
   public void convertToMilliLiter(Ingredient ingredientToBeConverted) {
     convertLiquid(ingredientToBeConverted, ValidUnit.ML, 1000, 100f, 1f);
+  }
+
+  public void autoMergeUnit(ValidUnit targetUnit, Ingredient ingredientToBeConverted) {
+    if (targetUnit != null && ingredientToBeConverted.getValidUnit() != null) {
+      switch (targetUnit) {
+        case L -> convertToLiter(ingredientToBeConverted);
+        case DL -> convertToDeciLiter(ingredientToBeConverted);
+        case ML -> convertToMilliLiter(ingredientToBeConverted);
+        case KG -> convertToKG(ingredientToBeConverted);
+        case G -> convertToGrams(ingredientToBeConverted);
+        default ->
+            throw new IllegalArgumentException("Illegal operation: cannot convert from " + ingredientToBeConverted.getValidUnit() + " to " + targetUnit);
+      }
+    }
   }
 
   /**

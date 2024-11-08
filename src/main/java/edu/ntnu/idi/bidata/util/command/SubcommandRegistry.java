@@ -6,11 +6,10 @@ import java.util.HashMap;
  * Manages a registry of subcommands associated with specific valid commands.
  * This class allows the addition of subcommands to a command and stores them
  * for later reference or validation.
- *
  * <h>Currently not been implemented</h>
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-08
  */
 public class SubcommandRegistry {
   HashMap<ValidCommand, String> validSubcommand;

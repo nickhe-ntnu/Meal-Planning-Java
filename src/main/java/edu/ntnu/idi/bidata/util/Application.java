@@ -9,7 +9,7 @@ import edu.ntnu.idi.bidata.util.command.*;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-11-07
+ * @version 2024-11-08
  */
 public class Application {
 
@@ -35,15 +35,6 @@ public class Application {
   }
 
   /**
-   * Set up the current
-   *
-   * @return the newly created user object.
-   */
-  private User userSetUp() {
-    return new User(inputScanner.getValidString().replaceAll("\\s", ""));
-  }
-
-  /**
    * Runs the main loop of the application, continually processing user commands until
    * a termination command is received. The method fetches user input through an input scanner,
    * processes the command, and prints any exceptions encountered.
@@ -58,6 +49,15 @@ public class Application {
         outputHandler.printOutput(e.getMessage());
       }
     } while (running);
+  }
+
+  /**
+   * Set up the current
+   *
+   * @return the newly created user object.
+   */
+  private User userSetUp() {
+    return new User(inputScanner.getValidString().replaceAll("\\s", ""));
   }
 
   /**
