@@ -2,6 +2,8 @@ package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
 
+import java.util.List;
+
 /**
  * The FindCommand class is responsible for handling the "find" command issued by a user.
  * This command allows users to search for specific ingredients or recipes within the system.
@@ -9,7 +11,7 @@ import edu.ntnu.idi.bidata.user.User;
  * "find" subcommands.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-09
  */
 public class FindCommand extends Command {
 
@@ -40,7 +42,16 @@ public class FindCommand extends Command {
   }
 
   private void findIngredient() {
-    // TODO
+    String ingredientName = getInputString("Please enter the ingredient name to find:");
+    List<String> storageContainsIngredient = user.findIngredient(ingredientName);
+    if (storageContainsIngredient.isEmpty()) {
+      outputHandler.printOutputWithLineBreak(ingredientName + " isn't present at any of the storages.");
+    } else {
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append(ingredientName).append(" is present at:");
+      storageContainsIngredient.forEach(storageName -> stringBuilder.append("\n  * ").append(storageName));
+      outputHandler.printOutputWithLineBreak(stringBuilder.toString());
+    }
   }
 
   private void findRecipe() {

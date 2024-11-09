@@ -14,17 +14,17 @@ import java.util.Stack;
  * process commands and subcommands.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-09
  */
 public abstract class Command {
-  User user;
-  ValidCommand userInputCommand;
-  String userInputSubcommand;
-  String userInputString;
+  protected User user;
+  protected ValidCommand userInputCommand;
+  protected String userInputSubcommand;
+  protected String userInputString;
 
-  OutputHandler outputHandler;
-  InputScanner inputScanner;
-  Stack<IngredientStorage> history;
+  protected OutputHandler outputHandler;
+  protected InputScanner inputScanner;
+  protected Stack<IngredientStorage> history;
 
   /**
    * Constructs a new Command object, initializes various components, and processes the command.
@@ -93,7 +93,7 @@ public abstract class Command {
    */
   public void init(User user) {
     setUser(user);
-    UserInput userInput = this.user.getUserInput();
+    UserInput userInput = this.user.getInput();
     setUserInput(userInput);
   }
 

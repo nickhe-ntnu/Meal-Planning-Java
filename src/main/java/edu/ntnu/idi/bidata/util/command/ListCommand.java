@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * recipes, ingredients, expired items, and available recipes.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-09
  */
 public class ListCommand extends Command {
   public ListCommand(User user) {
@@ -16,22 +16,12 @@ public class ListCommand extends Command {
   }
 
   /**
-   * Processes the subcommand specified by the user's input.
-   * This method overrides the abstract method in the parent Command class to provide specific
-   * implementations for different subcommands related to listing various types of information,
-   * such as inventory, location, recipe, ingredient, expired items, and available recipes.
-   * If the subcommand is not recognized, it throws an IllegalArgumentException.
-   * The recognized subcommands are:
-   * - "inventory": Calls the listInventory() method.
-   * - "location": Calls the listLocation() method.
-   * - "recipe": Calls the listRecipe() method.
-   * - "ingredient": Calls the listIngredient() method.
-   * - "expired": Calls the listExpired() method.
-   * - "available": Calls the listAvailableRecipe() method.
-   * Throws:
-   * - IllegalArgumentException: if the subcommand is not recognized.
+   * Processes various subcommands related to listing information, such as inventory,
+   * storage, recipes, ingredients, expired items, and available recipes.
+   * This method interprets the user-provided subcommand and delegates the task
+   * to the corresponding method.
    *
-   * @throws IllegalArgumentException if an unexpected subcommand is provided
+   * @throws IllegalArgumentException if the provided subcommand is unexpected or not recognized.
    */
   @Override
   protected void processSubcommand() {
@@ -46,12 +36,17 @@ public class ListCommand extends Command {
     }
   }
 
+  /**
+   * Lists the inventory of the user.
+   * This method retrieves the user's storage data as a formatted string
+   * and then prints it to the console with a line of separator characters.
+   */
   private void listInventory() {
-    outputHandler.printOutputWithLineBreak(user.getAllStorageString());
+    outputHandler.printOutputWithLineBreak(user.getInventoryString());
   }
 
   private void listStorage() {
-
+    outputHandler.printOutputWithLineBreak(user.getStorageString());
   }
 
   private void listRecipe() {

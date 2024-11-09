@@ -6,6 +6,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Represents an ingredient with a name, unit, and amount.
@@ -19,7 +20,7 @@ public class Ingredient {
   private float amount;
   private ValidUnit validUnit;
   private LocalDate expiryDate;
-  private float unitPrice;
+  private float standardUnitPrice;
   private IngredientType ingredientType;
 
   /**
@@ -31,11 +32,11 @@ public class Ingredient {
    * @throws IllegalArgumentException if the name is null or empty, the unit is null or empty, or the
    *                                  amount is negative or NaN
    */
-  public Ingredient(String name, float amount, ValidUnit validUnit, float unitPrice, int daysToExpiry) {
+  public Ingredient(String name, float amount, ValidUnit validUnit, float standardUnitPrice, int daysToExpiry) {
     setName(name);
     setAmount(amount);
     setValidUnit(validUnit);
-    setUnitPrice(unitPrice);
+    setStandardUnitPrice(standardUnitPrice);
     setExpiryDate(daysToExpiry);
   }
 
@@ -45,10 +46,16 @@ public class Ingredient {
    */
   public Ingredient(String password) {
     if (password.equals("expiredDemo")) {
-      name = "Expired Milk";
-      amount = 2;
-      validUnit = ValidUnit.L;
-
+      Random random = new Random();
+      String[] names = new String[]{"Expired Milk", "Expired Chicken", "Expired Egg"};
+      name = names[random.nextInt(names.length)];
+      amount = 4;
+      if (name.equals("Expired Milk")) {
+        validUnit = ValidUnit.L;
+      } else {
+        validUnit = ValidUnit.KG;
+      }
+      expiryDate = LocalDate.now().minusDays(random.nextInt(4, 17));
     }
   }
 
@@ -61,6 +68,11 @@ public class Ingredient {
   public String toString() {
     int dayTilExpiry = getDaysBetween(this.getExpiryDate());
     return "\n  * " + name + ": " + amount + " " + validUnit + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days)";
+  }
+
+  public String getExpiredIngredientString() {
+    int daysExpired = Math.abs(getDaysBetween(this.getExpiryDate()));
+    return "\n  * " + name + ": " + amount + " " + validUnit + " - Best before: " + expiryDate + " (Expired " + daysExpired + " days ago)";
   }
 
   public String getIngredientTypeString() {
@@ -167,25 +179,31 @@ public class Ingredient {
    *
    * @return the unit price of the ingredient
    */
-  public float getUnitPrice() {
-    return unitPrice;
+  public float getStandardUnitPrice() {
+    return standardUnitPrice;
   }
 
   /**
    * Sets the unit price of the ingredient.
    *
-   * @param unitPrice the unit price of the ingredient
+   * @param standardUnitPrice the unit price of the ingredient
    * @throws IllegalArgumentException if the unit price is negative or exceeds 1000
    */
-  public void setUnitPrice(float unitPrice) {
-    if (unitPrice < 0) {
+  public void setStandardUnitPrice(float standardUnitPrice) {
+    if (standardUnitPrice < 0) {
       throw new IllegalArgumentException("Price cannot be negative");
-    } else if (unitPrice > 1000) {
+    } else if (standardUnitPrice > 1000) {
       throw new IllegalArgumentException("Please enter a more reasonable unit price (max 1000");
     }
-    this.unitPrice = unitPrice;
+    this.standardUnitPrice = standardUnitPrice;
   }
 
+  /**
+   * Sets the type of the ingredient.
+   *
+   * @param ingredientType the type of the ingredient to set
+   * @throws IllegalArgumentException if the ingredient type is null
+   */
   private void setIngredientType(IngredientType ingredientType) {
     if (ingredientType == null) {
       throw new IllegalArgumentException("Ingredient type cannot be null.");
@@ -200,22 +218,16 @@ public class Ingredient {
    * converted to match the existing unit been used.
    *
    * @param ingredientToMerge the ingredient to be merged with the current ingredient
-   * @return true if the ingredients were successfully merged, false otherwise
    */
-  public boolean merge(Ingredient ingredientToMerge) {
-    if (isValidToMerge(ingredientToMerge)) {
-      UnitConverter unitConverter = new UnitConverter();
-      unitConverter.autoMergeUnit(this.validUnit, ingredientToMerge);
-      float mergedAmount = this.getAmount() + ingredientToMerge.getAmount();
-      float mergedPricePerUnit = Math.max(this.getUnitPrice(), ingredientToMerge.getUnitPrice());
-      this.setAmount(mergedAmount);
-      this.setUnitPrice(mergedPricePerUnit);
-      if (mergedAmount >= 1000) {
-        unitConverter.convertToStandard(this);
-      }
-      return true;
-    } else {
-      return false;
+  public void merge(Ingredient ingredientToMerge) {
+    UnitConverter unitConverter = new UnitConverter();
+    unitConverter.autoMergeUnit(this.validUnit, ingredientToMerge);
+    float mergedAmount = this.getAmount() + ingredientToMerge.getAmount();
+    float mergedPricePerUnit = Math.max(this.getStandardUnitPrice(), ingredientToMerge.getStandardUnitPrice());
+    this.setAmount(mergedAmount);
+    this.setStandardUnitPrice(mergedPricePerUnit);
+    if (mergedAmount >= 1000) {
+      unitConverter.convertToStandard(this);
     }
   }
 
@@ -237,20 +249,47 @@ public class Ingredient {
    * @return true if the ingredient is valid to merge, false otherwise
    */
   private boolean isValidToMerge(Ingredient ingredientToMerge) {
-    // Null check first to prevent null pointer exceptions
-    boolean isValidToMerge = ingredientToMerge != null;
-    if (ingredientToMerge.name == null) {
-      isValidToMerge = false;
-    }
-    if (!this.name.equals(ingredientToMerge.name)) {
-      isValidToMerge = false;
-    }
-    if (!this.expiryDate.isEqual(ingredientToMerge.expiryDate)) {
-      isValidToMerge = false;
-    }
-    return isValidToMerge;
+    return isNonNull(ingredientToMerge) &&
+        hasSameName(ingredientToMerge) &&
+        hasSameExpiryDate(ingredientToMerge);
   }
 
+  /**
+   * Checks if the given ingredient and its name are not null.
+   *
+   * @param ingredient the ingredient to be checked
+   * @return true if the ingredient and its name are not null, false otherwise
+   */
+  private boolean isNonNull(Ingredient ingredient) {
+    return ingredient != null && ingredient.name != null;
+  }
+
+  /**
+   * Checks if the name of the current ingredient matches the name of the specified ingredient.
+   *
+   * @param ingredientToMerge the ingredient to compare with the current ingredient
+   * @return true if both ingredients have the same name, false otherwise
+   */
+  private boolean hasSameName(Ingredient ingredientToMerge) {
+    return this.name.equals(ingredientToMerge.name);
+  }
+
+  /**
+   * Checks if the expiry date of the current ingredient is the same as the expiry date of the specified ingredient.
+   *
+   * @param ingredientToMerge the ingredient to compare expiry dates with
+   * @return true if both ingredients have the same expiry date, false otherwise
+   */
+  private boolean hasSameExpiryDate(Ingredient ingredientToMerge) {
+    return this.expiryDate.isEqual(ingredientToMerge.expiryDate);
+  }
+
+  /**
+   * Determines the type of ingredient based on the provided valid unit.
+   *
+   * @param validUnit the unit to evaluate
+   * @return the corresponding ingredient type if the unit matches, otherwise null
+   */
   private IngredientType getIngredientType(ValidUnit validUnit) {
     ValidUnit[] validSolidUnits;
     ValidUnit[] validLiquidUnits;
@@ -264,6 +303,10 @@ public class Ingredient {
     return null;
   }
 
+  /**
+   * Enumeration representing the type of ingredient, which can be
+   * either SOLID or LIQUID.
+   */
   enum IngredientType {
     SOLID,
     LIQUID

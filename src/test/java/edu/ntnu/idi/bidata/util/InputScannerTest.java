@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * from various input streams, ensuring correct functionality and handling of edge cases.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-09
  */
 class InputScannerTest {
 
@@ -39,7 +39,7 @@ class InputScannerTest {
     empty = new ByteArrayInputStream("".getBytes());
     System.setIn(empty);
     InputScanner inputScanner = new InputScanner();
-    assertThrows(IllegalArgumentException.class, () -> inputScanner.getInputString());
+    assertThrows(IllegalArgumentException.class, inputScanner::getInputString);
 
   }
 
@@ -51,7 +51,7 @@ class InputScannerTest {
     InputScanner inputScanner = new InputScanner();
     assertEquals(0.9f, inputScanner.getInputFloat());
     System.setIn(floatStream);
-//    assertEquals("0.9", inputScanner.getInputString());
+    //    assertEquals("0.9", inputScanner.getInputString());
   }
 
   @Test

@@ -9,11 +9,11 @@ import java.util.HashMap;
  * <h>Currently not been implemented</h>
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-09
  */
 public class SubcommandRegistry {
-  HashMap<ValidCommand, String> validSubcommand;
-  ValidCommand command;
+  private HashMap<ValidCommand, String> validSubcommand;
+  private ValidCommand command;
 
   public SubcommandRegistry(ValidCommand command) {
     this.command = command;

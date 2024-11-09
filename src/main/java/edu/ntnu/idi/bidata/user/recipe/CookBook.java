@@ -4,10 +4,10 @@ import java.util.HashSet;
 
 /**
  * @author Nick Heggø
- * @version 2024-10-31
+ * @version 2024-11-09
  */
 public class CookBook {
-  HashSet<Recipe> recipes;
+  private final HashSet<Recipe> recipes;
 
   public CookBook() {
     recipes = new HashSet<>();

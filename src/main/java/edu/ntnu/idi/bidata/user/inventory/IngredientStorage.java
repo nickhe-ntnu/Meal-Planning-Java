@@ -8,7 +8,7 @@ import java.util.*;
  * stored in various named collections.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-09
  */
 public class IngredientStorage {
 
@@ -24,14 +24,21 @@ public class IngredientStorage {
   }
 
   /**
-   * Print all the ingredients in the storage.
+   * Builds and returns a string representation of the storage.
+   * The string begins with the storage name followed by each ingredient's details.
+   * If the storage is empty, it indicates so.
    *
-   * @return String of everything storage in the inventory.
+   * @return a string representation of the storage and its contents
    */
   public String getStorageString() {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append("\n# ").append(storageName);
-    ingredientMap.values().forEach(ingredient -> stringBuilder.append(ingredient.toString()));
+    if (ingredientMap.isEmpty()) {
+      stringBuilder.append("\n  (Empty)");
+    } else {
+      ingredientMap.values().forEach(ingredientList ->
+          ingredientList.forEach(ingredient -> stringBuilder.append(ingredient.toString())));
+    }
     return stringBuilder.toString();
   }
 
@@ -56,7 +63,7 @@ public class IngredientStorage {
   public List<Ingredient> getAllExpired() {
     List<Ingredient> listOfExpired = new ArrayList<>();
     ingredientMap.values().forEach(ingredients -> ingredients.stream()
-        .filter(ingredient -> ingredient.getExpiryDate().isAfter(LocalDate.now()))
+        .filter(ingredient -> ingredient.getExpiryDate().isBefore(LocalDate.now()))
         .forEach(listOfExpired::add));
     return listOfExpired;
   }
@@ -82,10 +89,10 @@ public class IngredientStorage {
   }
 
   /**
-   * Removes an ingredient from the storage if it is present.
+   * Removes an ingredient from the storage if it is present and prints a success/failure message.
    *
    * @param ingredientName the name of the ingredient to be removed
-   * @return true if the ingredient was present and removed, false otherwise
+   * @param expiryDate the expiry date of the ingredient to be removed
    */
   public void removeIngredient(String ingredientName, LocalDate expiryDate) {
     if (removeFromStorage(ingredientName, expiryDate)) {
@@ -94,6 +101,17 @@ public class IngredientStorage {
       System.out.println("Failed to remove " + ingredientName + " from " + getStorageName());
     }
 
+  }
+
+  /**
+   * Checks if the specified ingredient is present in the storage.
+   *
+   * @param ingredientName the name of the ingredient to check for
+   * @return true if the ingredient is present; false otherwise
+   */
+  public boolean isIngredientPresent(String ingredientName) {
+    String mapKey = ingredientName.toLowerCase();
+    return ingredientMap.containsKey(mapKey);
   }
 
   /**
@@ -112,18 +130,13 @@ public class IngredientStorage {
   }
 
   /**
-   * Puts the specified ingredient into the ingredient map.
-   * If the ingredient is already present, it will be added to the existing list,
-   * otherwise a new list will be created and the ingredient added to it.
+   * Adds the specified ingredient to the list associated with its map key.
+   * If the map key does not already exist, a new list is created.
    *
-   * @param ingredientToAdd The ingredient to be added to the map.
+   * @param ingredientToAdd the ingredient to be added to the list
    */
   private void addToList(Ingredient ingredientToAdd) {
-    String mapKey = generateMapKey(ingredientToAdd);
-    if (isIngredientPresent(ingredientToAdd)) {
-      ingredientMap.get(mapKey).add(ingredientToAdd);
-    }
-    ingredientMap.computeIfAbsent(generateMapKey(ingredientToAdd), key -> new ArrayList<>()).add(ingredientToAdd);
+    ingredientMap.computeIfAbsent(generateMapKey(ingredientToAdd), mapKey -> new ArrayList<>()).add(ingredientToAdd);
   }
 
   /**

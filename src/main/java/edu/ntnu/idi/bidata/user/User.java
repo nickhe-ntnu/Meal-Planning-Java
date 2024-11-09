@@ -5,8 +5,7 @@ import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
 import edu.ntnu.idi.bidata.user.recipe.CookBook;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
-import java.util.HashMap;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * The User class encapsulates information about a user, including their name,
@@ -14,14 +13,14 @@ import java.util.Stack;
  * methods to interact with and manage these attributes.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-09
  */
 public class User {
-  private final HashMap<String, IngredientStorage> storageMap;
+  private final Map<String, IngredientStorage> storageMap;
   private final CookBook cookBook;
   private final Stack<IngredientStorage> history;
   private String name;
-  private UserInput userInput;
+  private UserInput input;
   private IngredientStorage currentStorage;
 
   /**
@@ -58,23 +57,33 @@ public class User {
     this.name = name;
   }
 
-  public String getAllStorageString() {
+  public String getInventoryString() {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append("###### Inventory #######");
     storageMap.values().forEach(storage -> stringBuilder.append(storage.getStorageString()));
     return stringBuilder.toString();
   }
 
-  public UserInput getUserInput() {
-    return this.userInput;
+  public UserInput getInput() {
+    return this.input;
   }
 
-  public void setUserInput(UserInput userInput) {
-    this.userInput = userInput;
+  public void setInput(UserInput input) {
+    this.input = input;
   }
 
   public Stack<IngredientStorage> getHistory() {
     return history;
+  }
+
+  public String getStorageString() {
+    if (currentStorage == null) {
+      throw new IllegalArgumentException("You're currently not in a storage, use the 'go' command");
+    }
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("#### Current Storage ###");
+    stringBuilder.append(currentStorage.getStorageString());
+    return stringBuilder.toString();
   }
 
   public IngredientStorage getStorage(String storageName) {
@@ -83,6 +92,16 @@ public class User {
 
   public void addIngredient(Ingredient ingredient) {
     currentStorage.addIngredient(ingredient);
+  }
+
+  public List<String> findIngredient(String ingredientName) {
+    ArrayList<String> listOfStorageContainsIngredient = new ArrayList<>();
+    storageMap.values().forEach(storage -> {
+      if (storage.isIngredientPresent(ingredientName)) {
+        listOfStorageContainsIngredient.add(storage.getStorageName());
+      }
+    });
+    return listOfStorageContainsIngredient;
   }
 
   /**

@@ -11,7 +11,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
  * such as locations and storage entries for a given user.
  *
  * @author Nick Heggø
- * @version 2024-11-07
+ * @version 2024-11-09
  */
 public class AddCommand extends Command {
 
@@ -70,6 +70,16 @@ public class AddCommand extends Command {
     printOperationMessage(success);
   }
 
+  /**
+   * Adds a new ingredient to the user's current storage.
+   * This method first checks if the user is located in a directory.
+   * If the user is not in a directory, an {@code IllegalArgumentException} is thrown.
+   * Then, the method launches a wizard to collect the details of the ingredient
+   * and subsequently adds the ingredient to the user's list.
+   * Finally, it prints a success message indicating that the ingredient has been added.
+   *
+   * @throws IllegalArgumentException if the user is not in a directory.
+   */
   private void addIngredient() {
     if (user.getCurrentStorage() == null) {
       throw new IllegalArgumentException("You are currently not in a directory, please use the 'go' command");
@@ -85,10 +95,11 @@ public class AddCommand extends Command {
 
   private Ingredient addIngredientWizard() {
     outputHandler.printOutput("#### Add ingredient ####");
+
     outputHandler.printOutput("Please enter the ingredient name:");
     String name = inputScanner.getValidString();
-    outputHandler.printOutput("Please enter the amount with unit:");
 
+    outputHandler.printOutput("Please enter the amount with unit:");
     UserInput userInput = inputScanner.fetchUnit();
     while (userInput.getValidUnit() == ValidUnit.UNKNOWN) {
       System.out.println("Type error, please ensure to use a valid unit");
@@ -96,8 +107,10 @@ public class AddCommand extends Command {
     }
     float amount = userInput.getUnitAmount();
     ValidUnit unit = userInput.getValidUnit();
+
     outputHandler.printOutput("Please enter the unit price");
     float unitPrice = inputScanner.getValidFloat();
+
     outputHandler.printOutput("Please enter days until expiry date");
     int dayToExpiry = (int) inputScanner.getInputFloat();
 

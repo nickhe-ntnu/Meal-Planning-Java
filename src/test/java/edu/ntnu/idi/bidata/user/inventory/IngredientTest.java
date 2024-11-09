@@ -11,11 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Test class for the Ingredient class.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-09
  */
 class IngredientTest {
-  Ingredient mergedIngredient;
-  Ingredient testIngredient;
+  private Ingredient mergedIngredient;
+  private Ingredient testIngredient;
 
   @BeforeEach
   void beforeEach() {
@@ -30,7 +30,7 @@ class IngredientTest {
     assertEquals(expectedMergeResult.getName(), testIngredient.getName());
     assertEquals(expectedMergeResult.getAmount(), testIngredient.getAmount());
     assertEquals(expectedMergeResult.getValidUnit(), testIngredient.getValidUnit());
-    assertEquals(expectedMergeResult.getUnitPrice(), testIngredient.getUnitPrice());
+    assertEquals(expectedMergeResult.getStandardUnitPrice(), testIngredient.getStandardUnitPrice());
     assertEquals(expectedMergeResult.getExpiryDate(), testIngredient.getExpiryDate());
   }
 
