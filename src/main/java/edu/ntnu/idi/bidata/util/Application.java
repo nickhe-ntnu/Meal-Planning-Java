@@ -2,7 +2,11 @@ package edu.ntnu.idi.bidata.util;
 
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.UserInput;
+import edu.ntnu.idi.bidata.user.inventory.Ingredient;
+import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
+import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
 import edu.ntnu.idi.bidata.util.command.*;
+import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 /**
  * The Application class represents the main execution for the meal planning application.
@@ -18,9 +22,9 @@ public class Application {
   private final OutputHandler outputHandler;
 
   public Application() {
-    user = new User("testUser");
-    inputScanner = new InputScanner();
-    outputHandler = new OutputHandler();
+    user = userSetUp();
+    inputScanner = user.getInputScanner();
+    outputHandler = user.getOutputHandler();
   }
 
   /**
@@ -31,7 +35,23 @@ public class Application {
   public void initialize() {
     outputHandler.printWelcomeMessage();
     outputHandler.printHelpMessage();
+    startUpCondition();
     engine();
+  }
+
+  private void startUpCondition() {
+    InventoryManager inventoryManager = user.getInventoryManager();
+    inventoryManager.addStorage("Fridge");
+    inventoryManager.setCurrentStorage(inventoryManager.getStorage("fridge"));
+    inventoryManager.addIngredient(new Ingredient("Chocolate", 300, ValidUnit.G, 10, 4));
+    inventoryManager.addIngredient(new Ingredient("expiredDemo"));
+    inventoryManager.addIngredient(new Ingredient("expiredDemo"));
+    inventoryManager.addIngredient(new Ingredient("expiredDemo"));
+    inventoryManager.addStorage("Cold Room");
+    inventoryManager.setCurrentStorage("CoLd RoOm");
+    inventoryManager.addIngredient(new Ingredient("Potato", 4, ValidUnit.KG, 40, 25));
+    inventoryManager.addStorage("Office Fridge");
+    inventoryManager.setCurrentStorage((IngredientStorage) null);
   }
 
   /**
@@ -39,13 +59,14 @@ public class Application {
    * a termination command is received. The method fetches user input through an input scanner,
    * processes the command, and prints any exceptions encountered.
    */
-  public void engine() {
+  private void engine() {
     boolean running = true;
     do {
       try {
+        outputHandler.printCommandPrompt();
         this.user.setInput(inputScanner.fetchCommand());
         running = processUserCommand(user.getInput());
-      } catch (IllegalArgumentException e) {
+      } catch (IllegalArgumentException | IllegalCommandCombinationException e) {
         outputHandler.printOutput(e.getMessage());
       }
     } while (running);
@@ -57,7 +78,10 @@ public class Application {
    * @return the newly created user object.
    */
   private User userSetUp() {
-    return new User(inputScanner.getValidString().replaceAll("\\s", ""));
+    User createdUser = new User();
+    //    user.setName(inputScanner.getValidString().replaceAll("\\s", ""));
+    createdUser.setName("Developer");
+    return createdUser;
   }
 
   /**

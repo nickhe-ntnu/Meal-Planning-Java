@@ -36,18 +36,17 @@ public class GoCommand extends Command {
     switch (userInputSubcommand) {
       case "to" -> goTo();
       case "back" -> goBack();
-      default -> throw new IllegalArgumentException("Unexpected command combination: go "
-          + userInputSubcommand);
+      default -> illegalCommand();
     }
   }
 
   private void goTo() {
     String inputString = getInputString("Please enter the storage name:");
-    IngredientStorage ingredientStorage = user.getStorage(inputString);
+    IngredientStorage ingredientStorage = inventoryManager.getStorage(inputString);
     boolean success = ingredientStorage != null;
     if (success) {
-      user.setCurrentStorage(ingredientStorage);
-      addToHistory(user.getCurrentStorage());
+      inventoryManager.setCurrentStorage(ingredientStorage);
+      addToHistory(inventoryManager.getCurrentStorage());
     }
     printOperationMessage(success, inputString);
   }
@@ -59,8 +58,8 @@ public class GoCommand extends Command {
     if (history.isEmpty()) {
       outputHandler.printOutput("History is empty, there is no where to go");
     } else {
-      user.setCurrentStorage(removeFromHistory());
-      printOperationMessage(true, user.getCurrentStorage().getStorageName());
+      inventoryManager.setCurrentStorage(removeFromHistory());
+      printOperationMessage(true, inventoryManager.getCurrentStorage().getStorageName());
     }
   }
 
@@ -74,7 +73,7 @@ public class GoCommand extends Command {
 
   private void printOperationMessage(boolean success, String locationName) {
     if (success) {
-      outputHandler.printOutput("You are now at " + user.getCurrentStorage().getStorageName());
+      outputHandler.printOutput("You are now at " + inventoryManager.getCurrentStorage().getStorageName());
     } else {
       outputHandler.printOutput("Fail to locate destination " + userInputString);
     }

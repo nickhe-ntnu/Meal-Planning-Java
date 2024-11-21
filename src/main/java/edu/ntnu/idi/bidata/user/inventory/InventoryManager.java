@@ -1,0 +1,204 @@
+package edu.ntnu.idi.bidata.user.inventory;
+
+import edu.ntnu.idi.bidata.user.UserInput;
+import edu.ntnu.idi.bidata.util.InputScanner;
+import edu.ntnu.idi.bidata.util.OutputHandler;
+import edu.ntnu.idi.bidata.util.unit.ValidUnit;
+
+import java.util.*;
+
+public class InventoryManager {
+
+  private final InputScanner inputScanner;
+  private final OutputHandler outputHandler;
+
+  private final Map<String, IngredientStorage> storageMap;
+  private final Stack<IngredientStorage> history;
+
+  private IngredientStorage currentStorage;
+
+  public InventoryManager(InputScanner inputScanner, OutputHandler outputHandler) {
+    this.inputScanner = inputScanner;
+    this.outputHandler = outputHandler;
+    storageMap = new HashMap<>();
+    history = new Stack<>();
+    history.add(null);
+  }
+
+  public IngredientStorage getStorage(String storageName) {
+    return storageMap.get(generateMapKey(storageName));
+  }
+
+  /**
+   * Adds an ingredient to the current storage after validating inventory availability.
+   * Takes input from the user and creates an Ingredient object.
+   */
+  public void createIngredient() {
+    assertInventoryIsAvailable();
+    Ingredient createdIngredient = inputIngredientDetails();
+    currentStorage.addIngredient(createdIngredient);
+  }
+
+  /**
+   * Adds an ingredient to the current storage.
+   *
+   * @param ingredientToBeAdded The ingredient to be added to the storage.
+   */
+  public void addIngredient(Ingredient ingredientToBeAdded) {
+    assertInventoryIsAvailable();
+    currentStorage.addIngredient(ingredientToBeAdded);
+  }
+
+  public List<String> findIngredientStorage(String ingredientName) {
+    ArrayList<String> listOfStorageContainsIngredient = new ArrayList<>();
+    storageMap.values().forEach(storage -> {
+      if (storage.isIngredientPresent(ingredientName)) {
+        listOfStorageContainsIngredient.add(storage.getStorageName());
+      }
+    });
+    return listOfStorageContainsIngredient;
+  }
+
+  public List<Ingredient> findIngredient(String name) {
+    ArrayList<Ingredient> ingredientArrayList = new ArrayList<>();
+    storageMap.values().forEach(ingredientStorage ->
+        ingredientArrayList.addAll(ingredientStorage.getAllIngredient(name)));
+    return ingredientArrayList;
+  }
+
+  /**
+   * Adds a new storage to the user's storage map if it is not already present.
+   *
+   * @param storageName The name of the storage to be added.
+   * @return true if the storage was successfully added; false otherwise.
+   */
+  public boolean addStorage(String storageName) {
+    boolean success = !isStoragePresent(storageName);
+    if (success) {
+      putToMap(storageName);
+    }
+    return success;
+  }
+
+  private String generateMapKey(String stringToBeConverted) {
+    return stringToBeConverted.toLowerCase();
+  }
+
+  /**
+   * Checks if a storage with the specified name is present in the storage map.
+   * The storage name is case-insensitive.
+   *
+   * @param storageName The name of the storage to check for.
+   * @return true if the storage is present; false otherwise.
+   */
+  private boolean isStoragePresent(String storageName) {
+    return storageMap.containsKey(storageName.toLowerCase());
+  }
+
+  /**
+   * Adds a new ingredient storage to the storage map with the provided name.
+   * The storage name is converted to lowercase before being used as the key in the map.
+   *
+   * @param storageName The name of the storage to be added.
+   */
+  private void putToMap(String storageName) {
+    storageMap.put(generateMapKey(storageName), new IngredientStorage(storageName));
+  }
+
+  private Ingredient inputIngredientDetails() {
+    outputHandler.printOutput("#### Add ingredient ####");
+
+    outputHandler.printInputPrompt("Please enter the ingredient name:");
+    String name = inputScanner.getValidString();
+
+    outputHandler.printInputPrompt("Please enter the amount with unit:");
+    UserInput userInput = inputScanner.fetchUnit();
+    while (userInput.getValidUnit() == ValidUnit.UNKNOWN) {
+      outputHandler.printInputPrompt("Type error, please ensure to use a valid unit");
+      userInput = inputScanner.fetchUnit();
+    }
+    float amount = userInput.getUnitAmount();
+    ValidUnit unit = userInput.getValidUnit();
+
+    outputHandler.printInputPrompt("Please enter the unit price");
+    float unitPrice = inputScanner.getValidFloat();
+
+    outputHandler.printInputPrompt("Please enter days until expiry date");
+    int dayToExpiry = (int) inputScanner.getInputFloat();
+
+    return new Ingredient(name, amount, unit, unitPrice, dayToExpiry);
+  }
+
+  /**
+   * Ensures that the current inventory is not null.
+   *
+   * @throws IllegalArgumentException if no inventory is currently selected.
+   */
+  private void assertInventoryIsAvailable() {
+    if (currentStorage == null) {
+      throw new IllegalArgumentException("You are currently not in an inventory, please use the 'go' command.");
+    }
+  }
+
+  public String getInventoryString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("###### Inventory #######");
+    storageMap.values().forEach(storage -> stringBuilder.append(storage.getStorageString()));
+    return stringBuilder.toString();
+  }
+
+  public Stack<IngredientStorage> getHistory() {
+    return history;
+  }
+
+  public String getStorageString() {
+    if (currentStorage == null) {
+      throw new IllegalArgumentException("You're currently not in a storage, use the 'go' command");
+    }
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("#### Current Storage ###");
+    stringBuilder.append(currentStorage.getStorageString());
+    return stringBuilder.toString();
+  }
+
+  public String getStorageNameString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("####### Storages #######");
+    storageMap.values().stream()
+        .map(IngredientStorage::getStorageName)
+        .forEach(name -> stringBuilder.append("\n# ").append(name));
+    return stringBuilder.toString();
+  }
+
+  public IngredientStorage getCurrentStorage() {
+    return currentStorage;
+  }
+
+  public void setCurrentStorage(IngredientStorage storage) {
+    currentStorage = storage;
+  }
+
+  public void setCurrentStorage(String storageName) {
+    IngredientStorage storage = getStorage(generateMapKey(storageName));
+    if (storage != null) {
+      currentStorage = storage;
+    }
+  }
+
+  /**
+   * Retrieves a string representation of all expired ingredients in the current inventory.
+   *
+   * @return A string listing all expired ingredients.
+   */
+  public String getExpiredString() {
+    assertInventoryIsAvailable();
+    List<Ingredient> listOfExpired = currentStorage.getAllExpired();
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("####### Expired ########");
+    listOfExpired.stream()
+        .map(Ingredient::toString)
+        .forEach(string -> stringBuilder.append("\n").append(string));
+    return stringBuilder.toString();
+  }
+
+}

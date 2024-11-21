@@ -1,9 +1,6 @@
 package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
-import edu.ntnu.idi.bidata.user.UserInput;
-import edu.ntnu.idi.bidata.user.inventory.Ingredient;
-import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 /**
  * The AddCommand class extends the Command class and is responsible for handling
@@ -27,13 +24,13 @@ public class AddCommand extends Command {
   }
 
   /**
-   * Processes the subcommand provided by the user input.
-   * This method determines which specific "add" subcommand needs to be executed
-   * (e.g., addLocation, addStorage, addIngredient, addRecipe) and calls the
-   * corresponding method. If the subcommand is not recognized, an
-   * {@code IllegalArgumentException} is thrown.
+   * Processes the subcommand provided by the user input and delegates it
+   * to the appropriate method based on the subcommand string. This method switches
+   * between different subcommands ("storage", "ingredient", "recipe") and calls the respective methods
+   * for each of these subcommands. If the subcommand does not match any of the expected values,
+   * an {@code IllegalArgumentException} is thrown.
    *
-   * @throws IllegalArgumentException if the provided subcommand is unexpected.
+   * @throws IllegalArgumentException if the provided subcommand is not recognized.
    */
   @Override
   protected void processSubcommand() {
@@ -41,8 +38,7 @@ public class AddCommand extends Command {
       case "storage" -> addStorage();
       case "ingredient" -> addIngredient();
       case "recipe" -> addRecipe();
-      default -> throw new IllegalArgumentException("Unexpected subcommand: "
-          + userInputSubcommand);
+      default -> illegalCommand();
     }
   }
 
@@ -66,7 +62,7 @@ public class AddCommand extends Command {
    */
   private void addStorage() {
     getInputString("Please enter new storage name:");
-    boolean success = user.addStorage(userInputString);
+    boolean success = inventoryManager.addStorage(userInputString);
     printOperationMessage(success);
   }
 
@@ -81,40 +77,11 @@ public class AddCommand extends Command {
    * @throws IllegalArgumentException if the user is not in a directory.
    */
   private void addIngredient() {
-    if (user.getCurrentStorage() == null) {
-      throw new IllegalArgumentException("You are currently not in a directory, please use the 'go' command");
-    }
-    Ingredient ingredient = addIngredientWizard();
-    user.addIngredient(ingredient);
-    outputHandler.printOutputWithLineBreak("Successfully added " + ingredient.getName());
+    inventoryManager.createIngredient();
   }
 
   private void addRecipe() {
     // TODO
-  }
-
-  private Ingredient addIngredientWizard() {
-    outputHandler.printOutput("#### Add ingredient ####");
-
-    outputHandler.printOutput("Please enter the ingredient name:");
-    String name = inputScanner.getValidString();
-
-    outputHandler.printOutput("Please enter the amount with unit:");
-    UserInput userInput = inputScanner.fetchUnit();
-    while (userInput.getValidUnit() == ValidUnit.UNKNOWN) {
-      System.out.println("Type error, please ensure to use a valid unit");
-      userInput = inputScanner.fetchUnit();
-    }
-    float amount = userInput.getUnitAmount();
-    ValidUnit unit = userInput.getValidUnit();
-
-    outputHandler.printOutput("Please enter the unit price");
-    float unitPrice = inputScanner.getValidFloat();
-
-    outputHandler.printOutput("Please enter days until expiry date");
-    int dayToExpiry = (int) inputScanner.getInputFloat();
-
-    return new Ingredient(name, amount, unit, unitPrice, dayToExpiry);
   }
 
 }

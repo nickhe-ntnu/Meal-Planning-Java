@@ -47,9 +47,9 @@ public class Ingredient {
   public Ingredient(String password) {
     if (password.equals("expiredDemo")) {
       Random random = new Random();
-      String[] names = new String[]{"Expired Milk", "Expired Chicken", "Expired Egg"};
+      String[] names = new String[]{"Expired Milk", "Expired Chicken", "Expired Egg", "Moldy Bread"};
       name = names[random.nextInt(names.length)];
-      amount = 4;
+      amount = random.nextInt(1, 4);
       if (name.equals("Expired Milk")) {
         validUnit = ValidUnit.L;
       } else {
@@ -66,13 +66,19 @@ public class Ingredient {
    */
   @Override
   public String toString() {
-    int dayTilExpiry = getDaysBetween(this.getExpiryDate());
-    return "\n  * " + name + ": " + amount + " " + validUnit + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days)";
+    String stringToReturn;
+    if (LocalDate.now().isAfter(expiryDate)) {
+      stringToReturn = getExpiredIngredientString();
+    } else {
+      int dayTilExpiry = getDaysBetween(this.getExpiryDate());
+      stringToReturn = "  * " + name + ": " + amount + " " + validUnit + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days)";
+    }
+    return stringToReturn;
   }
 
   public String getExpiredIngredientString() {
     int daysExpired = Math.abs(getDaysBetween(this.getExpiryDate()));
-    return "\n  * " + name + ": " + amount + " " + validUnit + " - Best before: " + expiryDate + " (Expired " + daysExpired + " days ago)";
+    return "  * " + name + ": " + amount + " " + validUnit + " - Best before: " + expiryDate + " (Expired " + daysExpired + " days ago)";
   }
 
   public String getIngredientTypeString() {
@@ -86,7 +92,7 @@ public class Ingredient {
    * @return the expiry date of the ingredient, or a date 20 days before the current date if not set
    */
   public LocalDate getExpiryDate() {
-    return (expiryDate != null) ? expiryDate : LocalDate.now().minusDays(20);
+    return (expiryDate != null) ? expiryDate : LocalDate.now().minusDays(999);
   }
 
   /**
@@ -212,12 +218,10 @@ public class Ingredient {
   }
 
   /**
-   * Merges the specified ingredient with the current ingredient if they are valid to merge.
-   * The name and expiry date will not be changed since its already been validated.
-   * Unit will also remain unchanged, since the incoming will be
-   * converted to match the existing unit been used.
+   * Merges the specified ingredient into this ingredient by combining their amounts and updating the price per unit.
+   * If the combined amount is greater than or equal to 1000, this ingredient is converted to a standard unit.
    *
-   * @param ingredientToMerge the ingredient to be merged with the current ingredient
+   * @param ingredientToMerge the ingredient to be merged with this ingredient
    */
   public void merge(Ingredient ingredientToMerge) {
     UnitConverter unitConverter = new UnitConverter();

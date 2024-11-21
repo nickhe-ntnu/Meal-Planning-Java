@@ -28,6 +28,15 @@ public class InputScanner {
   }
 
   /**
+   * Create an input scanner to read from the terminal window.
+   */
+  public InputScanner(Scanner scannerSource) {
+    scanner = scannerSource;
+    commandRegistry = new CommandRegistry();
+    unitRegistry = new UnitRegistry();
+  }
+
+  /**
    * Prompts the user to input a line of text and reads it from the terminal.
    * The input is trimmed of leading and trailing whitespace.
    * If the input is blank, an IllegalArgumentException is thrown.
@@ -36,7 +45,6 @@ public class InputScanner {
    * @throws IllegalArgumentException if the input is blank.
    */
   public String getInputString() {
-    System.out.print("> ");
     if (!scanner.hasNextLine()) {
       throw new IllegalArgumentException("Input cannot be blank.");
     }
@@ -68,6 +76,21 @@ public class InputScanner {
     return inputString;
   }
 
+  public String getValidString(String message) {
+
+    String inputString = "";
+    boolean validInput = false;
+    do {
+      try {
+        inputString = getInputString();
+        validInput = true;
+      } catch (IllegalArgumentException e) {
+        System.out.println(e.getMessage());
+      }
+    } while (!validInput);
+    return inputString;
+  }
+
   public float getValidFloat() {
     float inputFloat = 0f;
     boolean validInput = false;
@@ -84,8 +107,14 @@ public class InputScanner {
     return inputFloat;
   }
 
+  /**
+   * Prompts the user for a floating-point number input.
+   * If the input is blank or cannot be parsed as a float, an IllegalArgumentException is thrown.
+   *
+   * @return the floating-point number entered by the user.
+   * @throws IllegalArgumentException if the input is blank or cannot be parsed as a float.
+   */
   public float getInputFloat() {
-    System.out.print("> ");
     if (!scanner.hasNextLine()) {
       throw new IllegalArgumentException("Input cannot be blank.");
     }
@@ -97,8 +126,9 @@ public class InputScanner {
   }
 
   /**
-   * Fetches and processes user input from the terminal. The input is trimmed of leading and trailing whitespace,
-   * and split into tokens based on whitespace. These tokens are then used to create a UserInput object.
+   * Fetches and processes user input from the terminal.
+   * The input is trimmed of leading and trailing whitespace and split into tokens based on whitespace.
+   * These tokens are then used to create a UserInput object.
    *
    * @return a UserInput object representing the parsed user input, including command, subcommand, and input string.
    */
@@ -107,6 +137,13 @@ public class InputScanner {
     return setCommandInput(tokens);
   }
 
+  /**
+   * Continuously prompts the user for input until valid unit input is provided.
+   * The input is split into tokens based on whitespace.
+   * These tokens are then used to create a UserInput object representing a unit and its amount.
+   *
+   * @return a UserInput object containing the parsed unit and its amount.
+   */
   public UserInput fetchUnit() {
     String[] tokens = new String[3];
     boolean success = false;
@@ -122,8 +159,14 @@ public class InputScanner {
     return setUnitInput(tokens);
   }
 
+  /**
+   * Prompts the user for input, reads the input line, trims any leading and trailing whitespace,
+   * and splits the input into tokens based on whitespace.
+   *
+   * @return an array of strings containing the tokens from the user's input.
+   * The array will contain at most three elements: the first token, the second token, and the rest of the input.
+   */
   private String[] scanLineToToken() {
-    System.out.print("> ");
     String inputLine = scanner.nextLine().trim();
     return inputLine.split("\\s+", 3);
   }
@@ -143,6 +186,13 @@ public class InputScanner {
     return new UserInput(commandRegistry.getCommandWord(command), subcommand, inputString);
   }
 
+  /**
+   * Processes user input tokens and creates a UserInput object based on those tokens.
+   *
+   * @param tokens an array of strings representing the user's input, split by whitespace.
+   *               The first token is treated as the unit amount, and the second token (if present) is treated as the unit.
+   * @return a UserInput object containing the parsed unit amount and unit type.
+   */
   private UserInput setUnitInput(String[] tokens) {
     float unitAmount = (tokens.length > 0) ? Float.valueOf(tokens[0]) : -1;
     String unit = (tokens.length > 1) ? tokens[1].toLowerCase() : null;

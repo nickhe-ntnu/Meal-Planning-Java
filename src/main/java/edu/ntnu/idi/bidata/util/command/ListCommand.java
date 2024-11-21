@@ -32,8 +32,14 @@ public class ListCommand extends Command {
       case "ingredient" -> listIngredient();
       case "expired" -> listExpired();
       case "available" -> listAvailableRecipe();
-      default -> throw new IllegalArgumentException("Unexpected command:  list " + userInputSubcommand);
+      case "command", "commands" -> outputHandler.printHelpMessage();
+      case "name" -> listName();
+      default -> illegalCommand();
     }
+  }
+
+  private void listName() {
+    outputHandler.printOutputWithLineBreak(inventoryManager.getStorageNameString());
   }
 
   /**
@@ -42,11 +48,11 @@ public class ListCommand extends Command {
    * and then prints it to the console with a line of separator characters.
    */
   private void listInventory() {
-    outputHandler.printOutputWithLineBreak(user.getInventoryString());
+    outputHandler.printOutputWithLineBreak(inventoryManager.getInventoryString());
   }
 
   private void listStorage() {
-    outputHandler.printOutputWithLineBreak(user.getStorageString());
+    outputHandler.printOutputWithLineBreak(inventoryManager.getStorageString());
   }
 
   private void listRecipe() {
@@ -58,7 +64,7 @@ public class ListCommand extends Command {
   }
 
   private void listExpired() {
-    // TODO
+    outputHandler.printOutputWithLineBreak(inventoryManager.getExpiredString());
   }
 
   private void listAvailableRecipe() {

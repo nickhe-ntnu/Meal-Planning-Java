@@ -22,6 +22,19 @@ public class OutputHandler {
     System.out.println("########################");
   }
 
+  public void printCommandPrompt() {
+    System.out.print("> ");
+  }
+
+  public void printInputPrompt(String inputPrompt) {
+    System.out.println(inputPrompt);
+    System.out.print("  ~ ");
+  }
+
+  public void printInputPrompt() {
+    System.out.print("  ~ ");
+  }
+
   /**
    * Prints the specified output to the console.
    *
@@ -57,15 +70,8 @@ public class OutputHandler {
     printOutputWithLineBreak("Successfully " + operation + " " + name);
   }
 
-  public void printHelpMessage() {
-    printOutput("""
-        Available commands are:
-          help, list, go, add, remove, find, exit""");
-
-  }
-
-  public void printHelpMessage(String subcommand) {
-    switch (subcommand) {
+  public void printHelpMessage(String command) {
+    switch (command) {
       case "unknown" -> printUnknownInstruction();
       case "help" -> printHelpMessage();
       case "list" -> printListInstruction();
@@ -78,6 +84,13 @@ public class OutputHandler {
     }
   }
 
+  public void printHelpMessage() {
+    printOutput("""
+        Available commands are:
+        # help, list, go, add, remove, find, exit""");
+
+  }
+
   public void printUnknownInstruction() {
     printOutput("Unknown command, see 'help'");
   }
@@ -85,41 +98,41 @@ public class OutputHandler {
   private void printHelpInstruction() {
     printOutput("""
         Valid print commands are:
-          help, help {valid command}""");
+        # help, help {valid command}""");
   }
 
   private void printListInstruction() {
     printOutput("""
         Valid list commands are:
-          list inventory, list recipe, list ingredient,
-          list expired, list available recipe""");
+        # list inventory, list recipe, list ingredient,
+        # list expired, list available recipe""");
 
   }
 
   private void printGoInstruction() {
     printOutput("""
         Valid go commands are:
-          go to {storage name}, go back""");
+        # go to {storage name}, go back""");
   }
 
   private void printAddInstruction() {
     printOutput("""
         Valid add commands are:
-          add storage, add ingredient, add recipe""");
+        # add storage, add ingredient, add recipe""");
   }
 
   private void printRemoveInstruction() {
     printOutput("""
         Valid remove commands are:
-          remove storage {storage name}
-          remove ingredient {ingredient name}
-          remove recipe {recipe name}""");
+        # remove storage {storage name}
+        # remove ingredient {ingredient name}
+        # remove recipe {recipe name}""");
   }
 
   private void printFindInstruction() {
     printOutput("""
         Valid find commands are:
-          find ingredient {ingredient name}, find recipe {recipe name}""");
+        # find ingredient {ingredient name}, find recipe {recipe name}""");
   }
 
 }

@@ -2,8 +2,6 @@ package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
 
-import java.time.LocalDate;
-
 /**
  * The RemoveCommand class extends the Command class to handle "remove" operations
  * based on user-submitted subcommands. Depending on the specified subcommand, it
@@ -28,19 +26,19 @@ public class RemoveCommand extends Command {
       case "storage" -> removeStorage();
       case "ingredient" -> removeIngredient();
       case "recipe" -> removeRecipe();
+      default -> illegalCommand();
     }
   }
 
   private void removeStorage() {
-    getInputString("Please enter name and expiry date to remove: {Ingredient Name} {YYYY-MM-DD}");
+    getInputString("Please enter the storage name to remove:");
     // TODO
   }
 
   private void removeIngredient() {
-    String inputString = getInputString("Please enter name and expiry date to remove: {YYYY-MM-DD} {Ingredient Name}");
-    String[] token = inputString.split("\\s", 2);
-    user.getCurrentStorage().removeIngredient(token[1], LocalDate.parse(token[0]));
-    // TODO let user choose how much to remove, instead of remove everything at once
+    String ingredientName = getInputString("Please enter the ingredient name:");
+    inputScanner.getValidString();
+    inventoryManager.findIngredientStorage(ingredientName);
   }
 
   private void removeRecipe() {

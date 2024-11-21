@@ -29,6 +29,12 @@ public class Recipe {
     this.nameOfRecipe = nameOfRecipe;
   }
 
+  private void addSteps() {
+    //    int iteration = 0;
+    //    boolean adding = false;
+    //    while ()
+  }
+
   /**
    * Returns the name of the recipe.
    *

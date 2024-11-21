@@ -16,9 +16,6 @@ class IngredientStorageTest {
     for (int i = 0; i < expiredIngredientToGenerate; i++) {
       ingredientStorage.addIngredient(new Ingredient("expiredDemo"));
     }
-    ingredientStorage.getAllExpired().stream()
-        .map(Ingredient::getExpiredIngredientString)
-        .forEach(System.out::print);
   }
 
   @Test

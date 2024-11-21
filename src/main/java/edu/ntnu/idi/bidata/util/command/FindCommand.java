@@ -38,12 +38,13 @@ public class FindCommand extends Command {
     switch (userInputSubcommand) {
       case "ingredient" -> findIngredient();
       case "recipe" -> findRecipe();
+      default -> illegalCommand();
     }
   }
 
   private void findIngredient() {
     String ingredientName = getInputString("Please enter the ingredient name to find:");
-    List<String> storageContainsIngredient = user.findIngredient(ingredientName);
+    List<String> storageContainsIngredient = inventoryManager.findIngredientStorage(ingredientName);
     if (storageContainsIngredient.isEmpty()) {
       outputHandler.printOutputWithLineBreak(ingredientName + " isn't present at any of the storages.");
     } else {

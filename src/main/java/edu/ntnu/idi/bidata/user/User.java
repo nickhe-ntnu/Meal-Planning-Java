@@ -1,11 +1,9 @@
 package edu.ntnu.idi.bidata.user;
 
-import edu.ntnu.idi.bidata.user.inventory.Ingredient;
-import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
-import edu.ntnu.idi.bidata.user.recipe.CookBook;
-import edu.ntnu.idi.bidata.util.unit.ValidUnit;
-
-import java.util.*;
+import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
+import edu.ntnu.idi.bidata.user.recipe.RecipeManager;
+import edu.ntnu.idi.bidata.util.InputScanner;
+import edu.ntnu.idi.bidata.util.OutputHandler;
 
 /**
  * The User class encapsulates information about a user, including their name,
@@ -16,37 +14,29 @@ import java.util.*;
  * @version 2024-11-09
  */
 public class User {
-  private final Map<String, IngredientStorage> storageMap;
-  private final CookBook cookBook;
-  private final Stack<IngredientStorage> history;
+
+  private final InputScanner inputScanner;
+  private final OutputHandler outputHandler;
+
+  private final InventoryManager inventoryManager;
+  private final RecipeManager recipeManager;
+
   private String name;
   private UserInput input;
-  private IngredientStorage currentStorage;
 
   /**
-   * Constructs a new User object with the given name, initializes various components and default inventory.
-   *
-   * @param name The name of the user to be created.
+   * Default constructor for the User class.
+   * Initializes the input scanner, output handler, inventory manager, and recipe manager.
+   * The InputScanner facilitates user interaction.
+   * The OutputHandler manages user output.
+   * The InventoryManager handles inventory tasks.
+   * The RecipeManager manages recipe-related tasks.
    */
-  public User(String name) {
-    setName(name);
-    storageMap = new HashMap<>();
-    cookBook = new CookBook();
-    history = new Stack<>();
-
-    addStorage("Fridge");
-    setCurrentStorage(getStorage("fridge"));
-    addIngredient(new Ingredient("Chocolate", 300, ValidUnit.G, 10, 4));
-    addStorage("Cold Room");
-    addStorage("Office Fridge");
-  }
-
-  public IngredientStorage getCurrentStorage() {
-    return currentStorage;
-  }
-
-  public void setCurrentStorage(IngredientStorage storage) {
-    currentStorage = storage;
+  public User() {
+    inputScanner = new InputScanner();
+    outputHandler = new OutputHandler();
+    inventoryManager = new InventoryManager(inputScanner, outputHandler);
+    recipeManager = new RecipeManager(inputScanner, outputHandler);
   }
 
   public String getName() {
@@ -57,13 +47,6 @@ public class User {
     this.name = name;
   }
 
-  public String getInventoryString() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("###### Inventory #######");
-    storageMap.values().forEach(storage -> stringBuilder.append(storage.getStorageString()));
-    return stringBuilder.toString();
-  }
-
   public UserInput getInput() {
     return this.input;
   }
@@ -72,70 +55,19 @@ public class User {
     this.input = input;
   }
 
-  public Stack<IngredientStorage> getHistory() {
-    return history;
+  public InputScanner getInputScanner() {
+    return inputScanner;
   }
 
-  public String getStorageString() {
-    if (currentStorage == null) {
-      throw new IllegalArgumentException("You're currently not in a storage, use the 'go' command");
-    }
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("#### Current Storage ###");
-    stringBuilder.append(currentStorage.getStorageString());
-    return stringBuilder.toString();
+  public OutputHandler getOutputHandler() {
+    return outputHandler;
   }
 
-  public IngredientStorage getStorage(String storageName) {
-    return storageMap.get(storageName);
+  public InventoryManager getInventoryManager() {
+    return inventoryManager;
   }
 
-  public void addIngredient(Ingredient ingredient) {
-    currentStorage.addIngredient(ingredient);
-  }
-
-  public List<String> findIngredient(String ingredientName) {
-    ArrayList<String> listOfStorageContainsIngredient = new ArrayList<>();
-    storageMap.values().forEach(storage -> {
-      if (storage.isIngredientPresent(ingredientName)) {
-        listOfStorageContainsIngredient.add(storage.getStorageName());
-      }
-    });
-    return listOfStorageContainsIngredient;
-  }
-
-  /**
-   * Adds a new storage to the user's storage map if it is not already present.
-   *
-   * @param storageName The name of the storage to be added.
-   * @return true if the storage was successfully added; false otherwise.
-   */
-  public boolean addStorage(String storageName) {
-    boolean success = !isStoragePresent(storageName);
-    if (success) {
-      putToMap(storageName);
-    }
-    return success;
-  }
-
-  /**
-   * Checks if a storage with the specified name is present in the storage map.
-   * The storage name is case-insensitive.
-   *
-   * @param storageName The name of the storage to check for.
-   * @return true if the storage is present; false otherwise.
-   */
-  private boolean isStoragePresent(String storageName) {
-    return storageMap.containsKey(storageName.toLowerCase());
-  }
-
-  /**
-   * Adds a new ingredient storage to the storage map with the provided name.
-   * The storage name is converted to lowercase before being used as the key in the map.
-   *
-   * @param storageName The name of the storage to be added.
-   */
-  private void putToMap(String storageName) {
-    storageMap.put(storageName.toLowerCase(), new IngredientStorage(storageName));
+  public RecipeManager getRecipeManager() {
+    return recipeManager;
   }
 }
