@@ -30,7 +30,7 @@ class InputScannerTest {
   @Test
   void testGetUserInput() {
     InputScanner inputScanner = new InputScanner();
-    assertEquals("lISt   testSuBcOmmand    test   uSEr iNput stRing", inputScanner.getValidString());
+    assertEquals("lISt   testSuBcOmmand    test   uSEr iNput stRing", inputScanner.collectValidString());
   }
 
   @Test
@@ -39,8 +39,7 @@ class InputScannerTest {
     empty = new ByteArrayInputStream("".getBytes());
     System.setIn(empty);
     InputScanner inputScanner = new InputScanner();
-    assertThrows(IllegalArgumentException.class, inputScanner::getInputString);
-
+    assertThrows(IllegalArgumentException.class, inputScanner::scanNextLine);
   }
 
   @Test
@@ -61,6 +60,6 @@ class InputScannerTest {
     assertEquals(ValidCommand.LIST, userInput.getCommandWord());
     assertEquals("list", userInput.getCommandWord().name().toLowerCase());
     assertEquals("testsubcommand", userInput.getSubcommand());
-    assertEquals("test   user input string", userInput.getInputString());
+    assertEquals("test   uSEr iNput stRing", userInput.getInputString());
   }
 }

@@ -31,13 +31,13 @@ public class RemoveCommand extends Command {
   }
 
   private void removeStorage() {
-    getInputString("Please enter the storage name to remove:");
+    requestInputIfNeeded("Please enter the storage name to remove:");
     // TODO
   }
 
   private void removeIngredient() {
-    String ingredientName = getInputString("Please enter the ingredient name:");
-    inputScanner.getValidString();
+    String ingredientName = requestInputIfNeeded("Please enter the ingredient name:");
+    inputScanner.collectValidString();
     inventoryManager.findIngredientStorage(ingredientName);
   }
 

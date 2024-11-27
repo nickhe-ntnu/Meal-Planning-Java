@@ -44,9 +44,10 @@ public class Application {
     inventoryManager.addStorage("Fridge");
     inventoryManager.setCurrentStorage(inventoryManager.getStorage("fridge"));
     inventoryManager.addIngredient(new Ingredient("Chocolate", 300, ValidUnit.G, 10, 4));
-    inventoryManager.addIngredient(new Ingredient("expiredDemo"));
-    inventoryManager.addIngredient(new Ingredient("expiredDemo"));
-    inventoryManager.addIngredient(new Ingredient("expiredDemo"));
+    int amountOfExpiredIngredientToGenerate = 3;
+    for (int generatedIngredient = 0; generatedIngredient < amountOfExpiredIngredientToGenerate; generatedIngredient++) {
+      inventoryManager.addIngredient(new Ingredient("expiredDemo"));
+    }
     inventoryManager.addStorage("Cold Room");
     inventoryManager.setCurrentStorage("CoLd RoOm");
     inventoryManager.addIngredient(new Ingredient("Potato", 4, ValidUnit.KG, 40, 25));

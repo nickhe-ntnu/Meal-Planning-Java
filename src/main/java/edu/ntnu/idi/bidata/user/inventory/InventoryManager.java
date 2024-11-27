@@ -33,10 +33,8 @@ public class InventoryManager {
    * Adds an ingredient to the current storage after validating inventory availability.
    * Takes input from the user and creates an Ingredient object.
    */
-  public void createIngredient() {
-    assertInventoryIsAvailable();
-    Ingredient createdIngredient = inputIngredientDetails();
-    currentStorage.addIngredient(createdIngredient);
+  public Ingredient createIngredient(String ingredientName) {
+    return inputIngredientDetails(ingredientName);
   }
 
   /**
@@ -78,66 +76,6 @@ public class InventoryManager {
       putToMap(storageName);
     }
     return success;
-  }
-
-  private String generateMapKey(String stringToBeConverted) {
-    return stringToBeConverted.toLowerCase();
-  }
-
-  /**
-   * Checks if a storage with the specified name is present in the storage map.
-   * The storage name is case-insensitive.
-   *
-   * @param storageName The name of the storage to check for.
-   * @return true if the storage is present; false otherwise.
-   */
-  private boolean isStoragePresent(String storageName) {
-    return storageMap.containsKey(storageName.toLowerCase());
-  }
-
-  /**
-   * Adds a new ingredient storage to the storage map with the provided name.
-   * The storage name is converted to lowercase before being used as the key in the map.
-   *
-   * @param storageName The name of the storage to be added.
-   */
-  private void putToMap(String storageName) {
-    storageMap.put(generateMapKey(storageName), new IngredientStorage(storageName));
-  }
-
-  private Ingredient inputIngredientDetails() {
-    outputHandler.printOutput("#### Add ingredient ####");
-
-    outputHandler.printInputPrompt("Please enter the ingredient name:");
-    String name = inputScanner.getValidString();
-
-    outputHandler.printInputPrompt("Please enter the amount with unit:");
-    UserInput userInput = inputScanner.fetchUnit();
-    while (userInput.getValidUnit() == ValidUnit.UNKNOWN) {
-      outputHandler.printInputPrompt("Type error, please ensure to use a valid unit");
-      userInput = inputScanner.fetchUnit();
-    }
-    float amount = userInput.getUnitAmount();
-    ValidUnit unit = userInput.getValidUnit();
-
-    outputHandler.printInputPrompt("Please enter the unit price");
-    float unitPrice = inputScanner.getValidFloat();
-
-    outputHandler.printInputPrompt("Please enter days until expiry date");
-    int dayToExpiry = (int) inputScanner.getInputFloat();
-
-    return new Ingredient(name, amount, unit, unitPrice, dayToExpiry);
-  }
-
-  /**
-   * Ensures that the current inventory is not null.
-   *
-   * @throws IllegalArgumentException if no inventory is currently selected.
-   */
-  private void assertInventoryIsAvailable() {
-    if (currentStorage == null) {
-      throw new IllegalArgumentException("You are currently not in an inventory, please use the 'go' command.");
-    }
   }
 
   public String getInventoryString() {
@@ -199,6 +137,68 @@ public class InventoryManager {
         .map(Ingredient::toString)
         .forEach(string -> stringBuilder.append("\n").append(string));
     return stringBuilder.toString();
+  }
+
+  private String generateMapKey(String stringToBeConverted) {
+    return stringToBeConverted.toLowerCase();
+  }
+
+  /**
+   * Checks if a storage with the specified name is present in the storage map.
+   * The storage name is case-insensitive.
+   *
+   * @param storageName The name of the storage to check for.
+   * @return true if the storage is present; false otherwise.
+   */
+  private boolean isStoragePresent(String storageName) {
+    return storageMap.containsKey(storageName.toLowerCase());
+  }
+
+  /**
+   * Adds a new ingredient storage to the storage map with the provided name.
+   * The storage name is converted to lowercase before being used as the key in the map.
+   *
+   * @param storageName The name of the storage to be added.
+   */
+  private void putToMap(String storageName) {
+    storageMap.put(generateMapKey(storageName), new IngredientStorage(storageName));
+  }
+
+  private Ingredient inputIngredientDetails(String ingredientName) {
+    outputHandler.printOutput("#### Add ingredient ####");
+    String name = ingredientName;
+    if (name == null) {
+      outputHandler.printInputPrompt("Please enter the ingredient name:");
+      name = inputScanner.collectValidString();
+    }
+
+    outputHandler.printInputPrompt("Please enter the amount with unit:");
+    UserInput userInput = inputScanner.fetchUnit();
+    while (userInput.getValidUnit() == ValidUnit.UNKNOWN) {
+      outputHandler.printInputPrompt("Type error, please ensure to use a valid unit");
+      userInput = inputScanner.fetchUnit();
+    }
+    float amount = userInput.getUnitAmount();
+    ValidUnit unit = userInput.getValidUnit();
+
+    outputHandler.printInputPrompt("Please enter the unit price");
+    float unitPrice = inputScanner.collectValidFloat();
+
+    outputHandler.printInputPrompt("Please enter days until expiry date");
+    int dayToExpiry = (int) inputScanner.getInputFloat();
+
+    return new Ingredient(name, amount, unit, unitPrice, dayToExpiry);
+  }
+
+  /**
+   * Ensures that the current inventory is not null.
+   *
+   * @throws IllegalArgumentException if no inventory is currently selected.
+   */
+  private void assertInventoryIsAvailable() {
+    if (currentStorage == null) {
+      throw new IllegalArgumentException("You are currently not in an inventory, please use the 'go' command.");
+    }
   }
 
 }

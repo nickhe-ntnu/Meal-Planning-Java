@@ -19,7 +19,8 @@ public class InputScanner {
   private final UnitRegistry unitRegistry;
 
   /**
-   * Create an input scanner to read from the terminal window.
+   * Default constructor for InputScanner.
+   * Initializes the internal scanner, command registry, and unit registry.
    */
   public InputScanner() {
     scanner = new Scanner(System.in);
@@ -28,7 +29,10 @@ public class InputScanner {
   }
 
   /**
-   * Create an input scanner to read from the terminal window.
+   * Constructs an InputScanner instance.
+   * Initializes the internal scanner, command registry, and unit registry.
+   *
+   * @param scannerSource the Scanner object to be used for input parsing.
    */
   public InputScanner(Scanner scannerSource) {
     scanner = scannerSource;
@@ -37,22 +41,28 @@ public class InputScanner {
   }
 
   /**
-   * Prompts the user to input a line of text and reads it from the terminal.
-   * The input is trimmed of leading and trailing whitespace.
-   * If the input is blank, an IllegalArgumentException is thrown.
+   * Fetches and processes user input as a command.
+   * Scans the input, tokenizes it, and converts it into a UserInput object.
    *
-   * @return the trimmed user input line.
-   * @throws IllegalArgumentException if the input is blank.
+   * @return a UserInput object representing the parsed command input.
    */
-  public String getInputString() {
-    if (!scanner.hasNextLine()) {
-      throw new IllegalArgumentException("Input cannot be blank.");
-    }
-    String inputLine = scanner.nextLine().trim();
-    if (inputLine.isBlank()) {
-      throw new IllegalArgumentException("Input cannot be blank.");
-    }
-    return inputLine;
+  public UserInput fetchCommand() {
+    String scannedLine = scanNextLine();
+    assertEmptyInput(scannedLine);
+    String[] tokenized = tokenizeInput(scannedLine);
+    return createCommandInput(tokenized);
+  }
+
+  /**
+   * Fetches and processes user input as a unit.
+   * The input is scanned, tokenized, and converted into a UserInput object.
+   *
+   * @return a UserInput object representing the parsed unit input.
+   */
+  public UserInput fetchUnit() {
+    String scannedLine = scanNextLine();
+    String[] tokenized = tokenizeInput(scannedLine);
+    return createUnitInput(tokenized);
   }
 
   /**
@@ -62,49 +72,49 @@ public class InputScanner {
    *
    * @return the valid input string provided by the user.
    */
-  public String getValidString() {
-    String inputString = "";
-    boolean validInput = false;
-    do {
+  public String collectValidString() {
+    String result = null;
+    boolean valid = false;
+
+    while (!valid) {
       try {
-        inputString = getInputString();
-        validInput = true;
+        result = scanNextLine();
+        valid = true;
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
       }
-    } while (!validInput);
-    return inputString;
+    }
+
+    return result;
   }
 
-  public String getValidString(String message) {
-
-    String inputString = "";
+  public float collectValidFloat() {
+    float result = 0f;
     boolean validInput = false;
-    do {
+
+    while (!validInput) {
       try {
-        inputString = getInputString();
+        result = getInputFloat();
         validInput = true;
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
       }
-    } while (!validInput);
-    return inputString;
+    }
+
+    return result;
   }
 
-  public float getValidFloat() {
-    float inputFloat = 0f;
-    boolean validInput = false;
-    do {
-      try {
-        inputFloat = getInputFloat();
-        validInput = true;
-      } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
-        // TODO check if there are error when input is none float.
-      }
-
-    } while (!validInput);
-    return inputFloat;
+  /**
+   * Reads and returns the next trimmed line from the input.
+   *
+   * @return the next line of input as a trimmed string.
+   * @throws IllegalArgumentException if no input is found.
+   */
+  public String scanNextLine() {
+    assertEmptyLine();
+    String inputLine = scanner.nextLine().trim();
+    assertEmptyInput(inputLine);
+    return inputLine;
   }
 
   /**
@@ -115,85 +125,67 @@ public class InputScanner {
    * @throws IllegalArgumentException if the input is blank or cannot be parsed as a float.
    */
   public float getInputFloat() {
+    assertEmptyLine();
+    return scanner.nextFloat();
+  }
+
+  /**
+   * Asserts that the input from the scanner is not empty.
+   *
+   * @throws IllegalArgumentException if no input is found.
+   */
+  private void assertEmptyLine() {
     if (!scanner.hasNextLine()) {
-      throw new IllegalArgumentException("Input cannot be blank.");
+      throw new IllegalArgumentException("Input cannot be empty.");
     }
-    float inputFloat = Float.parseFloat(scanner.nextLine());
-    if (inputFloat == 0.0f) {
-      throw new IllegalArgumentException("Input cannot be blank.");
+  }
+
+  /**
+   * Asserts that the input string is not empty.
+   *
+   * @param input the string input to be validated
+   * @throws IllegalArgumentException if the input is empty or consists only of whitespace
+   */
+  private void assertEmptyInput(String input) {
+    if (input.isBlank()) {
+      throw new IllegalArgumentException("Input cannot be empty.");
     }
-    return inputFloat;
   }
 
   /**
-   * Fetches and processes user input from the terminal.
-   * The input is trimmed of leading and trailing whitespace and split into tokens based on whitespace.
-   * These tokens are then used to create a UserInput object.
+   * Splits an input line into a maximum of three tokens based on whitespace.
    *
-   * @return a UserInput object representing the parsed user input, including command, subcommand, and input string.
+   * @param inputLine the input string to be tokenized.
+   * @return an array containing up to three tokens extracted from the input string.
    */
-  public UserInput fetchCommand() {
-    String[] tokens = scanLineToToken();
-    return setCommandInput(tokens);
-  }
-
-  /**
-   * Continuously prompts the user for input until valid unit input is provided.
-   * The input is split into tokens based on whitespace.
-   * These tokens are then used to create a UserInput object representing a unit and its amount.
-   *
-   * @return a UserInput object containing the parsed unit and its amount.
-   */
-  public UserInput fetchUnit() {
-    String[] tokens = new String[3];
-    boolean success = false;
-    do {
-      try {
-        tokens = scanLineToToken();
-        success = true;
-      } catch (NumberFormatException e) {
-        System.out.println("Invalid input, please enter in the format:"
-            + "{number} {unit}");
-      }
-    } while (!success);
-    return setUnitInput(tokens);
-  }
-
-  /**
-   * Prompts the user for input, reads the input line, trims any leading and trailing whitespace,
-   * and splits the input into tokens based on whitespace.
-   *
-   * @return an array of strings containing the tokens from the user's input.
-   * The array will contain at most three elements: the first token, the second token, and the rest of the input.
-   */
-  private String[] scanLineToToken() {
-    String inputLine = scanner.nextLine().trim();
+  private String[] tokenizeInput(String inputLine) {
     return inputLine.split("\\s+", 3);
-  }
-
-  /**
-   * Processes user input tokens and sets up a UserInput object based on those tokens.
-   *
-   * @param tokens an array of strings representing the user's input, split by whitespace.
-   *               The first token is treated as the command, the second token as the subcommand,
-   *               and the third token and beyond as additional input.
-   * @return a UserInput object containing the parsed command, subcommand, and input string.
-   */
-  private UserInput setCommandInput(String[] tokens) {
-    String command = (tokens.length > 0) ? tokens[0].toLowerCase() : null;
-    String subcommand = (tokens.length > 1) ? tokens[1].toLowerCase() : null;
-    String inputString = (tokens.length > 2) ? tokens[2].toLowerCase() : null;
-    return new UserInput(commandRegistry.getCommandWord(command), subcommand, inputString);
   }
 
   /**
    * Processes user input tokens and creates a UserInput object based on those tokens.
    *
    * @param tokens an array of strings representing the user's input, split by whitespace.
-   *               The first token is treated as the unit amount, and the second token (if present) is treated as the unit.
-   * @return a UserInput object containing the parsed unit amount and unit type.
+   *               The first token is treated as the command, the second as the subcommand,
+   *               and the third as the full input string.
+   * @return a UserInput object containing the parsed command, subcommand, and full input string.
    */
-  private UserInput setUnitInput(String[] tokens) {
+  private UserInput createCommandInput(String[] tokens) {
+    String command = (tokens.length > 0) ? tokens[0].toLowerCase() : null;
+    String subcommand = (tokens.length > 1) ? tokens[1].toLowerCase() : null;
+    String inputString = (tokens.length > 2) ? tokens[2] : null;
+    return new UserInput(commandRegistry.getCommandWord(command), subcommand, inputString);
+  }
+
+  /**
+   * Processes user input tokens to create a UserInput object for units.
+   *
+   * @param tokens an array of strings representing the user's input.
+   *               The first token should be the unit amount,
+   *               and the second token should be the unit type.
+   * @return a UserInput object containing the unit amount and its type.
+   */
+  private UserInput createUnitInput(String[] tokens) {
     float unitAmount = (tokens.length > 0) ? Float.valueOf(tokens[0]) : -1;
     String unit = (tokens.length > 1) ? tokens[1].toLowerCase() : null;
     return new UserInput(unitAmount, unitRegistry.getUnitType(unit));

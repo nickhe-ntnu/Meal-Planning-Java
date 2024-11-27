@@ -1,6 +1,8 @@
 package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
+import edu.ntnu.idi.bidata.user.inventory.Ingredient;
+import edu.ntnu.idi.bidata.user.recipe.Recipe;
 
 /**
  * The AddCommand class extends the Command class and is responsible for handling
@@ -35,7 +37,7 @@ public class AddCommand extends Command {
   @Override
   protected void processSubcommand() {
     switch (userInputSubcommand) {
-      case "storage" -> addStorage();
+      case "storage", "inventory" -> addStorage();
       case "ingredient" -> addIngredient();
       case "recipe" -> addRecipe();
       default -> illegalCommand();
@@ -61,27 +63,25 @@ public class AddCommand extends Command {
    * success message is printed. If not, an operation failure message is printed.
    */
   private void addStorage() {
-    getInputString("Please enter new storage name:");
+    requestInputIfNeeded("Please enter new storage name:");
     boolean success = inventoryManager.addStorage(userInputString);
     printOperationMessage(success);
   }
 
   /**
-   * Adds a new ingredient to the user's current storage.
-   * This method first checks if the user is located in a directory.
-   * If the user is not in a directory, an {@code IllegalArgumentException} is thrown.
-   * Then, the method launches a wizard to collect the details of the ingredient
-   * and subsequently adds the ingredient to the user's list.
-   * Finally, it prints a success message indicating that the ingredient has been added.
-   *
-   * @throws IllegalArgumentException if the user is not in a directory.
+   * Creates a new Ingredient using the inventory manager and adds it to the inventory.
    */
   private void addIngredient() {
-    inventoryManager.createIngredient();
+    Ingredient createdIngredient = inventoryManager.createIngredient(userInputString);
+    inventoryManager.addIngredient(createdIngredient);
   }
 
+  /**
+   * Creates and adds a new recipe using the recipe manager.
+   */
   private void addRecipe() {
-    // TODO
+    Recipe createdRecipe = recipeManager.createRecipe();
+    recipeManager.addRecipe(createdRecipe);
   }
 
 }

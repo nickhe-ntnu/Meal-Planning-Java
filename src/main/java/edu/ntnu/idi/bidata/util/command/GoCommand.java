@@ -41,7 +41,7 @@ public class GoCommand extends Command {
   }
 
   private void goTo() {
-    String inputString = getInputString("Please enter the storage name:");
+    String inputString = requestInputIfNeeded("Please enter the storage name:").toLowerCase();
     IngredientStorage ingredientStorage = inventoryManager.getStorage(inputString);
     boolean success = ingredientStorage != null;
     if (success) {

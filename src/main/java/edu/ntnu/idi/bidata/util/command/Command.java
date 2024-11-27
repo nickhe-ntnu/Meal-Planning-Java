@@ -75,15 +75,15 @@ public abstract class Command {
   }
 
   /**
-   * Prompts the user for input by displaying a message if the user input string has not already been set.
+   * Requests user input if it hasn't been provided already.
    *
-   * @param message The message to be printed if the user input string is not set.
-   * @return The user's input string.
+   * @param message The message to prompt the user for input.
+   * @return The user input string.
    */
-  protected String getInputString(String message) {
+  protected String requestInputIfNeeded(String message) {
     if (userInputString == null) {
       outputHandler.printInputPrompt(message);
-      userInputString = inputScanner.getValidString();
+      userInputString = inputScanner.collectValidString();
     }
     return userInputString;
   }

@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**/
 class RemoveCommandTest {
   User testUser;
   InventoryManager testInventoryManager;

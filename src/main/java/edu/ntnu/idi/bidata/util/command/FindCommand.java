@@ -43,7 +43,7 @@ public class FindCommand extends Command {
   }
 
   private void findIngredient() {
-    String ingredientName = getInputString("Please enter the ingredient name to find:");
+    String ingredientName = requestInputIfNeeded("Please enter the ingredient name to find:");
     List<String> storageContainsIngredient = inventoryManager.findIngredientStorage(ingredientName);
     if (storageContainsIngredient.isEmpty()) {
       outputHandler.printOutputWithLineBreak(ingredientName + " isn't present at any of the storages.");
