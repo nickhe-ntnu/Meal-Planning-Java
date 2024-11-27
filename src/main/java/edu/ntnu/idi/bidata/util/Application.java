@@ -13,14 +13,21 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-11-09
+ * @version 2024-11-27
  */
 public class Application {
-
+  private static final String WELCOME_MESSAGE = """
+      Hello, %s
+      Thank you for using the meal planning app!
+      Earth thanks you for taking care of her.""";
   private final User user;
   private final InputScanner inputScanner;
   private final OutputHandler outputHandler;
 
+  /**
+   * Initializes a new instance of the Application
+   * Sets up the user, input scanner, and output handler.
+   */
   public Application() {
     user = userSetUp();
     inputScanner = user.getInputScanner();
@@ -33,12 +40,17 @@ public class Application {
    * It handles any exceptions by printing the error messages.
    */
   public void initialize() {
-    outputHandler.printWelcomeMessage();
+    outputHandler.printWelcomeMessage(user.getName());
     outputHandler.printHelpMessage();
     startUpCondition();
     engine();
   }
 
+  /**
+   * Allows demo to be more efficient with already exising data.
+   * Add all the desired start-up conditions here
+   * e.g., create a recipe, create ingredients, add storage locations.
+   */
   private void startUpCondition() {
     InventoryManager inventoryManager = user.getInventoryManager();
     inventoryManager.addStorage("Fridge");

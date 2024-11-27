@@ -1,36 +1,31 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
-import edu.ntnu.idi.bidata.util.unit.UnitConverter;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
- * Represents an ingredient with a name, unit, and amount.
+ * Represents an ingredient with attributes such as
+ * name, amount, unit, expiry date, and standard unit price.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-27
  */
 public class Ingredient {
-  // Instance variables
-  private String name;
-  private float amount;
-  private ValidUnit validUnit;
+  private final Measurement measurement = new Measurement();
   private LocalDate expiryDate;
-  private float standardUnitPrice;
-  private IngredientType ingredientType;
+  private float standardUnitPrice; // per KG/L
 
   /**
-   * Create a new ingredient with a name, unit, and amount.
+   * Constructs an Ingredient object with the specified parameters.
    *
-   * @param name      the name of the ingredient
-   * @param validUnit the unit of the ingredient
-   * @param amount    the amount of the ingredient
-   * @throws IllegalArgumentException if the name is null or empty, the unit is null or empty, or the
-   *                                  amount is negative or NaN
+   * @param name              the name of the ingredient
+   * @param amount            the amount of the ingredient
+   * @param validUnit         the unit of measurement for the ingredient
+   * @param standardUnitPrice the standard price per unit of the ingredient
+   * @param daysToExpiry      the number of days until the ingredient expires
    */
   public Ingredient(String name, float amount, ValidUnit validUnit, float standardUnitPrice, int daysToExpiry) {
     setName(name);
@@ -41,55 +36,82 @@ public class Ingredient {
   }
 
   /**
-   * For the sake of demonstrating out of date scenario.
-   * TODO remove this backdoor constructor before production
+   * Constructs an Ingredient with an expired status, using a password for validation.
+   *
+   * @param password the password to validate for creating an expired ingredient
    */
   public Ingredient(String password) {
-    if (password.equals("expiredDemo")) {
-      Random random = new Random();
-      String[] names = new String[]{"Expired Milk", "Expired Chicken", "Expired Egg", "Moldy Bread"};
-      name = names[random.nextInt(names.length)];
-      amount = random.nextInt(1, 4);
-      if (name.equals("Expired Milk")) {
-        validUnit = ValidUnit.L;
-      } else {
-        validUnit = ValidUnit.KG;
-      }
-      expiryDate = LocalDate.now().minusDays(random.nextInt(4, 17));
+    validatePassword(password);
+    createExpiredIngredient();
+  }
+
+  /**
+   * Returns a string representation of the ingredient.
+   *
+   * @return a string indicating the ingredient's details, or an expired message if it has expired.
+   */
+  @Override
+  public String toString() {
+    return isExpired() ? getExpiredString() : getString();
+  }
+
+  /**
+   * Calculate the number of days between the current date and a specified future date.
+   *
+   * @param untilDate the future date until which the number of days is to be calculated
+   * @return the number of days between the current date and the specified future date
+   * @throws IllegalArgumentException if the untilDate is null
+   */
+  public int getDaysBetween(LocalDate untilDate) {
+    return (int) ChronoUnit.DAYS.between(LocalDate.now(), untilDate);
+  }
+
+  /**
+   * Merges the specified ingredient with the current one.
+   *
+   * @param ingredientToMerge the ingredient to merge into the current ingredient
+   */
+  public void merge(Ingredient ingredientToMerge) {
+    if (isValidToMerge(ingredientToMerge)) {
+      Measurement measurementToMerge = ingredientToMerge.getMeasurement();
+      this.standardUnitPrice = Math.max(this.standardUnitPrice, ingredientToMerge.getStandardUnitPrice());
+      this.measurement.merge(measurementToMerge);
     }
   }
 
   /**
-   * Returns a string representation of the ingredient, including its name, amount, unit, and expiry date.
+   * Checks if the ingredient has expired.
    *
-   * @return a string containing the ingredient's details and the number of days until its expiry.
+   * @return true if the current date is after the expiry date, false otherwise
    */
-  @Override
-  public String toString() {
-    String stringToReturn;
-    if (LocalDate.now().isAfter(expiryDate)) {
-      stringToReturn = getExpiredIngredientString();
-    } else {
-      int dayTilExpiry = getDaysBetween(this.getExpiryDate());
-      stringToReturn = "  * " + name + ": " + amount + " " + validUnit + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days)";
-    }
-    return stringToReturn;
+  private boolean isExpired() {
+    return LocalDate.now().isAfter(expiryDate);
   }
 
-  public String getExpiredIngredientString() {
+  private String getString() {
+    int dayTilExpiry = getDaysBetween(this.getExpiryDate());
+    return "\n" + "  - " + getName() + ": " + getAmount()
+        + " " + getUnit()
+        + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days)";
+  }
+
+  /**
+   * Generates a string detailing the ingredient's name, amount, unit, expiry date, and how many days it has been expired.
+   *
+   * @return a formatted string describing the expired ingredient
+   */
+  private String getExpiredString() {
     int daysExpired = Math.abs(getDaysBetween(this.getExpiryDate()));
-    return "  * " + name + ": " + amount + " " + validUnit + " - Best before: " + expiryDate + " (Expired " + daysExpired + " days ago)";
-  }
-
-  public String getIngredientTypeString() {
-    return ingredientType.name();
+    return "\n" + "  * " + getName() + ": " + getAmount() + " "
+        + getUnit() + " - Best before: " + expiryDate
+        + " (Expired " + daysExpired + " days ago)";
   }
 
   /**
    * Retrieves the expiry date of the ingredient.
-   * If the expiry date is not set, it returns a date 20 days before the current date.
+   * If the expiry date is not set, returns a default date 999 days in the past.
    *
-   * @return the expiry date of the ingredient, or a date 20 days before the current date if not set
+   * @return the LocalDate representing the expiry date.
    */
   public LocalDate getExpiryDate() {
     return (expiryDate != null) ? expiryDate : LocalDate.now().minusDays(999);
@@ -108,48 +130,71 @@ public class Ingredient {
     this.expiryDate = LocalDate.now().plusDays(daysToExpiry);
   }
 
+  public Measurement getMeasurement() {
+    return this.measurement;
+  }
+
   /**
    * Retrieves the name of the ingredient.
    *
    * @return the name of the ingredient if it is set, otherwise returns an empty string
    */
   public String getName() {
-    return (name != null) ? name : "";
+    return getMeasurementName();
   }
 
   /**
-   * Set the name of the ingredient.
+   * Sets the name of the ingredient's measurement.
    *
-   * @param name the name of the ingredient
-   * @throws IllegalArgumentException if the name is null or empty
+   * @param name the name of the measurement to set
    */
   public void setName(String name) {
-    if (name == null || name.isBlank()) {
-      throw new IllegalArgumentException("Name cannot be null or empty");
-    }
-    this.name = name;
+    measurement.setName(name);
+  }
+
+  /**
+   * Retrieves the name of the measurement associated with the ingredient.
+   *
+   * @return the measurement name as a string.
+   */
+  private String getMeasurementName() {
+    return measurement.getName();
   }
 
   /**
    * Retrieves the amount of the ingredient.
    *
-   * @return the amount of the ingredient
+   * @return the ingredient amount as a float
    */
   public float getAmount() {
-    return amount;
+    return getMeasurementAmount();
   }
 
   /**
-   * Set the amount of the ingredient.
+   * Sets the amount for this ingredient.
    *
-   * @param amount the amount of the ingredient
-   * @throws IllegalArgumentException if the amount is negative or NaN
+   * @param amount the amount to set
    */
   public void setAmount(float amount) {
-    if (amount < 0) {
-      throw new IllegalArgumentException("Amount cannot be negative");
-    }
-    this.amount = amount;
+    measurement.setAmount(amount);
+  }
+
+  /**
+   * Retrieves the measurement amount associated with the ingredient.
+   *
+   * @return the measurement amount as a float
+   */
+  private float getMeasurementAmount() {
+    return measurement.getAmount();
+  }
+
+  /**
+   * Retrieves the valid measurement unit of the ingredient.
+   *
+   * @return the valid measurement unit as an instance of ValidUnit
+   */
+  private ValidUnit getMeasurementUnit() {
+    return measurement.getValidUnit();
   }
 
   /**
@@ -158,26 +203,8 @@ public class Ingredient {
    * @return the unit of the ingredient if it is set,
    * otherwise returns {@code ValidUnit.UNKNOWN}
    */
-  public ValidUnit getValidUnit() {
-    return (validUnit != null) ? validUnit : ValidUnit.UNKNOWN;
-  }
-
-  /**
-   * Sets the unit of the ingredient.
-   *
-   * @param validUnit the unit to be set for the ingredient
-   * @throws IllegalArgumentException if the unit is null or if the unit is
-   *                                  {@code ValidUnit.UNKNOWN}
-   */
-  public void setValidUnit(ValidUnit validUnit) {
-    if (validUnit == null) {
-      throw new IllegalArgumentException("Unit cannot be null.");
-    }
-    if (validUnit == ValidUnit.UNKNOWN) {
-      throw new IllegalArgumentException("Invalid unit, please try again.");
-    }
-    setIngredientType(getIngredientType(validUnit));
-    this.validUnit = validUnit;
+  public ValidUnit getUnit() {
+    return getMeasurementUnit();
   }
 
   /**
@@ -205,45 +232,47 @@ public class Ingredient {
   }
 
   /**
-   * Sets the type of the ingredient.
+   * Sets the valid unit for the measurement of the ingredient.
    *
-   * @param ingredientType the type of the ingredient to set
-   * @throws IllegalArgumentException if the ingredient type is null
+   * @param validUnit the valid unit to be set
+   * @throws IllegalArgumentException if the unit is null or UNKNOWN
    */
-  private void setIngredientType(IngredientType ingredientType) {
-    if (ingredientType == null) {
-      throw new IllegalArgumentException("Ingredient type cannot be null.");
-    }
-    this.ingredientType = ingredientType;
+  public void setValidUnit(ValidUnit validUnit) {
+    measurement.setValidUnit(validUnit);
   }
 
   /**
-   * Merges the specified ingredient into this ingredient by combining their amounts and updating the price per unit.
-   * If the combined amount is greater than or equal to 1000, this ingredient is converted to a standard unit.
+   * Validates the password for the backdoor constructor.
    *
-   * @param ingredientToMerge the ingredient to be merged with this ingredient
+   * @param password the password to validate
+   * @throws RuntimeException if the provided password does not match the required value
    */
-  public void merge(Ingredient ingredientToMerge) {
-    UnitConverter unitConverter = new UnitConverter();
-    unitConverter.autoMergeUnit(this.validUnit, ingredientToMerge);
-    float mergedAmount = this.getAmount() + ingredientToMerge.getAmount();
-    float mergedPricePerUnit = Math.max(this.getStandardUnitPrice(), ingredientToMerge.getStandardUnitPrice());
-    this.setAmount(mergedAmount);
-    this.setStandardUnitPrice(mergedPricePerUnit);
-    if (mergedAmount >= 1000) {
-      unitConverter.convertToStandard(this);
+  private void validatePassword(String password) {
+    final String EXPIRED_PASSWORD = "expiredDemo";
+    if (!password.equals(EXPIRED_PASSWORD)) {
+      throw new RuntimeException("Wrong password for backdoor constructor, action not allowed.");
     }
   }
 
   /**
-   * Calculate the number of days between the current date and a specified future date.
-   *
-   * @param untilDate the future date until which the number of days is to be calculated
-   * @return the number of days between the current date and the specified future date
-   * @throws IllegalArgumentException if the untilDate is null
+   * Creates an expired ingredient with randomized attributes.
+   * Randomly selects the name and amount for an expired ingredient.
+   * Sets the appropriate unit based on the selected name.
+   * Assigns a random expiry date within a specific range.
    */
-  public int getDaysBetween(LocalDate untilDate) {
-    return (int) ChronoUnit.DAYS.between(LocalDate.now(), untilDate);
+  private void createExpiredIngredient() {
+    Random random = new Random();
+    String[] expiredNames = {"Expired Milk", "Expired Chicken", "Expired Egg", "Moldy Bread"};
+
+    String name = expiredNames[random.nextInt(expiredNames.length)];
+    float amount = random.nextInt(1, 4);
+    ValidUnit validUnit = (name.equals("Expired Milk")) ? ValidUnit.L : ValidUnit.KG;
+
+    setName(name);
+    setAmount(amount);
+    setValidUnit(validUnit);
+    // setters do not allow the expiry date to be date before today.
+    expiryDate = LocalDate.now().minusDays(random.nextInt(4, 17));
   }
 
   /**
@@ -253,9 +282,9 @@ public class Ingredient {
    * @return true if the ingredient is valid to merge, false otherwise
    */
   private boolean isValidToMerge(Ingredient ingredientToMerge) {
-    return isNonNull(ingredientToMerge) &&
-        hasSameName(ingredientToMerge) &&
-        hasSameExpiryDate(ingredientToMerge);
+    return isNonNull(ingredientToMerge)
+        && hasSameName(ingredientToMerge)
+        && hasSameExpiryDate(ingredientToMerge);
   }
 
   /**
@@ -265,7 +294,7 @@ public class Ingredient {
    * @return true if the ingredient and its name are not null, false otherwise
    */
   private boolean isNonNull(Ingredient ingredient) {
-    return ingredient != null && ingredient.name != null;
+    return ingredient != null && ingredient.getName() != null;
   }
 
   /**
@@ -275,7 +304,7 @@ public class Ingredient {
    * @return true if both ingredients have the same name, false otherwise
    */
   private boolean hasSameName(Ingredient ingredientToMerge) {
-    return this.name.equals(ingredientToMerge.name);
+    return this.getName().equals(ingredientToMerge.getName());
   }
 
   /**
@@ -286,34 +315,6 @@ public class Ingredient {
    */
   private boolean hasSameExpiryDate(Ingredient ingredientToMerge) {
     return this.expiryDate.isEqual(ingredientToMerge.expiryDate);
-  }
-
-  /**
-   * Determines the type of ingredient based on the provided valid unit.
-   *
-   * @param validUnit the unit to evaluate
-   * @return the corresponding ingredient type if the unit matches, otherwise null
-   */
-  private IngredientType getIngredientType(ValidUnit validUnit) {
-    ValidUnit[] validSolidUnits;
-    ValidUnit[] validLiquidUnits;
-    validSolidUnits = new ValidUnit[]{ValidUnit.G, ValidUnit.KG};
-    validLiquidUnits = new ValidUnit[]{ValidUnit.ML, ValidUnit.DL, ValidUnit.L};
-    if (Arrays.stream(validLiquidUnits).anyMatch(unit -> unit == validUnit)) {
-      return IngredientType.LIQUID;
-    } else if (Arrays.stream(validSolidUnits).anyMatch(unit -> unit == validUnit)) {
-      return IngredientType.SOLID;
-    }
-    return null;
-  }
-
-  /**
-   * Enumeration representing the type of ingredient, which can be
-   * either SOLID or LIQUID.
-   */
-  enum IngredientType {
-    SOLID,
-    LIQUID
   }
 
 }

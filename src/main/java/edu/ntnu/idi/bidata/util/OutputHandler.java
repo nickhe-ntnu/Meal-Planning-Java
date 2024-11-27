@@ -1,13 +1,22 @@
 package edu.ntnu.idi.bidata.util;
 
+import edu.ntnu.idi.bidata.util.command.ValidCommand;
+
+import java.util.List;
+
 /**
  * The OutputHandler class is responsible for displaying various messages
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-11-27
  */
 public class OutputHandler {
+
+  private static final String WELCOME_MESSAGE = """
+      Hello, %s
+      Thank you for using the meal planning app!
+      Earth thanks you for taking care of her.""";
 
   public OutputHandler() {
   }
@@ -48,15 +57,12 @@ public class OutputHandler {
    * Prints a welcome message to the user indicating the application has started
    * and encourages environmental responsibility.
    */
-  public void printWelcomeMessage() {
-    printOutput("""
-        Thank you for using the meal planning app!
-        Earth thanks you for taking care of her.""");
+  public void printWelcomeMessage(String userName) {
+    printOutput(String.format(WELCOME_MESSAGE, userName));
   }
 
   /**
-   * Prints a farewell message to the user indicating the application
-   * has ended and thanking them for usage.
+   * Prints a farewell message to the user to indicating the application has ended.
    */
   public void printGoodbyeMessage() {
     printOutput("Thank you for using the application, goodbye!");
@@ -85,10 +91,12 @@ public class OutputHandler {
   }
 
   public void printHelpMessage() {
-    printOutput("""
-        Available commands are:
-        # help, list, go, add, remove, find, exit""");
+    printOutput("Available commands are:" + "\n" + formatCommands());
+  }
 
+  private String formatCommands() {
+    List<String> commands = ValidCommand.getCommands();
+    return " help | " + String.join(" | ", commands) + " | exit";
   }
 
   public void printUnknownInstruction() {
@@ -98,41 +106,41 @@ public class OutputHandler {
   private void printHelpInstruction() {
     printOutput("""
         Valid print commands are:
-        # help, help {valid command}""");
+         help | help {valid command}""");
   }
 
   private void printListInstruction() {
     printOutput("""
         Valid list commands are:
-        # list inventory, list recipe, list ingredient,
-        # list expired, list available recipe""");
+         list inventory | list recipe | list ingredient
+         list expired | list available recipe""");
 
   }
 
   private void printGoInstruction() {
     printOutput("""
         Valid go commands are:
-        # go to {storage name}, go back""");
+         go to {storage name} | go back""");
   }
 
   private void printAddInstruction() {
     printOutput("""
         Valid add commands are:
-        # add storage, add ingredient, add recipe""");
+         add storage | add ingredient | add recipe""");
   }
 
   private void printRemoveInstruction() {
     printOutput("""
         Valid remove commands are:
-        # remove storage {storage name}
-        # remove ingredient {ingredient name}
-        # remove recipe {recipe name}""");
+         remove storage {storage name}
+         remove ingredient {ingredient name}
+         remove recipe {recipe name}""");
   }
 
   private void printFindInstruction() {
     printOutput("""
         Valid find commands are:
-        # find ingredient {ingredient name}, find recipe {recipe name}""");
+         find ingredient {ingredient name} | find recipe {recipe name}""");
   }
 
 }

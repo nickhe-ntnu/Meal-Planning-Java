@@ -1,6 +1,6 @@
 package edu.ntnu.idi.bidata.util.unit;
 
-import edu.ntnu.idi.bidata.user.inventory.Ingredient;
+import edu.ntnu.idi.bidata.user.inventory.Measurement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,62 +12,62 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * functionality of unit conversion methods within the UnitConverter class.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-27
  */
 class UnitConverterTest {
 
   UnitConverter unitConverter;
-  Ingredient solidIngredient;
-  Ingredient liquidIngredient;
+  Measurement solidMeasurement;
+  Measurement liquidMeasurement;
 
   @BeforeEach
   void beforeEach() {
     unitConverter = new UnitConverter();
-    solidIngredient = new Ingredient("test object", 123.456f, ValidUnit.KG, 200, 12);
-    liquidIngredient = new Ingredient("test object", 123.456f, ValidUnit.DL, 200, 12);
+    solidMeasurement = new Measurement("test object", 12345.6f, ValidUnit.G);
+    liquidMeasurement = new Measurement("test object", 123.456f, ValidUnit.DL);
   }
 
   @Test
   void convertToStandard() {
-    unitConverter.convertToStandard(solidIngredient);
-    unitConverter.convertToStandard(liquidIngredient);
-    assertEquals(123.46f, solidIngredient.getAmount());
-    assertEquals(ValidUnit.KG, solidIngredient.getValidUnit());
-    assertEquals(12.35f, liquidIngredient.getAmount());
-    assertEquals(ValidUnit.L, liquidIngredient.getValidUnit());
+    unitConverter.convertToStandard(solidMeasurement);
+    unitConverter.convertToStandard(liquidMeasurement);
+    assertEquals(12.35f, solidMeasurement.getAmount());
+    assertEquals(ValidUnit.KG, solidMeasurement.getValidUnit());
+    assertEquals(12.35f, liquidMeasurement.getAmount());
+    assertEquals(ValidUnit.L, liquidMeasurement.getValidUnit());
   }
 
   @Test
   void convertToGrams() {
-    unitConverter.convertToGrams(solidIngredient);
-    assertEquals(123456, solidIngredient.getAmount());
-    assertEquals(ValidUnit.G, solidIngredient.getValidUnit());
+    unitConverter.convertToGrams(solidMeasurement);
+    assertEquals(12345.6f, solidMeasurement.getAmount());
+    assertEquals(ValidUnit.G, solidMeasurement.getValidUnit());
   }
 
   @Test
   void convertToKG() {
-    unitConverter.convertToKG(solidIngredient);
-    assertEquals(123.46f, solidIngredient.getAmount());
-    assertEquals(ValidUnit.KG, solidIngredient.getValidUnit());
+    unitConverter.convertToKG(solidMeasurement);
+    assertEquals(12.35f, solidMeasurement.getAmount());
+    assertEquals(ValidUnit.KG, solidMeasurement.getValidUnit());
   }
 
   @Test
   void convertToLiter() {
-    unitConverter.convertToLiter(liquidIngredient);
-    assertEquals(12.35f, liquidIngredient.getAmount());
+    unitConverter.convertToLiter(liquidMeasurement);
+    assertEquals(12.35f, liquidMeasurement.getAmount());
   }
 
   @Test
   void convertToDeciLiter() {
-    unitConverter.convertToDeciLiter(liquidIngredient);
-    assertEquals(123.46f, liquidIngredient.getAmount());
-    assertEquals(ValidUnit.DL, liquidIngredient.getValidUnit());
+    unitConverter.convertToDeciLiter(liquidMeasurement);
+    assertEquals(123.46f, liquidMeasurement.getAmount());
+    assertEquals(ValidUnit.DL, liquidMeasurement.getValidUnit());
   }
 
   @Test
   void convertToMilliLiter() {
-    unitConverter.convertToMilliLiter(liquidIngredient);
-    assertEquals(12345.6f, liquidIngredient.getAmount());
-    assertEquals(ValidUnit.ML, liquidIngredient.getValidUnit());
+    unitConverter.convertToMilliLiter(liquidMeasurement);
+    assertEquals(12345.6f, liquidMeasurement.getAmount());
+    assertEquals(ValidUnit.ML, liquidMeasurement.getValidUnit());
   }
 }

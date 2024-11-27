@@ -8,7 +8,7 @@ import java.util.*;
  * stored in various named collections.
  *
  * @author Nick Heggø
- * @version 2024-11-09
+ * @version 2024-11-27
  */
 public class IngredientStorage {
 
@@ -32,9 +32,9 @@ public class IngredientStorage {
    */
   public String getStorageString() {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("\n# ").append(storageName);
+    stringBuilder.append("\n ").append(storageName);
     if (ingredientMap.isEmpty()) {
-      stringBuilder.append("\n  (Empty)");
+      stringBuilder.append("\n   (Empty)");
     } else {
       ingredientMap.values().forEach(ingredientList ->
           ingredientList.forEach(ingredient -> stringBuilder.append(ingredient.toString())));

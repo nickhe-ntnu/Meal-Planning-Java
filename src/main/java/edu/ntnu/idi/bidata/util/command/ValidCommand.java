@@ -1,5 +1,9 @@
 package edu.ntnu.idi.bidata.util.command;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * Holds the every valid command.
  * UNKNOWN - non-valid command
@@ -10,7 +14,7 @@ package edu.ntnu.idi.bidata.util.command;
  * HELP - list of all commands.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-27
  */
 public enum ValidCommand {
   EXIT,
@@ -20,5 +24,14 @@ public enum ValidCommand {
   FIND,
   LIST,
   HELP,
-  UNKNOWN
+  UNKNOWN;
+
+  public static List<String> getCommands() {
+    return Stream.of(ValidCommand.values())
+        .map(Enum::name)
+        .filter(name -> !name.equals("HELP") && !name.equals("EXIT") && !name.equals("UNKNOWN"))
+        .map(String::toLowerCase)
+        .sorted()
+        .collect(Collectors.toList());
+  }
 }

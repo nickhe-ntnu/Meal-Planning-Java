@@ -7,6 +7,13 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.*;
 
+/**
+ * Manages multiple ingredient storages and provides functionalities
+ * for ingredient and storage management.
+ *
+ * @author Nick Heggø
+ * @version 2024-11-27
+ */
 public class InventoryManager {
 
   private final InputScanner inputScanner;
@@ -81,7 +88,8 @@ public class InventoryManager {
   public String getInventoryString() {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append("###### Inventory #######");
-    storageMap.values().forEach(storage -> stringBuilder.append(storage.getStorageString()));
+    storageMap.values()
+        .forEach(storage -> stringBuilder.append(storage.getStorageString()));
     return stringBuilder.toString();
   }
 
@@ -135,7 +143,7 @@ public class InventoryManager {
     stringBuilder.append("####### Expired ########");
     listOfExpired.stream()
         .map(Ingredient::toString)
-        .forEach(string -> stringBuilder.append("\n").append(string));
+        .forEach(stringBuilder::append);
     return stringBuilder.toString();
   }
 
