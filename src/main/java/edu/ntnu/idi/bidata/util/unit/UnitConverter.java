@@ -2,6 +2,7 @@ package edu.ntnu.idi.bidata.util.unit;
 
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
+import edu.ntnu.idi.bidata.util.command.Utility;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * enumeration which includes units for weight (KG, G) and volume (L, DL, ML).
  *
  * @author Nick Heggø
- * @version 2024-11-27
+ * @version 2024-11-28
  */
 public class UnitConverter {
 
@@ -35,6 +36,18 @@ public class UnitConverter {
     } else if (ingredientType.equals("LIQUID")) {
       convertToLiter(measurement);
     }
+  }
+
+  public List<Object> getStandardData(Measurement measurement) {
+    Utility.assertNonNull(measurement);
+    String ingredientType = measurement.getIngredientType();
+    List<Object> data = null;
+    if (ingredientType.equals("SOLID")) {
+      data = convertSolid(measurement, ValidUnit.KG, 1, 0.001f);
+    } else if (ingredientType.equals("LIQUID")) {
+      data = convertLiquid(measurement, ValidUnit.L, 1, 0.1f, 0.001f);
+    }
+    return data;
   }
 
   /**
@@ -125,15 +138,14 @@ public class UnitConverter {
   }
 
   /**
-   * Converts the given measurement from its current unit to the specified target unit for solids.
-   * Multiplies the current amount by the appropriate factor based on its current unit.
-   * The converted amount is rounded to two decimal places and set in the measurement.
+   * Converts a given solid measurement to the specified target unit using specified conversion factors.
    *
    * @param measurement  the measurement to be converted; must not be null
-   * @param targetUnit   the unit to convert the measurement to; must not be null or UNKNOWN
+   * @param targetUnit   the unit to convert the measurement to; must not be null
    * @param factorFromKG conversion factor to apply when the current unit is kilograms
    * @param factorFromG  conversion factor to apply when the current unit is grams
-   * @throws IllegalArgumentException if current unit is not KG or G
+   * @return a list containing the converted amount and target unit
+   * @throws IllegalArgumentException if the conversion between the current unit and the target unit is not allowed
    */
   private List<Object> convertSolid(Measurement measurement, ValidUnit targetUnit, float factorFromKG, float factorFromG) {
     float amount = measurement.getAmount();

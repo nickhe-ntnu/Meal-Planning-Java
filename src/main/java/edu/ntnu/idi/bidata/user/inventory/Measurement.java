@@ -3,18 +3,20 @@ package edu.ntnu.idi.bidata.user.inventory;
 import edu.ntnu.idi.bidata.util.unit.UnitConverter;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
+import java.util.List;
+
 /**
  * Represents a measurement with a name, amount, unit, and ingredient type.
  *
  * @author Nick Heggø
- * @version 2024-11-27
+ * @version 2024-11-28
  */
 public class Measurement {
+  private final UnitConverter unitConverter;
   private String name; // Ingredient Name
   private float amount;
   private ValidUnit validUnit;
   private IngredientType ingredientType; // set automatically, based on ValidUnit.
-  private UnitConverter unitConverter;
 
   /**
    * Default constructor for the Measurement class.
@@ -38,9 +40,9 @@ public class Measurement {
     unitConverter = new UnitConverter();
   }
 
-  //  public float getStandardAmount() {
-  //    return unitConverter.convertToStandard();
-  //  }
+  public List<Object> getStandardData() {
+    return unitConverter.getStandardData(this);
+  }
 
   /**
    * Merges the specified Measurement instance with the current one.

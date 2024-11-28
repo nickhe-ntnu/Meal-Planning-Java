@@ -1,9 +1,12 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,14 +18,27 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class IngredientStorageTest {
   static IngredientStorage ingredientStorage;
+  private final PrintStream originalOut = System.out;
+  private final ByteArrayOutputStream outTest = new ByteArrayOutputStream();
 
   @BeforeEach
   void BeforeEach() {
+    System.setOut(new PrintStream(outTest));
     ingredientStorage = new IngredientStorage("Test Storage");
   }
 
-  //  @Test
-  //  void testHas
+  @AfterEach
+  void restoreStreams() {
+    System.setOut(originalOut);
+  }
+
+  @Test
+  void testEdgeCase() {
+    assertThrows(IllegalArgumentException.class, () -> ingredientStorage.addIngredient(null));
+    ingredientStorage.getIngredientList((Ingredient) null);
+    ingredientStorage.getIngredientList((String) null);
+    ingredientStorage.removeExpired();
+  }
 
   @Test
   void testGetAllExpired() {

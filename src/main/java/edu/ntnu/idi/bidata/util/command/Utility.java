@@ -2,6 +2,12 @@ package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 
+/**
+ * A utility class providing methods to manipulate strings and objects.
+ *
+ * @author Nick Heggø
+ * @version 2024-11-28
+ */
 public class Utility {
 
   private Utility() {
@@ -25,5 +31,11 @@ public class Utility {
    */
   public static String createKey(Ingredient o) {
     return (o == null) ? null : o.getName().toLowerCase();
+  }
+
+  public static void assertNonNull(Object o) {
+    if (o == null) {
+      throw new IllegalArgumentException("Null is prohibited.");
+    }
   }
 }

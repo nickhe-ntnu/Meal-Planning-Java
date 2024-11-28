@@ -37,6 +37,7 @@ public class IngredientStorage {
    * @param newIngredient The ingredient to be added to the storage.
    */
   public void addIngredient(Ingredient newIngredient) {
+    Utility.assertNonNull(newIngredient);
     if (hasMatchingExpiryDate(newIngredient)) {
       mergeIngredient(newIngredient);
     } else {
@@ -78,8 +79,30 @@ public class IngredientStorage {
   }
 
   public void removeExpired() {
+    if (ingredientMap.isEmpty()) {
+      System.out.println("No ingredients available to check for expiry.");
+      return;
+    }
+
+    List<Ingredient> removedIngredients = new ArrayList<>(); // List to track removed ingredients
+
     for (List<Ingredient> ingredientList : ingredientMap.values()) {
-      ingredientList.removeIf(ingredient -> ingredient.getExpiryDate().isBefore(LocalDate.now()));
+      ingredientList.removeIf(ingredient -> {
+        boolean isExpired = ingredient.getExpiryDate().isBefore(LocalDate.now());
+        if (isExpired) {
+          removedIngredients.add(ingredient); // Collect expired ingredient
+        }
+        return isExpired;
+      });
+    }
+
+    if (!removedIngredients.isEmpty()) {
+      System.out.println(removedIngredients.size() + " expired ingredients were removed:");
+      for (Ingredient ingredient : removedIngredients) {
+        System.out.println(" - " + ingredient);
+      }
+    } else {
+      System.out.println("No expired ingredients were found.");
     }
   }
 
@@ -161,8 +184,10 @@ public class IngredientStorage {
    * @param ingredientToAdd the ingredient to be added to the list
    */
   private void addToList(Ingredient ingredientToAdd) {
-    ingredientMap.computeIfAbsent(Utility.createKey(ingredientToAdd), key -> new ArrayList<>())
-        .add(ingredientToAdd);
+    if (ingredientToAdd != null) {
+      ingredientMap.computeIfAbsent(Utility.createKey(ingredientToAdd), key -> new ArrayList<>())
+          .add(ingredientToAdd);
+    }
   }
 
   /**

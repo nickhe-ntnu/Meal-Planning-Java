@@ -10,11 +10,10 @@ import edu.ntnu.idi.bidata.util.OutputHandler;
  * is printed using the provided OutputHandler instance.
  *
  * @author Nick Heggø
- * @version 2024-11-14
+ * @version 2024-11-28
  */
 public class IllegalCommandCombinationException extends RuntimeException {
   public IllegalCommandCombinationException(String command, String subcommand, OutputHandler outputHandler) {
     super("Invalid command combination: '" + command + "' + '" + subcommand + "'");
-    outputHandler.printHelpMessage(command);
   }
 }

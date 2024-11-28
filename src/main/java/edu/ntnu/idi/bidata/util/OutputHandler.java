@@ -9,7 +9,7 @@ import java.util.List;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-11-27
+ * @version 2024-11-28
  */
 public class OutputHandler {
 
@@ -18,8 +18,7 @@ public class OutputHandler {
       Thank you for using the meal planning app!
       Earth thanks you for taking care of her.""";
 
-  public OutputHandler() {
-  }
+  public OutputHandler() {}
 
   /**
    * Prints the specified message to the console and follows it with a line of separator characters.
@@ -94,13 +93,13 @@ public class OutputHandler {
     printOutput("Available commands are:" + "\n" + formatCommands());
   }
 
+  public void printUnknownInstruction() {
+    printOutput("Unknown command, see 'help'");
+  }
+
   private String formatCommands() {
     List<String> commands = ValidCommand.getCommands();
     return " help | " + String.join(" | ", commands) + " | exit";
-  }
-
-  public void printUnknownInstruction() {
-    printOutput("Unknown command, see 'help'");
   }
 
   private void printHelpInstruction() {

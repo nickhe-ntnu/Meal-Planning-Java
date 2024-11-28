@@ -13,7 +13,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-11-27
+ * @version 2024-11-28
  */
 public class Application {
   private final User user;
@@ -75,8 +75,11 @@ public class Application {
         outputHandler.printCommandPrompt();
         this.user.setInput(inputScanner.fetchCommand());
         running = processUserCommand(user.getInput());
-      } catch (IllegalArgumentException | IllegalCommandCombinationException e) {
-        outputHandler.printOutput(e.getMessage());
+      } catch (IllegalArgumentException illegalArgumentException) {
+        outputHandler.printOutput(illegalArgumentException.getMessage());
+      } catch (IllegalCommandCombinationException illegalCommandCombinationException) {
+        outputHandler.printOutput(illegalCommandCombinationException.getMessage());
+        outputHandler.printHelpMessage(user.getInput().getCommandWord().name().toLowerCase());
       }
     } while (running);
   }

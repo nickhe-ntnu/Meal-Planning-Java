@@ -4,6 +4,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -11,12 +12,13 @@ import java.util.Random;
  * name, amount, unit, expiry date, and standard unit price.
  *
  * @author Nick Heggø
- * @version 2024-11-27
+ * @version 2024-11-28
  */
 public class Ingredient {
   private final Measurement measurement = new Measurement();
   private LocalDate expiryDate;
   private float standardUnitPrice; // per KG/L
+  private float value;
 
   /**
    * Constructs an Ingredient object with the specified parameters.
@@ -275,12 +277,10 @@ public class Ingredient {
     expiryDate = LocalDate.now().minusDays(random.nextInt(4, 17));
   }
 
-/*
   public float getValue() {
-//    return this.getStandardUnitPrice() * measurement.get
-
+    List<Object> data = measurement.getStandardData();
+    return getStandardUnitPrice() * (float) data.getFirst();
   }
-*/
 
   /**
    * Checks whether the specified ingredient is valid to merge with the current ingredient.

@@ -1,8 +1,7 @@
 package edu.ntnu.idi.bidata.util.command;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Holds the every valid command.
@@ -14,7 +13,7 @@ import java.util.stream.Stream;
  * HELP - list of all commands.
  *
  * @author Nick Heggø
- * @version 2024-11-27
+ * @version 2024-11-28
  */
 public enum ValidCommand {
   EXIT,
@@ -27,11 +26,11 @@ public enum ValidCommand {
   UNKNOWN;
 
   public static List<String> getCommands() {
-    return Stream.of(ValidCommand.values())
-        .map(Enum::name)
-        .filter(name -> !name.equals("HELP") && !name.equals("EXIT") && !name.equals("UNKNOWN"))
-        .map(String::toLowerCase)
-        .sorted()
-        .collect(Collectors.toList());
+    return Arrays.stream(ValidCommand.values())
+        .filter(command -> command != HELP)
+        .filter(command -> command != EXIT)
+        .filter(command -> command != UNKNOWN)
+        .map(ValidCommand::name)
+        .toList();
   }
 }
