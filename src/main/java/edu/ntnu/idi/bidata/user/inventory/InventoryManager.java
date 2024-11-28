@@ -3,6 +3,7 @@ package edu.ntnu.idi.bidata.user.inventory;
 import edu.ntnu.idi.bidata.user.UserInput;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
+import edu.ntnu.idi.bidata.util.command.Utility;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.*;
@@ -21,7 +22,6 @@ public class InventoryManager {
 
   private final Map<String, IngredientStorage> storageMap;
   private final Stack<IngredientStorage> history;
-
   private IngredientStorage currentStorage;
 
   public InventoryManager(InputScanner inputScanner, OutputHandler outputHandler) {
@@ -33,7 +33,7 @@ public class InventoryManager {
   }
 
   public IngredientStorage getStorage(String storageName) {
-    return storageMap.get(generateMapKey(storageName));
+    return storageMap.get(Utility.createKey(storageName));
   }
 
   /**
@@ -54,7 +54,7 @@ public class InventoryManager {
     currentStorage.addIngredient(ingredientToBeAdded);
   }
 
-  public List<String> findIngredientStorage(String ingredientName) {
+  public List<String> findAllIngredient(String ingredientName) {
     ArrayList<String> listOfStorageContainsIngredient = new ArrayList<>();
     storageMap.values().forEach(storage -> {
       if (storage.isIngredientPresent(ingredientName)) {
@@ -64,11 +64,9 @@ public class InventoryManager {
     return listOfStorageContainsIngredient;
   }
 
-  public List<Ingredient> findIngredient(String name) {
-    ArrayList<Ingredient> ingredientArrayList = new ArrayList<>();
-    storageMap.values().forEach(ingredientStorage ->
-        ingredientArrayList.addAll(ingredientStorage.getAllIngredient(name)));
-    return ingredientArrayList;
+  public List<Ingredient> fingIngredientList(String ingredientName) {
+    assertInventoryIsAvailable();
+    return currentStorage.getIngredientList(ingredientName);
   }
 
   /**
@@ -77,12 +75,8 @@ public class InventoryManager {
    * @param storageName The name of the storage to be added.
    * @return true if the storage was successfully added; false otherwise.
    */
-  public boolean addStorage(String storageName) {
-    boolean success = !isStoragePresent(storageName);
-    if (success) {
-      putToMap(storageName);
-    }
-    return success;
+  public void createStorage(String storageName) {
+    creatMapEntry(storageName);
   }
 
   public String getInventoryString() {
@@ -125,7 +119,7 @@ public class InventoryManager {
   }
 
   public void setCurrentStorage(String storageName) {
-    IngredientStorage storage = getStorage(generateMapKey(storageName));
+    IngredientStorage storage = getStorage(Utility.createKey(storageName));
     if (storage != null) {
       currentStorage = storage;
     }
@@ -147,19 +141,11 @@ public class InventoryManager {
     return stringBuilder.toString();
   }
 
-  private String generateMapKey(String stringToBeConverted) {
-    return stringToBeConverted.toLowerCase();
-  }
-
-  /**
-   * Checks if a storage with the specified name is present in the storage map.
-   * The storage name is case-insensitive.
-   *
-   * @param storageName The name of the storage to check for.
-   * @return true if the storage is present; false otherwise.
-   */
-  private boolean isStoragePresent(String storageName) {
-    return storageMap.containsKey(storageName.toLowerCase());
+  public void removeExpired() {
+    assertInventoryIsAvailable();
+    List<Ingredient> expired = currentStorage.getAllExpired();
+    currentStorage.removeExpired();
+    //    int sum = expired.stream().map(Ingredient::getAmount).reduce(0, Integer::sum);
   }
 
   /**
@@ -168,8 +154,8 @@ public class InventoryManager {
    *
    * @param storageName The name of the storage to be added.
    */
-  private void putToMap(String storageName) {
-    storageMap.put(generateMapKey(storageName), new IngredientStorage(storageName));
+  private void creatMapEntry(String storageName) {
+    storageMap.put(Utility.createKey(storageName), new IngredientStorage(storageName));
   }
 
   private Ingredient inputIngredientDetails(String ingredientName) {

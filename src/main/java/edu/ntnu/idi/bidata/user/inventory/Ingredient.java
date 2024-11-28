@@ -275,6 +275,13 @@ public class Ingredient {
     expiryDate = LocalDate.now().minusDays(random.nextInt(4, 17));
   }
 
+/*
+  public float getValue() {
+//    return this.getStandardUnitPrice() * measurement.get
+
+  }
+*/
+
   /**
    * Checks whether the specified ingredient is valid to merge with the current ingredient.
    *

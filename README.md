@@ -10,16 +10,16 @@ STUDENT ID = "134132"
 This project is a Meal Planning application developed as a part of the IDATG1003 course.
 The application allows users to create, track, remove both Recipes and Ingredients.
 The goal of this project was to help achieve the UN's sustainability goal by reducing food waste.
-That's why it also includes a summary of food been wasted 
+That's why it also includes a summary of food been wasted
 and available recipe suggestion based on the ingredients in the inventory.
 
 ## Project structure
 
 [//]: # (TODO: Describe the structure of your project here. How have you used packages in your structure. Where are all sourcefiles stored. Where are all JUnit-test classes stored. etc.)
 The project is divided into two parts, package `user` && `util`.
+
 * In the package `user` you can find all relevant classes that are connected with class User.
 * In the package `util` you can find all the related classed related to the application's main business logic.
-
 
 ## Link to repository
 
@@ -30,8 +30,6 @@ The project is divided into two parts, package `user` && `util`.
 [//]: # (TODO: Describe how to run your project here. What is the main class? What is the main method? What is the input and output of the program? What is the expected behaviour of the program?)
 The `main()` method is called from the class `Launcher`,
 where it creates a `new Application` and run the `initialize()` method.
-
-
 
 ## How to run the tests
 

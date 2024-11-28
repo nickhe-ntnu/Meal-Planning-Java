@@ -13,13 +13,15 @@ public class Measurement {
   private String name; // Ingredient Name
   private float amount;
   private ValidUnit validUnit;
-  private IngredientType ingredientType;
+  private IngredientType ingredientType; // set automatically, based on ValidUnit.
+  private UnitConverter unitConverter;
 
   /**
    * Default constructor for the Measurement class.
    * Initializes an empty Measurement instance.
    */
   public Measurement() {
+    unitConverter = new UnitConverter();
   }
 
   /**
@@ -33,7 +35,12 @@ public class Measurement {
     setName(name);
     setAmount(amount);
     setValidUnit(validUnit);
+    unitConverter = new UnitConverter();
   }
+
+  //  public float getStandardAmount() {
+  //    return unitConverter.convertToStandard();
+  //  }
 
   /**
    * Merges the specified Measurement instance with the current one.
@@ -49,7 +56,6 @@ public class Measurement {
       throw new IllegalArgumentException("Measurement cannot be null!");
     }
 
-    UnitConverter unitConverter = new UnitConverter();
     unitConverter.autoMergeUnit(measurementToMerge, this.validUnit);
     float mergedAmount = this.getAmount() + measurementToMerge.getAmount();
     this.setAmount(mergedAmount);
@@ -157,7 +163,7 @@ public class Measurement {
   /**
    * Represents the property of ingredient.
    */
-  enum IngredientType {
+  private enum IngredientType {
     SOLID,
     LIQUID
   }

@@ -37,7 +37,7 @@ public abstract class Command {
    *
    * @param user The user for whom the command is being created and processed.
    */
-  Command(User user) {
+  protected Command(User user) {
     init(user);
     processCommand();
   }

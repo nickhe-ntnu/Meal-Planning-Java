@@ -64,8 +64,8 @@ public class AddCommand extends Command {
    */
   private void addStorage() {
     requestInputIfNeeded("Please enter new storage name:");
-    boolean success = inventoryManager.addStorage(userInputString);
-    printOperationMessage(success);
+    inventoryManager.createStorage(userInputString);
+    printOperationMessage(true);
   }
 
   /**

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.io.ByteArrayInputStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**/
 class RemoveCommandTest {
@@ -23,7 +23,7 @@ class RemoveCommandTest {
   void beforeEach() {
     testUser = new User();
     testInventoryManager = testUser.getInventoryManager();
-    testInventoryManager.addStorage(storageName);
+    testInventoryManager.createStorage(storageName);
     testInventoryManager.setCurrentStorage(storageName);
     testInventoryManager.addIngredient(new Ingredient(ingredientName, 200, ValidUnit.G, 23, 23));
   }
@@ -35,8 +35,8 @@ class RemoveCommandTest {
     InputScanner inputScanner = new InputScanner();
     testUser.setInput(inputScanner.fetchCommand());
     assertEquals(storageName, testInventoryManager.getCurrentStorage().getStorageName());
-    assertEquals(true, testInventoryManager.getCurrentStorage().isIngredientPresent(ingredientName));
+    assertTrue(testInventoryManager.getCurrentStorage().isIngredientPresent(ingredientName));
     new RemoveCommand(testUser);
-    assertEquals(false, testInventoryManager.getCurrentStorage().isIngredientPresent(ingredientName));
+    assertFalse(testInventoryManager.getCurrentStorage().isIngredientPresent(ingredientName));
   }
 }

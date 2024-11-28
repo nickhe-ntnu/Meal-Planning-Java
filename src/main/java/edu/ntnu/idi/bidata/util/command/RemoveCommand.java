@@ -25,6 +25,7 @@ public class RemoveCommand extends Command {
     switch (userInputSubcommand) {
       case "storage" -> removeStorage();
       case "ingredient" -> removeIngredient();
+      case "expired" -> removeExpired();
       case "recipe" -> removeRecipe();
       default -> illegalCommand();
     }
@@ -35,10 +36,14 @@ public class RemoveCommand extends Command {
     // TODO
   }
 
+  private void removeExpired() {
+    inventoryManager.removeExpired();
+  }
+
   private void removeIngredient() {
     String ingredientName = requestInputIfNeeded("Please enter the ingredient name:");
     inputScanner.collectValidString();
-    inventoryManager.findIngredientStorage(ingredientName);
+    inventoryManager.findAllIngredient(ingredientName);
   }
 
   private void removeRecipe() {

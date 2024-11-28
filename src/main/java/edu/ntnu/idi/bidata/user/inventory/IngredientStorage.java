@@ -1,7 +1,12 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
+import edu.ntnu.idi.bidata.util.command.Utility;
+
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The Inventory class manages collections of ingredients
@@ -21,6 +26,74 @@ public class IngredientStorage {
   public IngredientStorage(String storageName) {
     setStorageName(storageName);
     ingredientMap = new HashMap<>();
+  }
+
+  /**
+   * Adds a given ingredient to the storage.
+   * If the ingredient is already present, it will be merged
+   * with the existing one.
+   * Otherwise, the new ingredient is saved directly.
+   *
+   * @param newIngredient The ingredient to be added to the storage.
+   */
+  public void addIngredient(Ingredient newIngredient) {
+    if (hasMatchingExpiryDate(newIngredient)) {
+      mergeIngredient(newIngredient);
+    } else {
+      addToList(newIngredient);
+    }
+  }
+
+  /**
+   * Removes an ingredient from the storage if it is present and prints a success/failure message.
+   *
+   * @param name       the name of the ingredient to be removed
+   * @param expiryDate the expiry date of the ingredient to be removed
+   */
+  public boolean removeIngredient(String name, LocalDate expiryDate) {
+    List<Ingredient> ingredientList = getIngredientList(name);
+    boolean result = ingredientList.remove(findIngredient(name, expiryDate));
+    if (ingredientList.isEmpty()) {
+      ingredientMap.remove(Utility.createKey(name));
+    }
+    return result;
+  }
+
+  /**
+   * Checks if the specified ingredient is present in the storage.
+   *
+   * @param ingredientName the name of the ingredient to check for
+   * @return true if the ingredient is present; false otherwise
+   */
+  public boolean isIngredientPresent(String ingredientName) {
+    return ingredientMap.containsKey(Utility.createKey(ingredientName));
+  }
+
+  public List<Ingredient> getIngredientList(String ingredientName) {
+    return ingredientMap.get(Utility.createKey(ingredientName));
+  }
+
+  public List<Ingredient> getIngredientList(Ingredient ingredient) {
+    return ingredientMap.get(Utility.createKey(ingredient));
+  }
+
+  public void removeExpired() {
+    for (List<Ingredient> ingredientList : ingredientMap.values()) {
+      ingredientList.removeIf(ingredient -> ingredient.getExpiryDate().isBefore(LocalDate.now()));
+    }
+  }
+
+  /**
+   * Retrieves an ingredient matching the specified name and expiry date.
+   *
+   * @param ingredientName       the name of the ingredient to find
+   * @param ingredientExpiryDate the expiry date of the ingredient to match
+   * @return the matching Ingredient, or null if no match is found
+   */
+  public Ingredient findIngredient(String ingredientName, LocalDate ingredientExpiryDate) {
+    return ingredientMap.get(ingredientName.toLowerCase()).stream()
+        .filter(ingredient -> ingredient.getExpiryDate().isEqual(ingredientExpiryDate))
+        .findFirst().orElse(null);
   }
 
   /**
@@ -61,67 +134,10 @@ public class IngredientStorage {
    * @return a list of expired ingredients; an empty list if no ingredients are expired.
    */
   public List<Ingredient> getAllExpired() {
-    List<Ingredient> listOfExpired = new ArrayList<>();
-    ingredientMap.values().forEach(ingredients -> ingredients.stream()
+    return ingredientMap.values().stream()
+        .flatMap(List::stream)
         .filter(ingredient -> ingredient.getExpiryDate().isBefore(LocalDate.now()))
-        .forEach(listOfExpired::add));
-    return listOfExpired;
-  }
-
-  /**
-   * Adds a given ingredient to the storage.
-   * If the ingredient is already present, it will be merged
-   * with the existing one.
-   * Otherwise, the new ingredient is saved directly.
-   *
-   * @param newIngredient The ingredient to be added to the storage.
-   */
-  public void addIngredient(Ingredient newIngredient) {
-    if (isIngredientPresent(newIngredient)) {
-      if (isIngredientExpiryMatching(newIngredient)) {
-        mergeIngredient(newIngredient);
-      } else {
-        addToList(newIngredient);
-      }
-    } else {
-      addToList(newIngredient);
-    }
-  }
-
-  /**
-   * Removes an ingredient from the storage if it is present and prints a success/failure message.
-   *
-   * @param ingredientName the name of the ingredient to be removed
-   * @param expiryDate     the expiry date of the ingredient to be removed
-   */
-  public void removeIngredient(String ingredientName, LocalDate expiryDate) {
-    if (removeFromStorage(ingredientName, expiryDate)) {
-      System.out.println("Successfully removed " + ingredientName + " from " + getStorageName());
-    } else {
-      System.out.println("Failed to remove " + ingredientName + " from " + getStorageName());
-    }
-
-  }
-
-  /**
-   * Checks if the specified ingredient is present in the storage.
-   *
-   * @param ingredientName the name of the ingredient to check for
-   * @return true if the ingredient is present; false otherwise
-   */
-  public boolean isIngredientPresent(String ingredientName) {
-    String mapKey = ingredientName.toLowerCase();
-    return ingredientMap.containsKey(mapKey);
-  }
-
-  public List<Ingredient> getAllIngredient(String name) {
-    ArrayList<Ingredient> list = new ArrayList<>();
-    if (isIngredientPresent(name)) {
-      ingredientMap.get(generateMapKey(name)).stream()
-          .filter(ingredient -> ingredient.getExpiryDate().isAfter(LocalDate.now()))
-          .forEach(list::add);
-    }
-    return list;
+        .toList();
   }
 
   /**
@@ -132,11 +148,10 @@ public class IngredientStorage {
    * @param ingredientToMerge The ingredient to be merged with an existing ingredient in the map.
    */
   private void mergeIngredient(Ingredient ingredientToMerge) {
-    String mapKey = generateMapKey(ingredientToMerge);
+    String name = ingredientToMerge.getName();
     LocalDate expiryDate = ingredientToMerge.getExpiryDate();
-    List<Ingredient> ingredientList = ingredientMap.get(mapKey);
-    Optional<Ingredient> existingIngredient = ingredientList.stream().filter(ingredient -> ingredient.getExpiryDate().isEqual(expiryDate)).findFirst();
-    existingIngredient.ifPresent(ingredient -> ingredient.merge(ingredientToMerge));
+    Ingredient existingIngredient = findIngredient(name, expiryDate);
+    existingIngredient.merge(ingredientToMerge);
   }
 
   /**
@@ -146,25 +161,8 @@ public class IngredientStorage {
    * @param ingredientToAdd the ingredient to be added to the list
    */
   private void addToList(Ingredient ingredientToAdd) {
-    ingredientMap.computeIfAbsent(generateMapKey(ingredientToAdd), mapKey -> new ArrayList<>()).add(ingredientToAdd);
-  }
-
-  /**
-   * Removes the specified key from the ingredient map after converting it to lowercase.
-   *
-   * @param key the key to be removed from the ingredient map
-   */
-  private boolean removeFromStorage(String key, LocalDate expiryDate) {
-    List<Ingredient> ingredientList = ingredientMap.get(key.toLowerCase());
-    return ingredientList.remove(getMatchingIngredient(key, expiryDate));
-  }
-
-  private Ingredient getMatchingIngredient(String ingredientName, LocalDate expiryDate) {
-    Optional<Ingredient> matchingIngredient;
-    matchingIngredient = ingredientMap.get(ingredientName.toLowerCase()).stream()
-        .filter(ingredient -> ingredient.getExpiryDate().isEqual(expiryDate))
-        .findFirst();
-    return matchingIngredient.orElse(null);
+    ingredientMap.computeIfAbsent(Utility.createKey(ingredientToAdd), key -> new ArrayList<>())
+        .add(ingredientToAdd);
   }
 
   /**
@@ -174,34 +172,29 @@ public class IngredientStorage {
    * @return true if the ingredient is present and has the same expiry date, false otherwise.
    */
   private boolean isIngredientPresent(Ingredient ingredientToCheck) {
-    String mapKey = generateMapKey(ingredientToCheck);
-    return ingredientMap.containsKey(mapKey);
+    return ingredientMap.containsKey(Utility.createKey(ingredientToCheck));
   }
 
   /**
-   * Generates a key for the ingredient map by converting the ingredient's name to lowercase.
+   * Checks if there is any ingredient in the storage with an expiry date matching the given ingredient.
    *
-   * @param ingredient the ingredient whose name is used to generate the map key
-   * @return the generated map key in lowercase
+   * @param ingredientToCheck The ingredient whose expiry date is to be checked against stored ingredients.
+   * @return true if a matching expiry date is found; false otherwise.
    */
-  private String generateMapKey(Ingredient ingredient) {
-    return ingredient.getName().toLowerCase();
-  }
-
-  private String generateMapKey(String name) {
-    return name.toLowerCase();
+  private boolean hasMatchingExpiryDate(Ingredient ingredientToCheck) {
+    List<Ingredient> ingredientList = getIngredientList(ingredientToCheck);
+    return ingredientList != null && ingredientList.stream()
+        .anyMatch(ingredient -> getIngredientExpiryDate(ingredient).isEqual(getIngredientExpiryDate(ingredientToCheck)));
   }
 
   /**
-   * Checks if the specified ingredient is present in the storage and if it has the same expiry date.
+   * Retrieves the expiry date of the given ingredient.
    *
-   * @param ingredientToCheck The ingredient to be checked in the storage.
-   * @return true if the ingredient is present and has the same expiry date, false otherwise.
+   * @param ingredient The ingredient whose expiry date is to be retrieved.
+   * @return The expiry date of the ingredient.
    */
-  private boolean isIngredientExpiryMatching(Ingredient ingredientToCheck) {
-    String mapKey = generateMapKey(ingredientToCheck);
-    LocalDate ingredientExpiryDate = ingredientToCheck.getExpiryDate();
-    return ingredientMap.get(mapKey).stream()
-        .anyMatch(ingredient -> ingredient.getExpiryDate().isEqual(ingredientExpiryDate));
+  private LocalDate getIngredientExpiryDate(Ingredient ingredient) {
+    return ingredient.getExpiryDate();
   }
+
 }

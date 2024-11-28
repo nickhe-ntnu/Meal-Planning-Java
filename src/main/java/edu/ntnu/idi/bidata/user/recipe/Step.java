@@ -1,6 +1,6 @@
 package edu.ntnu.idi.bidata.user.recipe;
 
-import edu.ntnu.idi.bidata.user.inventory.Ingredient;
+import edu.ntnu.idi.bidata.user.inventory.Measurement;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Step {
   private String instruction;
-  private List<Ingredient> ingredientList;
+  private List<Measurement> ingredientList;
 
   /**
    * Constructs a Step with provided cooking instruction and list of ingredients.
@@ -20,7 +20,7 @@ public class Step {
    * @param instruction    The cooking instruction for this step.
    * @param ingredientList List of ingredients required for this step.
    */
-  public Step(String instruction, List<Ingredient> ingredientList) {
+  public Step(String instruction, List<Measurement> ingredientList) {
     setInstruction(instruction);
     setIngredientList(ingredientList);
   }
@@ -30,7 +30,7 @@ public class Step {
    *
    * @return the list of ingredients.
    */
-  public List<Ingredient> getIngredientList() {
+  public List<Measurement> getIngredientList() {
     return ingredientList;
   }
 
@@ -39,7 +39,7 @@ public class Step {
    *
    * @param ingredientList List of ingredients to be set.
    */
-  private void setIngredientList(List<Ingredient> ingredientList) {
+  private void setIngredientList(List<Measurement> ingredientList) {
     this.ingredientList = ingredientList;
   }
 

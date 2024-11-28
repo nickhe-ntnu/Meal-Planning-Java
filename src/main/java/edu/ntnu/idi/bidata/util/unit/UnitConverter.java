@@ -3,6 +3,8 @@ package edu.ntnu.idi.bidata.util.unit;
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
 
+import java.util.List;
+
 /**
  * Class for converting between different units of measurement.
  * The UnitConverter class provides methods to convert values from one
@@ -14,9 +16,15 @@ import edu.ntnu.idi.bidata.user.inventory.Measurement;
  */
 public class UnitConverter {
 
-  public UnitConverter() {
-  }
+  public UnitConverter() {}
 
+  /**
+   * Converts the given measurement to a standard unit based on its ingredient type.
+   * If the type is "SOLID", it converts the measurement to kilograms.
+   * If the type is "LIQUID", it converts the measurement to liters.
+   *
+   * @param measurement the measurement to be converted; can be null
+   */
   public void convertToStandard(Measurement measurement) {
     String ingredientType = "";
     if (measurement != null) {
@@ -29,31 +37,74 @@ public class UnitConverter {
     }
   }
 
+  /**
+   * Converts the measurement of the given ingredient to the specified target unit.
+   *
+   * @param ingredient the ingredient whose measurement is to be converted; must not be null
+   * @param targetUnit the unit to which the ingredient's measurement should be converted; must not be null
+   */
   public void convertIngredient(Ingredient ingredient, ValidUnit targetUnit) {
     Measurement measurement = ingredient.getMeasurement();
     autoMergeUnit(measurement, targetUnit);
   }
 
+  /**
+   * Converts the given measurement to grams.
+   *
+   * @param measurement the measurement to be converted; must not be null
+   */
   public void convertToGrams(Measurement measurement) {
-    convertSolid(measurement, ValidUnit.G, 1000, 1);
+    List<Object> data = convertSolid(measurement, ValidUnit.G, 1000, 1);
+    updateMeasurement(measurement, data);
   }
 
+  /**
+   * Converts the given measurement to kilograms if it is a solid.
+   *
+   * @param measurement the measurement to be converted; must not be null
+   */
   public void convertToKG(Measurement measurement) {
-    convertSolid(measurement, ValidUnit.KG, 1, 0.001f);
+    List<Object> data = convertSolid(measurement, ValidUnit.KG, 1, 0.001f);
+    updateMeasurement(measurement, data);
   }
 
+  /**
+   * Converts the given measurement to liters.
+   *
+   * @param measurement the measurement to be converted; must not be null
+   */
   public void convertToLiter(Measurement measurement) {
-    convertLiquid(measurement, ValidUnit.L, 1, 0.1f, 0.001f);
+    List<Object> data = convertLiquid(measurement, ValidUnit.L, 1, 0.1f, 0.001f);
+    updateMeasurement(measurement, data);
   }
 
+  /**
+   * Converts the given measurement to deciliters.
+   *
+   * @param measurement the measurement to be converted; must not be null
+   */
   public void convertToDeciLiter(Measurement measurement) {
-    convertLiquid(measurement, ValidUnit.DL, 10, 1f, 0.01f);
+    List<Object> data = convertLiquid(measurement, ValidUnit.DL, 10, 1f, 0.01f);
+    updateMeasurement(measurement, data);
   }
 
+  /**
+   * Converts the given measurement to milliliters.
+   *
+   * @param measurement the measurement to be converted; must not be null
+   */
   public void convertToMilliLiter(Measurement measurement) {
-    convertLiquid(measurement, ValidUnit.ML, 1000, 100f, 1f);
+    List<Object> data = convertLiquid(measurement, ValidUnit.ML, 1000, 100f, 1f);
+    updateMeasurement(measurement, data);
   }
 
+  /**
+   * Converts the given measurement to the specified target unit based on its current valid unit.
+   *
+   * @param measurement the measurement to be converted; must not be null
+   * @param targetUnit  the unit to convert the measurement to; must not be null
+   * @throws IllegalArgumentException if the conversion between the current unit and the target unit is not allowed
+   */
   public void autoMergeUnit(Measurement measurement, ValidUnit targetUnit) {
     if (targetUnit != null && measurement.getValidUnit() != null) {
       switch (targetUnit) {
@@ -68,7 +119,23 @@ public class UnitConverter {
     }
   }
 
-  private void convertSolid(Measurement measurement, ValidUnit targetUnit, float factorFromKG, float factorFromG) {
+  public void updateMeasurement(Measurement sourceMeasurement, List<Object> data) {
+    sourceMeasurement.setAmount((Float) data.getFirst());
+    sourceMeasurement.setValidUnit((ValidUnit) data.getLast());
+  }
+
+  /**
+   * Converts the given measurement from its current unit to the specified target unit for solids.
+   * Multiplies the current amount by the appropriate factor based on its current unit.
+   * The converted amount is rounded to two decimal places and set in the measurement.
+   *
+   * @param measurement  the measurement to be converted; must not be null
+   * @param targetUnit   the unit to convert the measurement to; must not be null or UNKNOWN
+   * @param factorFromKG conversion factor to apply when the current unit is kilograms
+   * @param factorFromG  conversion factor to apply when the current unit is grams
+   * @throws IllegalArgumentException if current unit is not KG or G
+   */
+  private List<Object> convertSolid(Measurement measurement, ValidUnit targetUnit, float factorFromKG, float factorFromG) {
     float amount = measurement.getAmount();
     ValidUnit currentUnit = measurement.getValidUnit();
     switch (currentUnit) {
@@ -77,11 +144,22 @@ public class UnitConverter {
       default ->
           throw new IllegalArgumentException("Illegal operation: convert " + currentUnit + " to " + targetUnit + ".");
     }
-    measurement.setValidUnit(targetUnit);
-    measurement.setAmount(roundToTwoDecimals(amount));
+    amount = roundToTwoDecimals(amount);
+    return List.of(amount, targetUnit);
   }
 
-  private void convertLiquid(Measurement sourceMeasurement, ValidUnit targetUnit, float factorFromL, float factorFromDL, float factorFromML) {
+  /**
+   * Converts a given liquid measurement to the specified target unit using specified conversion factors.
+   *
+   * @param sourceMeasurement the measurement to be converted; must not be null
+   * @param targetUnit        the unit to convert the measurement to; must not be null
+   * @param factorFromL       conversion factor to apply when the current unit is liters
+   * @param factorFromDL      conversion factor to apply when the current unit is deciliters
+   * @param factorFromML      conversion factor to apply when the current unit is milliliters
+   * @return a list containing the converted amount and target unit
+   * @throws IllegalArgumentException if the conversion between the current unit and the target unit is not allowed
+   */
+  private List<Object> convertLiquid(Measurement sourceMeasurement, ValidUnit targetUnit, float factorFromL, float factorFromDL, float factorFromML) {
     float amount = sourceMeasurement.getAmount();
     ValidUnit currentUnit = sourceMeasurement.getValidUnit();
     switch (currentUnit) {
@@ -91,10 +169,17 @@ public class UnitConverter {
       default ->
           throw new IllegalArgumentException("Illegal operation: convert " + currentUnit + " to " + targetUnit + ".");
     }
-    sourceMeasurement.setValidUnit(targetUnit);
-    sourceMeasurement.setAmount(roundToTwoDecimals(amount));
+    amount = roundToTwoDecimals(amount);
+    return List.of(amount, targetUnit);
   }
 
+  /**
+   * Rounds a given float value to two decimal places.
+   * The method multiplies the value by 100, rounds it, and then divides by 100.
+   *
+   * @param value the float value to be rounded
+   * @return the rounded float value with two decimal places
+   */
   private float roundToTwoDecimals(float value) {
     return Math.round(value * 100) / 100.0f;
   }

@@ -16,10 +16,6 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
  * @version 2024-11-27
  */
 public class Application {
-  private static final String WELCOME_MESSAGE = """
-      Hello, %s
-      Thank you for using the meal planning app!
-      Earth thanks you for taking care of her.""";
   private final User user;
   private final InputScanner inputScanner;
   private final OutputHandler outputHandler;
@@ -53,17 +49,17 @@ public class Application {
    */
   private void startUpCondition() {
     InventoryManager inventoryManager = user.getInventoryManager();
-    inventoryManager.addStorage("Fridge");
+    inventoryManager.createStorage("Fridge");
     inventoryManager.setCurrentStorage(inventoryManager.getStorage("fridge"));
     inventoryManager.addIngredient(new Ingredient("Chocolate", 300, ValidUnit.G, 10, 4));
     int amountOfExpiredIngredientToGenerate = 3;
     for (int generatedIngredient = 0; generatedIngredient < amountOfExpiredIngredientToGenerate; generatedIngredient++) {
       inventoryManager.addIngredient(new Ingredient("expiredDemo"));
     }
-    inventoryManager.addStorage("Cold Room");
+    inventoryManager.createStorage("Cold Room");
     inventoryManager.setCurrentStorage("CoLd RoOm");
     inventoryManager.addIngredient(new Ingredient("Potato", 4, ValidUnit.KG, 40, 25));
-    inventoryManager.addStorage("Office Fridge");
+    inventoryManager.createStorage("Office Fridge");
     inventoryManager.setCurrentStorage((IngredientStorage) null);
   }
 
