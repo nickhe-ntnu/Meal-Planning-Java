@@ -3,17 +3,14 @@ package edu.ntnu.idi.bidata.user.inventory;
 import edu.ntnu.idi.bidata.util.command.Utility;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The Inventory class manages collections of ingredients
  * stored in various named collections.
  *
  * @author Nick Heggø
- * @version 2024-11-27
+ * @version 2024-11-29
  */
 public class IngredientStorage {
 
@@ -98,9 +95,7 @@ public class IngredientStorage {
 
     if (!removedIngredients.isEmpty()) {
       System.out.println(removedIngredients.size() + " expired ingredients were removed:");
-      for (Ingredient ingredient : removedIngredients) {
-        System.out.println(" - " + ingredient);
-      }
+      removedIngredients.forEach(System.out::println);
     } else {
       System.out.println("No expired ingredients were found.");
     }
@@ -132,10 +127,19 @@ public class IngredientStorage {
     if (ingredientMap.isEmpty()) {
       stringBuilder.append("\n   (Empty)");
     } else {
-      ingredientMap.values().forEach(ingredientList ->
-          ingredientList.forEach(ingredient -> stringBuilder.append(ingredient.toString())));
+      ingredientMap.values().stream()
+          .flatMap(Collection::stream)
+          .map(Ingredient::toString)
+          .forEach(string -> stringBuilder.append("\n").append(string));
     }
     return stringBuilder.toString();
+  }
+
+  public float getAllValue() {
+    return ingredientMap.values().stream()
+        .flatMap(Collection::stream)
+        .map(Ingredient::getValue)
+        .reduce(0.0f, Float::sum);
   }
 
   public String getStorageName() {

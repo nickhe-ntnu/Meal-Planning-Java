@@ -9,11 +9,9 @@ import java.util.List;
  * Represents a measurement with a name, amount, unit, and ingredient type.
  *
  * @author Nick Heggø
- * @version 2024-11-28
+ * @version 2024-11-29
  */
 public class Measurement {
-  private final UnitConverter unitConverter;
-  private String name; // Ingredient Name
   private float amount;
   private ValidUnit validUnit;
   private IngredientType ingredientType; // set automatically, based on ValidUnit.
@@ -22,26 +20,21 @@ public class Measurement {
    * Default constructor for the Measurement class.
    * Initializes an empty Measurement instance.
    */
-  public Measurement() {
-    unitConverter = new UnitConverter();
-  }
+  public Measurement() {}
 
   /**
    * Constructs a Measurement with the specified name, amount, and unit.
    *
-   * @param name      the name of the measurement, must not be null or empty
-   * @param amount    the amount of the measurement, must be non-negative
-   * @param validUnit the unit of measurement, must not be null or unknown
+   * @param amount    the amount of the measurement must be non-negative
+   * @param validUnit the unit of measurement must not be null or unknown
    */
-  public Measurement(String name, float amount, ValidUnit validUnit) {
-    setName(name);
+  public Measurement(float amount, ValidUnit validUnit) {
     setAmount(amount);
     setValidUnit(validUnit);
-    unitConverter = new UnitConverter();
   }
 
-  public List<Object> getStandardData() {
-    return unitConverter.getStandardData(this);
+  public List<Object> getStandardMeasurement() {
+    return UnitConverter.getStandardData(this);
   }
 
   /**
@@ -58,11 +51,11 @@ public class Measurement {
       throw new IllegalArgumentException("Measurement cannot be null!");
     }
 
-    unitConverter.autoMergeUnit(measurementToMerge, this.validUnit);
+    UnitConverter.autoMergeUnit(measurementToMerge, this.validUnit);
     float mergedAmount = this.getAmount() + measurementToMerge.getAmount();
     this.setAmount(mergedAmount);
     if (mergedAmount >= 1000) {
-      unitConverter.convertToStandard(this);
+      UnitConverter.convertToStandard(this);
     }
   }
 
@@ -79,7 +72,7 @@ public class Measurement {
    * Sets the amount for the measurement.
    * Throws IllegalArgumentException if the amount is negative.
    *
-   * @param amount the amount to set, must be non-negative
+   * @param amount the amount to set must be non-negative
    */
   public void setAmount(float amount) {
     if (amount < 0) {
@@ -97,28 +90,7 @@ public class Measurement {
     return ingredientType.toString();
   }
 
-  /**
-   * Retrieves the name of the measurement.
-   *
-   * @return the name as a string.
-   */
-  public String getName() {
-    return (name != null) ? name : "";
-  }
 
-  /**
-   * Sets the name of the measurement.
-   * The name must not be null or empty.
-   *
-   * @param name the name of the measurement
-   * @throws IllegalArgumentException if the name is null or empty
-   */
-  public void setName(String name) {
-    if (name == null || name.isBlank()) {
-      throw new IllegalArgumentException("Name cannot be null or empty");
-    }
-    this.name = name;
-  }
 
   /**
    * Retrieves the valid unit of measurement.

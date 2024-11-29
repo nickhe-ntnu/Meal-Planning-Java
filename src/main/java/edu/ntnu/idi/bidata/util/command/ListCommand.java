@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * recipes, ingredients, expired items, and available recipes.
  *
  * @author Nick Heggø
- * @version 2024-11-09
+ * @version 2024-11-29
  */
 public class ListCommand extends Command {
   public ListCommand(User user) {
@@ -34,8 +34,14 @@ public class ListCommand extends Command {
       case "available" -> listAvailableRecipe();
       case "command", "commands" -> outputHandler.printHelpMessage();
       case "name" -> listName();
+      case "value", "values" -> listValue();
       default -> illegalCommand();
     }
+  }
+
+  private void listValue() {
+    String message = inventoryManager.getTotalValue();
+    outputHandler.printOutput(message);
   }
 
   private void listName() {

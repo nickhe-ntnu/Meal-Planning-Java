@@ -13,7 +13,7 @@ import java.util.*;
  * for ingredient and storage management.
  *
  * @author Nick Heggø
- * @version 2024-11-27
+ * @version 2024-11-29
  */
 public class InventoryManager {
 
@@ -41,7 +41,33 @@ public class InventoryManager {
    * Takes input from the user and creates an Ingredient object.
    */
   public Ingredient createIngredient(String ingredientName) {
+    outputHandler.printOutput("#### Add ingredient ####");
     return inputIngredientDetails(ingredientName);
+  }
+
+  private Ingredient inputIngredientDetails(String ingredientName) {
+    String name = ingredientName;
+    if (name == null) {
+      outputHandler.printInputPrompt("Please enter the ingredient name:");
+      name = inputScanner.collectValidString();
+    }
+
+    outputHandler.printInputPrompt("Please enter the amount with unit:");
+    UserInput userInput = inputScanner.fetchUnit();
+    while (userInput.getValidUnit() == ValidUnit.UNKNOWN) {
+      outputHandler.printInputPrompt("Type error, please ensure to use a valid unit");
+      userInput = inputScanner.fetchUnit();
+    }
+    float amount = userInput.getUnitAmount();
+    ValidUnit unit = userInput.getValidUnit();
+
+    outputHandler.printInputPrompt("Please enter the unit price");
+    float unitPrice = inputScanner.collectValidFloat();
+
+    outputHandler.printInputPrompt("Please enter days until expiry date");
+    int dayToExpiry = (int) inputScanner.getInputFloat();
+
+    return new Ingredient(name, amount, unit, unitPrice, dayToExpiry);
   }
 
   /**
@@ -67,6 +93,18 @@ public class InventoryManager {
   public List<Ingredient> fingIngredientList(String ingredientName) {
     assertInventoryIsAvailable();
     return currentStorage.getIngredientList(ingredientName);
+  }
+
+  public String getTotalValue() {
+    float sum = storageMap.values().stream()
+        .map(IngredientStorage::getAllValue)
+        .reduce(0.0f, Float::sum);
+    sum = Math.round(sum * 100) / 100.0f;
+    return "Inventory has total value of: " + sum + " kr.";
+  }
+
+  public boolean removeStorage(String storageName) {
+    return storageMap.remove(Utility.createKey(storageName)) != null;
   }
 
   /**
@@ -137,15 +175,17 @@ public class InventoryManager {
     stringBuilder.append("####### Expired ########");
     listOfExpired.stream()
         .map(Ingredient::toString)
-        .forEach(stringBuilder::append);
+        .forEach(string -> stringBuilder.append("\n").append(string));
     return stringBuilder.toString();
   }
 
-  public void removeExpired() {
+  public float removeExpired() {
     assertInventoryIsAvailable();
     List<Ingredient> expired = currentStorage.getAllExpired();
     currentStorage.removeExpired();
-    //    int sum = expired.stream().map(Ingredient::getAmount).reduce(0, Integer::sum);
+    return expired.stream()
+        .map(Ingredient::getValue)
+        .reduce(0.0f, Float::sum);
   }
 
   /**
@@ -156,32 +196,6 @@ public class InventoryManager {
    */
   private void creatMapEntry(String storageName) {
     storageMap.put(Utility.createKey(storageName), new IngredientStorage(storageName));
-  }
-
-  private Ingredient inputIngredientDetails(String ingredientName) {
-    outputHandler.printOutput("#### Add ingredient ####");
-    String name = ingredientName;
-    if (name == null) {
-      outputHandler.printInputPrompt("Please enter the ingredient name:");
-      name = inputScanner.collectValidString();
-    }
-
-    outputHandler.printInputPrompt("Please enter the amount with unit:");
-    UserInput userInput = inputScanner.fetchUnit();
-    while (userInput.getValidUnit() == ValidUnit.UNKNOWN) {
-      outputHandler.printInputPrompt("Type error, please ensure to use a valid unit");
-      userInput = inputScanner.fetchUnit();
-    }
-    float amount = userInput.getUnitAmount();
-    ValidUnit unit = userInput.getValidUnit();
-
-    outputHandler.printInputPrompt("Please enter the unit price");
-    float unitPrice = inputScanner.collectValidFloat();
-
-    outputHandler.printInputPrompt("Please enter days until expiry date");
-    int dayToExpiry = (int) inputScanner.getInputFloat();
-
-    return new Ingredient(name, amount, unit, unitPrice, dayToExpiry);
   }
 
   /**

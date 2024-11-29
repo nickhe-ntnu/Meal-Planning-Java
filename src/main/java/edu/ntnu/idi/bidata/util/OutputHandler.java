@@ -9,14 +9,13 @@ import java.util.List;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-11-28
+ * @version 2024-11-29
  */
 public class OutputHandler {
 
   private static final String WELCOME_MESSAGE = """
       Hello, %s
-      Thank you for using the meal planning app!
-      Earth thanks you for taking care of her.""";
+      Thank you for using the meal planning app!""";
 
   public OutputHandler() {}
 

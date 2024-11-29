@@ -13,11 +13,29 @@ import java.util.List;
  * enumeration which includes units for weight (KG, G) and volume (L, DL, ML).
  *
  * @author Nick Heggø
- * @version 2024-11-28
+ * @version 2024-11-29
  */
 public class UnitConverter {
 
-  public UnitConverter() {}
+  private UnitConverter() {}
+
+  public static float getMultiplier(ValidUnit unit) {
+    float multiplier;
+    switch (unit) {
+      case KG -> multiplier = 1.0f;
+      case G -> multiplier = 1000.0f;
+      case L -> multiplier = 1.0f;
+      case DL -> multiplier = 10.0f;
+      case ML -> multiplier = 1000.0f;
+      default -> multiplier = 0.0f;
+    }
+    return multiplier;
+  }
+
+  public static float standardUnitPrice(ValidUnit unit, float unitPrice) {
+    float multiplier = getMultiplier(unit);
+    return Math.round(multiplier * unitPrice * 100) / 100.0f; // round to 2 decimal places
+  }
 
   /**
    * Converts the given measurement to a standard unit based on its ingredient type.
@@ -26,7 +44,7 @@ public class UnitConverter {
    *
    * @param measurement the measurement to be converted; can be null
    */
-  public void convertToStandard(Measurement measurement) {
+  public static void convertToStandard(Measurement measurement) {
     String ingredientType = "";
     if (measurement != null) {
       ingredientType = measurement.getIngredientType();
@@ -38,7 +56,7 @@ public class UnitConverter {
     }
   }
 
-  public List<Object> getStandardData(Measurement measurement) {
+  public static List<Object> getStandardData(Measurement measurement) {
     Utility.assertNonNull(measurement);
     String ingredientType = measurement.getIngredientType();
     List<Object> data = null;
@@ -56,7 +74,7 @@ public class UnitConverter {
    * @param ingredient the ingredient whose measurement is to be converted; must not be null
    * @param targetUnit the unit to which the ingredient's measurement should be converted; must not be null
    */
-  public void convertIngredient(Ingredient ingredient, ValidUnit targetUnit) {
+  public static void convertIngredient(Ingredient ingredient, ValidUnit targetUnit) {
     Measurement measurement = ingredient.getMeasurement();
     autoMergeUnit(measurement, targetUnit);
   }
@@ -66,7 +84,7 @@ public class UnitConverter {
    *
    * @param measurement the measurement to be converted; must not be null
    */
-  public void convertToGrams(Measurement measurement) {
+  public static void convertToGrams(Measurement measurement) {
     List<Object> data = convertSolid(measurement, ValidUnit.G, 1000, 1);
     updateMeasurement(measurement, data);
   }
@@ -76,7 +94,7 @@ public class UnitConverter {
    *
    * @param measurement the measurement to be converted; must not be null
    */
-  public void convertToKG(Measurement measurement) {
+  public static void convertToKG(Measurement measurement) {
     List<Object> data = convertSolid(measurement, ValidUnit.KG, 1, 0.001f);
     updateMeasurement(measurement, data);
   }
@@ -86,7 +104,7 @@ public class UnitConverter {
    *
    * @param measurement the measurement to be converted; must not be null
    */
-  public void convertToLiter(Measurement measurement) {
+  public static void convertToLiter(Measurement measurement) {
     List<Object> data = convertLiquid(measurement, ValidUnit.L, 1, 0.1f, 0.001f);
     updateMeasurement(measurement, data);
   }
@@ -96,7 +114,7 @@ public class UnitConverter {
    *
    * @param measurement the measurement to be converted; must not be null
    */
-  public void convertToDeciLiter(Measurement measurement) {
+  public static void convertToDeciLiter(Measurement measurement) {
     List<Object> data = convertLiquid(measurement, ValidUnit.DL, 10, 1f, 0.01f);
     updateMeasurement(measurement, data);
   }
@@ -106,7 +124,7 @@ public class UnitConverter {
    *
    * @param measurement the measurement to be converted; must not be null
    */
-  public void convertToMilliLiter(Measurement measurement) {
+  public static void convertToMilliLiter(Measurement measurement) {
     List<Object> data = convertLiquid(measurement, ValidUnit.ML, 1000, 100f, 1f);
     updateMeasurement(measurement, data);
   }
@@ -118,7 +136,7 @@ public class UnitConverter {
    * @param targetUnit  the unit to convert the measurement to; must not be null
    * @throws IllegalArgumentException if the conversion between the current unit and the target unit is not allowed
    */
-  public void autoMergeUnit(Measurement measurement, ValidUnit targetUnit) {
+  public static void autoMergeUnit(Measurement measurement, ValidUnit targetUnit) {
     if (targetUnit != null && measurement.getValidUnit() != null) {
       switch (targetUnit) {
         case L -> convertToLiter(measurement);
@@ -132,7 +150,7 @@ public class UnitConverter {
     }
   }
 
-  public void updateMeasurement(Measurement sourceMeasurement, List<Object> data) {
+  public static void updateMeasurement(Measurement sourceMeasurement, List<Object> data) {
     sourceMeasurement.setAmount((Float) data.getFirst());
     sourceMeasurement.setValidUnit((ValidUnit) data.getLast());
   }
@@ -147,7 +165,7 @@ public class UnitConverter {
    * @return a list containing the converted amount and target unit
    * @throws IllegalArgumentException if the conversion between the current unit and the target unit is not allowed
    */
-  private List<Object> convertSolid(Measurement measurement, ValidUnit targetUnit, float factorFromKG, float factorFromG) {
+  private static List<Object> convertSolid(Measurement measurement, ValidUnit targetUnit, float factorFromKG, float factorFromG) {
     float amount = measurement.getAmount();
     ValidUnit currentUnit = measurement.getValidUnit();
     switch (currentUnit) {
@@ -171,7 +189,7 @@ public class UnitConverter {
    * @return a list containing the converted amount and target unit
    * @throws IllegalArgumentException if the conversion between the current unit and the target unit is not allowed
    */
-  private List<Object> convertLiquid(Measurement sourceMeasurement, ValidUnit targetUnit, float factorFromL, float factorFromDL, float factorFromML) {
+  private static List<Object> convertLiquid(Measurement sourceMeasurement, ValidUnit targetUnit, float factorFromL, float factorFromDL, float factorFromML) {
     float amount = sourceMeasurement.getAmount();
     ValidUnit currentUnit = sourceMeasurement.getValidUnit();
     switch (currentUnit) {
@@ -192,7 +210,7 @@ public class UnitConverter {
    * @param value the float value to be rounded
    * @return the rounded float value with two decimal places
    */
-  private float roundToTwoDecimals(float value) {
+  private static float roundToTwoDecimals(float value) {
     return Math.round(value * 100) / 100.0f;
   }
 

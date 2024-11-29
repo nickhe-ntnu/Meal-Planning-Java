@@ -4,7 +4,6 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -12,29 +11,32 @@ import java.util.Random;
  * name, amount, unit, expiry date, and standard unit price.
  *
  * @author Nick Heggø
- * @version 2024-11-28
+ * @version 2024-11-29
  */
 public class Ingredient {
-  private final Measurement measurement = new Measurement();
+
+  private final Measurement measurement;
+  private String name; // Ingredient Name
+
   private LocalDate expiryDate;
-  private float standardUnitPrice; // per KG/L
   private float value;
 
   /**
    * Constructs an Ingredient object with the specified parameters.
    *
-   * @param name              the name of the ingredient
-   * @param amount            the amount of the ingredient
-   * @param validUnit         the unit of measurement for the ingredient
-   * @param standardUnitPrice the standard price per unit of the ingredient
-   * @param daysToExpiry      the number of days until the ingredient expires
+   * @param name          the name of the ingredient
+   * @param amount        the amount of the ingredient
+   * @param unit          the unit of measurement for the ingredient
+   * @param value         the standard price per unit of the ingredient
+   * @param daysTilExpiry the number of days until the ingredient expires
    */
-  public Ingredient(String name, float amount, ValidUnit validUnit, float standardUnitPrice, int daysToExpiry) {
+  public Ingredient(String name, float amount, ValidUnit unit, float value, int daysTilExpiry) {
+    measurement = new Measurement();
     setName(name);
     setAmount(amount);
-    setValidUnit(validUnit);
-    setStandardUnitPrice(standardUnitPrice);
-    setExpiryDate(daysToExpiry);
+    setUnit(unit);
+    setValue(value);
+    setExpiryDate(daysTilExpiry);
   }
 
   /**
@@ -44,6 +46,7 @@ public class Ingredient {
    */
   public Ingredient(String password) {
     validatePassword(password);
+    measurement = new Measurement();
     createExpiredIngredient();
   }
 
@@ -64,7 +67,7 @@ public class Ingredient {
    * @return the number of days between the current date and the specified future date
    * @throws IllegalArgumentException if the untilDate is null
    */
-  public int getDaysBetween(LocalDate untilDate) {
+  private int getDaysBetween(LocalDate untilDate) {
     return (int) ChronoUnit.DAYS.between(LocalDate.now(), untilDate);
   }
 
@@ -76,9 +79,13 @@ public class Ingredient {
   public void merge(Ingredient ingredientToMerge) {
     if (isValidToMerge(ingredientToMerge)) {
       Measurement measurementToMerge = ingredientToMerge.getMeasurement();
-      this.standardUnitPrice = Math.max(this.standardUnitPrice, ingredientToMerge.getStandardUnitPrice());
+      this.value += ingredientToMerge.getValue();
       this.measurement.merge(measurementToMerge);
     }
+  }
+
+  public float getValue() {
+    return value;
   }
 
   /**
@@ -90,11 +97,36 @@ public class Ingredient {
     return LocalDate.now().isAfter(expiryDate);
   }
 
+  /**
+   * Retrieves the name of the measurement.
+   *
+   * @return the name as a string.
+   */
+  public String getName() {
+    return (name != null) ? name : "";
+  }
+
+  /**
+   * Sets the name of the measurement.
+   * The name must not be null or empty.
+   *
+   * @param name the name of the measurement
+   * @throws IllegalArgumentException if the name is null or empty
+   */
+  public void setName(String name) {
+    if (name == null || name.isBlank()) {
+      throw new IllegalArgumentException("Name cannot be null or empty");
+    }
+    this.name = name;
+  }
+
+
+
   private String getString() {
     int dayTilExpiry = getDaysBetween(this.getExpiryDate());
-    return "\n" + "  - " + getName() + ": " + getAmount()
+    return "  - " + getName() + ": " + getAmount()
         + " " + getUnit()
-        + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days)";
+        + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days) Value: " + getValue() + " kr";
   }
 
   /**
@@ -104,9 +136,9 @@ public class Ingredient {
    */
   private String getExpiredString() {
     int daysExpired = Math.abs(getDaysBetween(this.getExpiryDate()));
-    return "\n" + "  * " + getName() + ": " + getAmount() + " "
+    return "  * " + getName() + ": " + getAmount() + " "
         + getUnit() + " - Best before: " + expiryDate
-        + " (Expired " + daysExpired + " days ago)";
+        + " (Expired " + daysExpired + " days ago) Value: " + getValue() + " kr";
   }
 
   /**
@@ -134,33 +166,6 @@ public class Ingredient {
 
   public Measurement getMeasurement() {
     return this.measurement;
-  }
-
-  /**
-   * Retrieves the name of the ingredient.
-   *
-   * @return the name of the ingredient if it is set, otherwise returns an empty string
-   */
-  public String getName() {
-    return getMeasurementName();
-  }
-
-  /**
-   * Sets the name of the ingredient's measurement.
-   *
-   * @param name the name of the measurement to set
-   */
-  public void setName(String name) {
-    measurement.setName(name);
-  }
-
-  /**
-   * Retrieves the name of the measurement associated with the ingredient.
-   *
-   * @return the measurement name as a string.
-   */
-  private String getMeasurementName() {
-    return measurement.getName();
   }
 
   /**
@@ -210,37 +215,33 @@ public class Ingredient {
   }
 
   /**
-   * Retrieves the unit price of the ingredient.
-   *
-   * @return the unit price of the ingredient
-   */
-  public float getStandardUnitPrice() {
-    return standardUnitPrice;
-  }
-
-  /**
    * Sets the unit price of the ingredient.
    *
-   * @param standardUnitPrice the unit price of the ingredient
+   * @param value the unit price of the ingredient
    * @throws IllegalArgumentException if the unit price is negative or exceeds 1000
    */
-  public void setStandardUnitPrice(float standardUnitPrice) {
-    if (standardUnitPrice < 0) {
+  public void setValue(float value) {
+    if (value < 0) {
       throw new IllegalArgumentException("Price cannot be negative");
-    } else if (standardUnitPrice > 1000) {
+    } else if (value > 1000) {
       throw new IllegalArgumentException("Please enter a more reasonable unit price (max 1000");
     }
-    this.standardUnitPrice = standardUnitPrice;
+
+    this.value = Math.round(value * 100) / 100.0f; // round it to 2 decimal places
+  }
+
+  private float calculateUnitPrice() {
+    return getValue() / getAmount();
   }
 
   /**
    * Sets the valid unit for the measurement of the ingredient.
    *
-   * @param validUnit the valid unit to be set
+   * @param unit the valid unit to be set
    * @throws IllegalArgumentException if the unit is null or UNKNOWN
    */
-  public void setValidUnit(ValidUnit validUnit) {
-    measurement.setValidUnit(validUnit);
+  public void setUnit(ValidUnit unit) {
+    measurement.setValidUnit(unit);
   }
 
   /**
@@ -272,14 +273,10 @@ public class Ingredient {
 
     setName(name);
     setAmount(amount);
-    setValidUnit(validUnit);
+    setUnit(validUnit);
+    setValue(random.nextFloat(50f, 144f));
     // setters do not allow the expiry date to be date before today.
     expiryDate = LocalDate.now().minusDays(random.nextInt(4, 17));
-  }
-
-  public float getValue() {
-    List<Object> data = measurement.getStandardData();
-    return getStandardUnitPrice() * (float) data.getFirst();
   }
 
   /**

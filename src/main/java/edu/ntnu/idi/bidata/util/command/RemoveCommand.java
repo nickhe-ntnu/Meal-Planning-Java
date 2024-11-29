@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * delegates the removal operation to the appropriate method.
  *
  * @author Nick Heggø
- * @version 2024-11-09
+ * @version 2024-11-29
  */
 public class RemoveCommand extends Command {
   public RemoveCommand(User user) {
@@ -33,11 +33,17 @@ public class RemoveCommand extends Command {
 
   private void removeStorage() {
     requestInputIfNeeded("Please enter the storage name to remove:");
-    // TODO
+    boolean success = inventoryManager.removeStorage(userInputString);
+    if (success) {
+      outputHandler.printOutputWithLineBreak("Successfully removed " + userInputString + " from the application.");
+    } else {
+      outputHandler.printOutput("Failed to remove " + userInputString + ", please check if the name is misspelled.");
+    }
   }
 
   private void removeExpired() {
-    inventoryManager.removeExpired();
+    float sum = inventoryManager.removeExpired();
+    outputHandler.printOutputWithLineBreak("Value of " + sum + " kr worth of food is now been deleted.");
   }
 
   private void removeIngredient() {
