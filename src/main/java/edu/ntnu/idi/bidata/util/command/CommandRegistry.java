@@ -1,5 +1,7 @@
 package edu.ntnu.idi.bidata.util.command;
 
+import edu.ntnu.idi.bidata.util.Utility;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +12,7 @@ import java.util.Map;
  * the validity of a command word and to retrieve all the valid commands as a string.
  *
  * @author Nick Heggø
- * @version 2024-11-28
+ * @version 2024-11-29
  */
 public class CommandRegistry {
   private final Map<String, ValidCommand> commandMap;

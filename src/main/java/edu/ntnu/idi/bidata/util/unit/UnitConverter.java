@@ -2,7 +2,7 @@ package edu.ntnu.idi.bidata.util.unit;
 
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
-import edu.ntnu.idi.bidata.util.command.Utility;
+import edu.ntnu.idi.bidata.util.Utility;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class UnitConverter {
   }
 
   public static List<Object> getStandardData(Measurement measurement) {
-    Utility.assertNonNull(measurement);
+    Utility.assertNoneNull(measurement);
     String ingredientType = measurement.getIngredientType();
     List<Object> data = null;
     if (ingredientType.equals("SOLID")) {

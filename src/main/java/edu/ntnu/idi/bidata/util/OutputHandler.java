@@ -35,6 +35,7 @@ public class OutputHandler {
 
   public void printInputPrompt(String inputPrompt) {
     System.out.println(inputPrompt);
+    System.out.println("Type 'abort' to abort the operation.");
     System.out.print("  ~ ");
   }
 

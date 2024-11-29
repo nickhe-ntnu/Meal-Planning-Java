@@ -1,6 +1,6 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
-import edu.ntnu.idi.bidata.util.command.Utility;
+import edu.ntnu.idi.bidata.util.Utility;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -34,7 +34,7 @@ public class IngredientStorage {
    * @param newIngredient The ingredient to be added to the storage.
    */
   public void addIngredient(Ingredient newIngredient) {
-    Utility.assertNonNull(newIngredient);
+    Utility.assertNoneNull(newIngredient);
     if (hasMatchingExpiryDate(newIngredient)) {
       mergeIngredient(newIngredient);
     } else {

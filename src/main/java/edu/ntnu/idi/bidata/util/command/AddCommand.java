@@ -2,7 +2,6 @@ package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
-import edu.ntnu.idi.bidata.user.recipe.Recipe;
 
 /**
  * The AddCommand class extends the Command class and is responsible for handling
@@ -10,7 +9,7 @@ import edu.ntnu.idi.bidata.user.recipe.Recipe;
  * such as locations and storage entries for a given user.
  *
  * @author Nick Heggø
- * @version 2024-11-09
+ * @version 2024-11-29
  */
 public class AddCommand extends Command {
 
@@ -39,7 +38,7 @@ public class AddCommand extends Command {
     switch (userInputSubcommand) {
       case "storage", "inventory" -> addStorage();
       case "ingredient" -> addIngredient();
-      case "recipe" -> addRecipe();
+      //      case "recipe" -> addRecipe();
       default -> illegalCommand();
     }
   }
@@ -79,9 +78,9 @@ public class AddCommand extends Command {
   /**
    * Creates and adds a new recipe using the recipe manager.
    */
-  private void addRecipe() {
-    Recipe createdRecipe = recipeManager.createRecipe();
-    recipeManager.addRecipe(createdRecipe);
-  }
+  //  private void addRecipe() {
+  //    Recipe createdRecipe = recipeManager.createRecipe();
+  //    recipeManager.addRecipe(createdRecipe);
+  //  }
 
 }

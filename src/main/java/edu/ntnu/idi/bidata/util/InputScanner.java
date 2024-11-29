@@ -11,7 +11,7 @@ import java.util.Scanner;
  * It is designed to parse input into predefined commands, subcommands, and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-29
  */
 public class InputScanner {
   private final Scanner scanner;
@@ -78,7 +78,11 @@ public class InputScanner {
 
     while (!valid) {
       try {
+        assertEmptyLine();
         result = scanNextLine();
+        if (Utility.createKey(result).equals("abort")) {
+          throw new IllegalArgumentException();
+        }
         valid = true;
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
@@ -136,7 +140,7 @@ public class InputScanner {
    */
   private void assertEmptyLine() {
     if (!scanner.hasNextLine()) {
-      throw new IllegalArgumentException("Input cannot be empty.");
+      throw new IllegalArgumentException("There are no lines to scann. (Error: Input Scanner)");
     }
   }
 
@@ -148,7 +152,7 @@ public class InputScanner {
    */
   private void assertEmptyInput(String input) {
     if (input.isBlank()) {
-      throw new IllegalArgumentException("Input cannot be empty.");
+      throw new IllegalArgumentException("Input can not be empty. (Error: Input Scanner)");
     }
   }
 

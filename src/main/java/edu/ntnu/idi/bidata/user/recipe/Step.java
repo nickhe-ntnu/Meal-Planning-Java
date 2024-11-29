@@ -8,21 +8,15 @@ import java.util.List;
  * Represents a step in a recipe with cooking instructions and ingredients.
  *
  * @author Nick Heggø
- * @version 2024-11-27
+ * @version 2024-11-29
  */
 public class Step {
+  private List<Measurement> measurementList;
   private String instruction;
-  private List<Measurement> ingredientList;
 
-  /**
-   * Constructs a Step with provided cooking instruction and list of ingredients.
-   *
-   * @param instruction    The cooking instruction for this step.
-   * @param ingredientList List of ingredients required for this step.
-   */
-  public Step(String instruction, List<Measurement> ingredientList) {
+  public Step(List<Measurement> measurementList, String instruction) {
+    setMeasurementList(measurementList);
     setInstruction(instruction);
-    setIngredientList(ingredientList);
   }
 
   /**
@@ -30,17 +24,20 @@ public class Step {
    *
    * @return the list of ingredients.
    */
-  public List<Measurement> getIngredientList() {
-    return ingredientList;
+  public List<Measurement> getMeasurementList() {
+    return measurementList;
   }
 
   /**
    * Sets the list of ingredients for this step.
    *
-   * @param ingredientList List of ingredients to be set.
+   * @param measurementList List of ingredients to be set.
    */
-  private void setIngredientList(List<Measurement> ingredientList) {
-    this.ingredientList = ingredientList;
+  private void setMeasurementList(List<Measurement> measurementList) {
+    if (measurementList == null) {
+      throw new IllegalArgumentException("Measurements cannot be null.");
+    }
+    this.measurementList = measurementList;
   }
 
   /**
@@ -57,7 +54,13 @@ public class Step {
    *
    * @param instruction The cooking instruction to be set.
    */
-  private void setInstruction(String instruction) {
+  public void setInstruction(String instruction) {
+    if (instruction == null) {
+      throw new IllegalArgumentException("Step instruction cannot be null.");
+    }
+    if (instruction.isBlank()) {
+      throw new IllegalArgumentException("Step instruction cannot be blank.");
+    }
     this.instruction = instruction;
   }
 }

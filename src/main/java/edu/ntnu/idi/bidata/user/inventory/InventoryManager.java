@@ -3,7 +3,7 @@ package edu.ntnu.idi.bidata.user.inventory;
 import edu.ntnu.idi.bidata.user.UserInput;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
-import edu.ntnu.idi.bidata.util.command.Utility;
+import edu.ntnu.idi.bidata.util.Utility;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.*;
