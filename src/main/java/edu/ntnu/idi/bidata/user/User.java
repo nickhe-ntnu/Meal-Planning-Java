@@ -11,7 +11,7 @@ import edu.ntnu.idi.bidata.util.OutputHandler;
  * methods to interact with and manage these attributes.
  *
  * @author Nick Heggø
- * @version 2024-11-09
+ * @version 2024-11-30
  */
 public class User {
 
@@ -33,8 +33,8 @@ public class User {
    * The RecipeManager manages recipe-related tasks.
    */
   public User() {
-    inputScanner = new InputScanner();
     outputHandler = new OutputHandler();
+    inputScanner = new InputScanner(outputHandler);
     inventoryManager = new InventoryManager(inputScanner, outputHandler);
     recipeManager = new RecipeManager(inputScanner, outputHandler);
   }

@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
  * an optional sub-command, and the complete input string.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-30
  */
 public class UserInput {
   private ValidCommand validCommand;
@@ -25,17 +25,17 @@ public class UserInput {
    * @param subcommand   The optional sub-command as a string.
    */
   public UserInput(ValidCommand validCommand, String subcommand, String inputString) {
-    setValidCommand(validCommand);
+    setCommand(validCommand);
     setSubcommand(subcommand);
     setInputString(inputString);
   }
 
   public UserInput(float unitAmount, ValidUnit unitType) {
-    setUnitAmount(unitAmount);
-    setValidUnit(unitType);
+    setAmount(unitAmount);
+    setUnit(unitType);
   }
 
-  public ValidUnit getValidUnit() {
+  public ValidUnit getUnit() {
     return validUnit;
   }
 
@@ -44,7 +44,7 @@ public class UserInput {
    *
    * @param validUnit The measurement unit represented by the ValidUnit enum.
    */
-  private void setValidUnit(ValidUnit validUnit) {
+  private void setUnit(ValidUnit validUnit) {
     this.validUnit = validUnit;
   }
 
@@ -53,7 +53,7 @@ public class UserInput {
    *
    * @return The main command word represented by the ValidCommand enum.
    */
-  public ValidCommand getCommandWord() {
+  public ValidCommand getCommand() {
     return validCommand;
   }
 
@@ -93,11 +93,11 @@ public class UserInput {
     this.inputString = inputString;
   }
 
-  public float getUnitAmount() {
+  public float getAmount() {
     return unitAmount;
   }
 
-  private void setUnitAmount(float unitAmount) {
+  private void setAmount(float unitAmount) {
     this.unitAmount = unitAmount;
   }
 
@@ -115,7 +115,7 @@ public class UserInput {
    *
    * @param validCommand The main command word represented by the ValidCommand enum.
    */
-  private void setValidCommand(ValidCommand validCommand) {
+  private void setCommand(ValidCommand validCommand) {
     this.validCommand = validCommand;
   }
 

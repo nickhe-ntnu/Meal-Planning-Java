@@ -6,7 +6,7 @@ import edu.ntnu.idi.bidata.user.inventory.Ingredient;
  * A utility class providing methods to manipulate strings and objects.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-11-30
  */
 public class Utility {
 
@@ -43,5 +43,17 @@ public class Utility {
     if (o.isBlank()) {
       throw new IllegalArgumentException("String cannot be blank.");
     }
+  }
+
+  public static String getOrdinalSuffix(int number) {
+    if (number % 100 >= 11 && number % 100 <= 13) {
+      return "th";
+    }
+    return switch (number % 10) {
+      case 1 -> "st";
+      case 2 -> "nd";
+      case 3 -> "rd";
+      default -> "th";
+    };
   }
 }

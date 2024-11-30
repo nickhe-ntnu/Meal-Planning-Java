@@ -9,7 +9,7 @@ import java.util.List;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-11-30
  */
 public class OutputHandler {
 
@@ -34,8 +34,8 @@ public class OutputHandler {
   }
 
   public void printInputPrompt(String inputPrompt) {
-    System.out.println(inputPrompt);
-    System.out.println("Type 'abort' to abort the operation.");
+    System.out.print(inputPrompt);
+    System.out.println(" Type 'abort' to abort the operation.");
     System.out.print("  ~ ");
   }
 

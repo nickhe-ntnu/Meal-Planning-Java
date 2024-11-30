@@ -2,42 +2,44 @@ package edu.ntnu.idi.bidata.user.recipe;
 
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a step in a recipe with cooking instructions and ingredients.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-11-30
  */
 public class Step {
-  private List<Measurement> measurementList;
   private String instruction;
+  private Map<String, Measurement> measurementMap;
 
-  public Step(List<Measurement> measurementList, String instruction) {
-    setMeasurementList(measurementList);
+  public Step(String instruction, Map<String, Measurement> measurementMap) {
+    setMeasurementMap(measurementMap);
     setInstruction(instruction);
   }
 
   /**
-   * Retrieves the list of ingredients for this step.
+   * Retrieves the map of ingredient measurements for this step.
    *
-   * @return the list of ingredients.
+   * @return a map where the key is a string representing the ingredient name, and the value is a Measurement object.
    */
-  public List<Measurement> getMeasurementList() {
-    return measurementList;
+  public Map<String, Measurement> getMeasurementMap() {
+    return measurementMap;
   }
 
   /**
-   * Sets the list of ingredients for this step.
+   * Sets the map of ingredient measurements for this step.
    *
-   * @param measurementList List of ingredients to be set.
+   * @param measurementMap a map where the key is a string representing the ingredient name,
+   *                       and the value is a Measurement object; must not be null
+   * @throws IllegalArgumentException if measurementMap is null
    */
-  private void setMeasurementList(List<Measurement> measurementList) {
-    if (measurementList == null) {
+  private void setMeasurementMap(Map<String, Measurement> measurementMap) {
+    if (measurementMap == null) {
       throw new IllegalArgumentException("Measurements cannot be null.");
     }
-    this.measurementList = measurementList;
+    this.measurementMap = measurementMap;
   }
 
   /**

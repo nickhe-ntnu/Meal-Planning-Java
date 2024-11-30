@@ -3,6 +3,7 @@ package edu.ntnu.idi.bidata.util;
 import edu.ntnu.idi.bidata.user.UserInput;
 import edu.ntnu.idi.bidata.util.command.CommandRegistry;
 import edu.ntnu.idi.bidata.util.unit.UnitRegistry;
+import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.Scanner;
 
@@ -11,12 +12,13 @@ import java.util.Scanner;
  * It is designed to parse input into predefined commands, subcommands, and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-11-30
  */
 public class InputScanner {
   private final Scanner scanner;
   private final CommandRegistry commandRegistry;
   private final UnitRegistry unitRegistry;
+  private final OutputHandler outputHandler;
 
   /**
    * Default constructor for InputScanner.
@@ -26,6 +28,20 @@ public class InputScanner {
     scanner = new Scanner(System.in);
     commandRegistry = new CommandRegistry();
     unitRegistry = new UnitRegistry();
+    outputHandler = new OutputHandler();
+  }
+
+  /**
+   * Constructs an InputScanner instance using the provided OutputHandler.
+   * Initializes the internal scanner, command registry, and unit registry.
+   *
+   * @param outputHandler the OutputHandler used for managing output display
+   */
+  public InputScanner(OutputHandler outputHandler) {
+    scanner = new Scanner(System.in);
+    commandRegistry = new CommandRegistry();
+    unitRegistry = new UnitRegistry();
+    this.outputHandler = outputHandler;
   }
 
   /**
@@ -38,6 +54,7 @@ public class InputScanner {
     scanner = scannerSource;
     commandRegistry = new CommandRegistry();
     unitRegistry = new UnitRegistry();
+    outputHandler = new OutputHandler();
   }
 
   /**
@@ -47,8 +64,7 @@ public class InputScanner {
    * @return a UserInput object representing the parsed command input.
    */
   public UserInput fetchCommand() {
-    String scannedLine = scanNextLine();
-    assertEmptyInput(scannedLine);
+    String scannedLine = nextLine();
     String[] tokenized = tokenizeInput(scannedLine);
     return createCommandInput(tokenized);
   }
@@ -60,9 +76,16 @@ public class InputScanner {
    * @return a UserInput object representing the parsed unit input.
    */
   public UserInput fetchUnit() {
-    String scannedLine = scanNextLine();
+    String scannedLine = nextLine();
     String[] tokenized = tokenizeInput(scannedLine);
+    assertUnitInput(tokenized);
     return createUnitInput(tokenized);
+  }
+
+  private void assertUnitInput(String[] tokens) {
+    if (tokens.length < 2) {
+      throw new IllegalArgumentException("Missing inputs.");
+    }
   }
 
   /**
@@ -74,18 +97,15 @@ public class InputScanner {
    */
   public String collectValidString() {
     String result = null;
-    boolean valid = false;
+    boolean validInput = false;
 
-    while (!valid) {
+    while (!validInput) {
       try {
         assertEmptyLine();
-        result = scanNextLine();
-        if (Utility.createKey(result).equals("abort")) {
-          throw new IllegalArgumentException();
-        }
-        valid = true;
+        result = nextLine();
+        validInput = true;
       } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+        outputHandler.printInputPrompt(e.getMessage());
       }
     }
 
@@ -93,15 +113,31 @@ public class InputScanner {
   }
 
   public float collectValidFloat() {
-    float result = 0f;
+    float result = 0.0f;
     boolean validInput = false;
 
     while (!validInput) {
       try {
-        result = getInputFloat();
+        result = nextFloat();
         validInput = true;
-      } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+      } catch (IllegalArgumentException illegalArgumentException) {
+        outputHandler.printInputPrompt(illegalArgumentException.getMessage());
+      }
+    }
+
+    return result;
+  }
+
+  public float collectValidInt() {
+    float result = 0.0f;
+    boolean validInput = false;
+
+    while (!validInput) {
+      try {
+        result = nextInteger();
+        validInput = true;
+      } catch (IllegalArgumentException illegalArgumentException) {
+        outputHandler.printInputPrompt(illegalArgumentException.getMessage());
       }
     }
 
@@ -114,11 +150,18 @@ public class InputScanner {
    * @return the next line of input as a trimmed string.
    * @throws IllegalArgumentException if no input is found.
    */
-  public String scanNextLine() {
+  public String nextLine() {
     assertEmptyLine();
     String inputLine = scanner.nextLine().trim();
     assertEmptyInput(inputLine);
+    assertAbort(inputLine);
     return inputLine;
+  }
+
+  private void assertAbort(String input) {
+    if (Utility.createKey(input).equals("abort")) {
+      throw new AbortException();
+    }
   }
 
   /**
@@ -128,9 +171,14 @@ public class InputScanner {
    * @return the floating-point number entered by the user.
    * @throws IllegalArgumentException if the input is blank or cannot be parsed as a float.
    */
-  public float getInputFloat() {
+  public float nextFloat() {
     assertEmptyLine();
-    return scanner.nextFloat();
+    return Float.parseFloat(nextLine());
+  }
+
+  public int nextInteger() {
+    assertEmptyLine();
+    return Integer.parseInt(nextLine());
   }
 
   /**
@@ -140,7 +188,7 @@ public class InputScanner {
    */
   private void assertEmptyLine() {
     if (!scanner.hasNextLine()) {
-      throw new IllegalArgumentException("There are no lines to scann. (Error: Input Scanner)");
+      throw new IllegalArgumentException("There are no lines to scan. (Error: Input Scanner)");
     }
   }
 
@@ -190,8 +238,9 @@ public class InputScanner {
    * @return a UserInput object containing the unit amount and its type.
    */
   private UserInput createUnitInput(String[] tokens) {
-    float unitAmount = (tokens.length > 0) ? Float.valueOf(tokens[0]) : -1;
-    String unit = (tokens.length > 1) ? tokens[1].toLowerCase() : null;
-    return new UserInput(unitAmount, unitRegistry.getUnitType(unit));
+    float unitAmount = (tokens.length > 0) ? Float.parseFloat(tokens[0]) : -1;
+    String unitString = (tokens.length > 1) ? tokens[1].toLowerCase() : null;
+    ValidUnit unit = unitRegistry.getUnitType(unitString);
+    return new UserInput(unitAmount, unit);
   }
 }

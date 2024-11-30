@@ -13,7 +13,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-11-30
  */
 public class Application {
   private final User user;
@@ -79,7 +79,7 @@ public class Application {
         outputHandler.printOutput(e.getMessage());
       } catch (IllegalCommandCombinationException illegalCommandCombinationException) {
         outputHandler.printOutput(illegalCommandCombinationException.getMessage());
-        outputHandler.printHelpMessage(user.getInput().getCommandWord().name().toLowerCase());
+        outputHandler.printHelpMessage(user.getInput().getCommand().name().toLowerCase());
       }
     } while (running);
   }
@@ -105,7 +105,7 @@ public class Application {
    */
   private boolean processUserCommand(UserInput userInput) {
     boolean running = true;
-    ValidCommand validCommand = userInput.getCommandWord();
+    ValidCommand validCommand = userInput.getCommand();
     switch (validCommand) {
       case UNKNOWN -> processUnknownCommand(userInput);
       case HELP -> new HelpCommand(this.user);
@@ -126,7 +126,7 @@ public class Application {
    * @param userInput The command entered by the user.
    */
   private void processUnknownCommand(UserInput userInput) {
-    outputHandler.printHelpMessage(userInput.getCommandWord().name().toLowerCase());
+    outputHandler.printHelpMessage(userInput.getCommand().name().toLowerCase());
   }
 
   /**

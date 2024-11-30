@@ -4,6 +4,7 @@ import edu.ntnu.idi.bidata.user.UserInput;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
 import edu.ntnu.idi.bidata.util.Utility;
+import edu.ntnu.idi.bidata.util.command.ValidCommand;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.*;
@@ -13,7 +14,7 @@ import java.util.*;
  * for ingredient and storage management.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-11-30
  */
 public class InventoryManager {
 
@@ -42,32 +43,59 @@ public class InventoryManager {
    */
   public Ingredient createIngredient(String ingredientName) {
     outputHandler.printOutput("#### Add ingredient ####");
-    return inputIngredientDetails(ingredientName);
+    String name = collectIngredientName(ingredientName);
+    UserInput amountAndUnit = collectAmountAndUnit();
+    float amount = amountAndUnit.getAmount();
+    ValidUnit unit = amountAndUnit.getUnit();
+    float value = collectIngredientValue();
+    int daysUntilExpiry = collectDaysUntilExpiry();
+
+    return new Ingredient(name, amount, unit, value, daysUntilExpiry);
   }
 
-  private Ingredient inputIngredientDetails(String ingredientName) {
-    String name = ingredientName;
-    if (name == null) {
+  private int collectDaysUntilExpiry() {
+    int daysTilExpiry;
+    do {
+      outputHandler.printInputPrompt("Please enter the days until expiry:");
+      daysTilExpiry = (int) inputScanner.collectValidInt();
+    } while (daysTilExpiry < -1);
+    return daysTilExpiry;
+  }
+
+  private float collectIngredientValue() {
+    float value;
+    do {
+      outputHandler.printInputPrompt("Please enter the ingredient value:");
+      value = inputScanner.collectValidFloat();
+    } while (value < 0.0f);
+    return value;
+  }
+
+  private UserInput collectAmountAndUnit() {
+    UserInput userInput = null;
+    boolean validInput = false;
+    while (!validInput) {
+      outputHandler.printInputPrompt("Please enter the amount with unit:");
+      try {
+        userInput = inputScanner.fetchUnit();
+        if (userInput.getCommand() == ValidCommand.UNKNOWN) {
+          throw new IllegalArgumentException("");
+        }
+        validInput = true;
+      } catch (IllegalArgumentException ignored) {
+      }
+    }
+
+    return userInput;
+  }
+
+  private String collectIngredientName(String inputName) {
+    String name = inputName;
+    if (inputName == null) {
       outputHandler.printInputPrompt("Please enter the ingredient name:");
       name = inputScanner.collectValidString();
     }
-
-    outputHandler.printInputPrompt("Please enter the amount with unit:");
-    UserInput userInput = inputScanner.fetchUnit();
-    while (userInput.getValidUnit() == ValidUnit.UNKNOWN) {
-      outputHandler.printInputPrompt("Type error, please ensure to use a valid unit");
-      userInput = inputScanner.fetchUnit();
-    }
-    float amount = userInput.getUnitAmount();
-    ValidUnit unit = userInput.getValidUnit();
-
-    outputHandler.printInputPrompt("Please enter the unit price");
-    float unitPrice = inputScanner.collectValidFloat();
-
-    outputHandler.printInputPrompt("Please enter days until expiry date");
-    int dayToExpiry = (int) inputScanner.getInputFloat();
-
-    return new Ingredient(name, amount, unit, unitPrice, dayToExpiry);
+    return name;
   }
 
   /**
@@ -203,7 +231,7 @@ public class InventoryManager {
    *
    * @throws IllegalArgumentException if no inventory is currently selected.
    */
-  private void assertInventoryIsAvailable() {
+  public void assertInventoryIsAvailable() {
     if (currentStorage == null) {
       throw new IllegalArgumentException("You are currently not in an inventory, please use the 'go' command.");
     }

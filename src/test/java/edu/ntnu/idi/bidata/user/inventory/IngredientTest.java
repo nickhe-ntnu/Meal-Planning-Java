@@ -6,12 +6,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test class for the Ingredient class.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-11-30
  */
 class IngredientTest {
   private Ingredient mergedIngredient;
@@ -39,5 +40,10 @@ class IngredientTest {
     UnitConverter.convertIngredient(testIngredient, ValidUnit.G);
     assertEquals(ValidUnit.G, testIngredient.getUnit());
     assertEquals(3000, testIngredient.getAmount());
+  }
+
+  @Test
+  void testSetAmount() {
+    assertThrows(IllegalArgumentException.class, () -> testIngredient.setAmount(-123));
   }
 }

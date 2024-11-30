@@ -1,10 +1,15 @@
 package edu.ntnu.idi.bidata.user.recipe;
 
+import edu.ntnu.idi.bidata.user.inventory.Measurement;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
+import edu.ntnu.idi.bidata.util.Utility;
+
+import java.util.HashMap;
 
 /**
- *
+ * @author Nick Heggø
+ * @version 2024-11-30
  */
 public class RecipeManager {
 
@@ -31,14 +36,16 @@ public class RecipeManager {
    *
    * @return the newly created Recipe object
    */
-  //  public Recipe createRecipe() {
-  //
-  //    boolean complete = false;
-  //    while (!complete) {
-  //      complete = builder(createdRecipe);
-  //    }
-  //    return createdRecipe;
-  //  }
+  public Recipe createRecipe(String name) {
+    String recipeName = name;
+    if (recipeName == null) {
+      outputHandler.printInputPrompt("Please enter the recipe name:");
+      inputScanner.collectValidString();
+    }
+    Recipe createdRecipe = builder(new Recipe(name));
+    return createdRecipe;
+  }
+
   private String getValidDescription() {
     outputHandler.printOutput("Please enter the recipe description:");
     return inputScanner.collectValidString();
@@ -49,20 +56,30 @@ public class RecipeManager {
    *
    * @param recipeToModify the Recipe object to be modified
    */
-  private boolean builder(Recipe recipeToModify) {
+  private Recipe builder(Recipe recipeToModify) {
     boolean finished = false;
-    System.out.println();
-    recipeToModify.setDescription(inputScanner.collectValidString());
+    recipeToModify.setDescription(getValidDescription());
+    int stepCount = 1;
     while (!finished) {
-      int iteration = 1;
-      System.out.println("Please enter the ingredient for the " + iteration + ". step: 'amount' 'unit' 'name'");
-      //      inputScanner.getValidStep()
-      System.out.println("Type 'exit' to terminate the ingredient wizard");
-      finished = inputScanner.collectValidString().equals("exit");
-      iteration++;
+      createStep(stepCount);
+      stepCount++;
+      outputHandler.printInputPrompt("Continue adding more steps? (Y/n)");
+      finished = !inputScanner.nextLine().equalsIgnoreCase("y");
     }
-    System.out.println("Please add ingredient for ");
-    return false;
+    return recipeToModify; //FIXME incomplete methods.
+  }
+
+  private Step createStep(int stepCount) {
+    outputHandler.printInputPrompt("Please enter the "
+        + stepCount + Utility.getOrdinalSuffix(stepCount) + " step instruction:");
+    String instruction = inputScanner.collectValidString();
+    HashMap<String, Measurement> measurementMap = new HashMap<>();
+    boolean finished = false;
+    while (!finished) {
+
+    }
+
+    return new Step(instruction, measurementMap); //FIXME incomplete method
   }
 
   /**
@@ -70,8 +87,7 @@ public class RecipeManager {
    *
    * @param recipeToBeAdded the recipe to be added to the cookbook
    */
-  //  public void addRecipe(Recipe recipeToBeAdded) {
-  //    Recipe createdRecipe = createRecipe();
-  //    cookBook.addRecipe(recipeToBeAdded);
-  //  }
+  public void addRecipe(Recipe recipeToBeAdded) {
+    cookBook.addRecipe(recipeToBeAdded);
+  }
 }

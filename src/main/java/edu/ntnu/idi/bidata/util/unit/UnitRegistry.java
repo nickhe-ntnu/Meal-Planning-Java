@@ -1,5 +1,7 @@
 package edu.ntnu.idi.bidata.util.unit;
 
+import edu.ntnu.idi.bidata.util.Utility;
+
 import java.util.HashMap;
 
 /**
@@ -7,7 +9,7 @@ import java.util.HashMap;
  * It provides functionality to initialize, validate, and retrieve information about measurement units.
  *
  * @author Nick Heggø
- * @version 2024-11-08
+ * @version 2024-11-30
  */
 public class UnitRegistry {
   private final HashMap<String, ValidUnit> validUnits;
@@ -18,7 +20,7 @@ public class UnitRegistry {
   public UnitRegistry() {
     validUnits = new HashMap<>();
     for (ValidUnit unit : ValidUnit.values()) {
-      validUnits.put(unit.name().toLowerCase(), unit);
+      validUnits.put(Utility.createKey(unit.name()), unit);
     }
   }
 
@@ -36,7 +38,7 @@ public class UnitRegistry {
    * @return null if it does not exist in
    */
   public ValidUnit getUnitType(String unitInput) {
-    ValidUnit unit = validUnits.get(unitInput);
+    ValidUnit unit = validUnits.get(Utility.createKey(unitInput));
     if (unit != null) {
       return unit;
     } else {

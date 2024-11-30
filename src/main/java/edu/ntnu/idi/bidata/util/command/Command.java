@@ -16,7 +16,7 @@ import java.util.Stack;
  * process commands and subcommands.
  *
  * @author Nick Heggø
- * @version 2024-11-09
+ * @version 2024-11-30
  */
 public abstract class Command {
   // user
@@ -130,7 +130,7 @@ public abstract class Command {
   /**
    * Sets the user associated with the command.
    *
-   * @param user The User object to be associated with the command.
+   * @param user The User objects to be associated with the command.
    */
   private void setUser(User user) {
     this.user = user;
@@ -153,7 +153,7 @@ public abstract class Command {
    * @param userInput The UserInput object containing the main command word.
    */
   private void setUserValidCommand(UserInput userInput) {
-    this.userInputCommand = userInput.getCommandWord();
+    this.userInputCommand = userInput.getCommand();
   }
 
   /**

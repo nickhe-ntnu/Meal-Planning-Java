@@ -19,8 +19,12 @@ public class Measurement {
   /**
    * Default constructor for the Measurement class.
    * Initializes an empty Measurement instance.
+   *
+   * @author Nick Heggø
+   * @version 2024-11-30
    */
-  public Measurement() {}
+  public Measurement() {
+  }
 
   /**
    * Constructs a Measurement with the specified name, amount, and unit.
@@ -89,8 +93,6 @@ public class Measurement {
   public String getIngredientType() {
     return ingredientType.toString();
   }
-
-
 
   /**
    * Retrieves the valid unit of measurement.

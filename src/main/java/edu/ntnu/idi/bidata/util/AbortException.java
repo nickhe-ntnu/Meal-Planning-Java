@@ -6,14 +6,12 @@ package edu.ntnu.idi.bidata.util;
  * a process needs to be terminated while in input mode simply by typing "abort".
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-11-30
  */
 public class AbortException extends RuntimeException {
 
-  private static final String DEFAULT_MESSAGE = "Operation aborted.";
-
   public AbortException() {
-    super(DEFAULT_MESSAGE);
+    super("Operation aborted.");
   }
 
   public AbortException(String message) {
