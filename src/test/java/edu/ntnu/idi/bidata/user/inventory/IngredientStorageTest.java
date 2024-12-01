@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Nick Heggø
- * @version 2024-11-28
+ * @version 2024-12-01
  */
 class IngredientStorageTest {
   static IngredientStorage ingredientStorage;
@@ -60,7 +60,7 @@ class IngredientStorageTest {
     Ingredient ingredient = new Ingredient("testIngredient", 23, ValidUnit.KG, 20, 4);
     ingredientStorage.addIngredient(ingredient);
     assertTrue(ingredientStorage.isIngredientPresent("TESTINGREDIENT"));
-    ingredientStorage.removeIngredient("TESTINGREDIENT", LocalDate.now().plusDays(4));
+    ingredientStorage.removeIngredient(ingredient);
     assertFalse(ingredientStorage.isIngredientPresent("TESTINGREDIENT"));
   }
 

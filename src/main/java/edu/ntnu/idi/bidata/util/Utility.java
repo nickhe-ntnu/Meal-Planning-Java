@@ -6,7 +6,7 @@ import edu.ntnu.idi.bidata.user.inventory.Ingredient;
  * A utility class providing methods to manipulate strings and objects.
  *
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-01
  */
 public class Utility {
 
@@ -20,7 +20,7 @@ public class Utility {
    * @return the lowercase version of the input string if not null, otherwise null.
    */
   public static String createKey(String s) {
-    return (s == null) ? null : s.trim().toLowerCase();
+    return (s == null) ? null : s.strip().toLowerCase();
   }
 
   /**
@@ -30,7 +30,7 @@ public class Utility {
    * @return the lowercase name of the Ingredient, or null if the Ingredient is null.
    */
   public static String createKey(Ingredient o) {
-    return (o == null) ? null : o.getName().trim().toLowerCase();
+    return (o == null) ? null : o.getName().strip().toLowerCase();
   }
 
   public static void assertNoneNull(Object o) {

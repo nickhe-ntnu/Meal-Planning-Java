@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Test class for the Ingredient class.
  *
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-01
  */
 class IngredientTest {
   private Ingredient mergedIngredient;
@@ -45,5 +45,12 @@ class IngredientTest {
   @Test
   void testSetAmount() {
     assertThrows(IllegalArgumentException.class, () -> testIngredient.setAmount(-123));
+  }
+
+  @Test
+  void testEquals() {
+    Ingredient ingredient1 = new Ingredient("test", 3.3f, ValidUnit.KG, 70.0f, 4);
+    Ingredient ingredient2 = new Ingredient("test", 3.3f, ValidUnit.KG, 70.0f, 4);
+    assertEquals(true, ingredient1.equals(ingredient2));
   }
 }

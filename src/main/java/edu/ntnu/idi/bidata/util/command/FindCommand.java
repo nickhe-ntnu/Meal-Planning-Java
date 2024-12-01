@@ -1,6 +1,7 @@
 package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
+import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * "find" subcommands.
  *
  * @author Nick Heggø
- * @version 2024-11-09
+ * @version 2024-12-01
  */
 public class FindCommand extends Command {
 
@@ -44,7 +45,7 @@ public class FindCommand extends Command {
 
   private void findIngredient() {
     String ingredientName = requestInputIfNeeded("Please enter the ingredient name to find:");
-    List<String> storageContainsIngredient = inventoryManager.findAllIngredient(ingredientName);
+    List<Ingredient> storageContainsIngredient = inventoryManager.findIngredientFromCurrent(ingredientName);
     if (storageContainsIngredient.isEmpty()) {
       outputHandler.printOutputWithLineBreak(ingredientName + " isn't present at any of the storages.");
     } else {

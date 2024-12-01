@@ -4,12 +4,13 @@ import edu.ntnu.idi.bidata.util.unit.UnitConverter;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a measurement with a name, amount, unit, and ingredient type.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-12-01
  */
 public class Measurement {
   private float amount;
@@ -35,6 +36,35 @@ public class Measurement {
   public Measurement(float amount, ValidUnit validUnit) {
     setAmount(amount);
     setValidUnit(validUnit);
+  }
+
+  /**
+   * Generates a hash code for the Measurement object based on its fields.
+   *
+   * @return an integer hash code derived from amount, validUnit, and ingredientType.
+   */
+  @Override
+  public int hashCode() {
+    return Objects.hash(amount, validUnit, ingredientType);
+  }
+
+  /**
+   * Compares this measurement to the specified object for equality.
+   *
+   * @param obj the object to compare with this measurement
+   * @return true if the specified object is equal to this measurement, false otherwise
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    Measurement m = (Measurement) obj;
+    return Float.compare(getAmount(), m.getAmount()) == 0
+        && getValidUnit().equals(m.getValidUnit());
   }
 
   public List<Object> getStandardMeasurement() {

@@ -12,7 +12,7 @@ import java.util.Scanner;
  * It is designed to parse input into predefined commands, subcommands, and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-01
  */
 public class InputScanner {
   private final Scanner scanner;
@@ -128,8 +128,8 @@ public class InputScanner {
     return result;
   }
 
-  public float collectValidInt() {
-    float result = 0.0f;
+  public int collectValidInteger() {
+    int result = 0;
     boolean validInput = false;
 
     while (!validInput) {
@@ -152,7 +152,7 @@ public class InputScanner {
    */
   public String nextLine() {
     assertEmptyLine();
-    String inputLine = scanner.nextLine().trim();
+    String inputLine = scanner.nextLine().strip();
     assertEmptyInput(inputLine);
     assertAbort(inputLine);
     return inputLine;

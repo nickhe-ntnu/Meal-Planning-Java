@@ -10,7 +10,7 @@ import edu.ntnu.idi.bidata.user.recipe.Recipe;
  * such as locations and storage entries for a given user.
  *
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-01
  */
 public class AddCommand extends Command {
 
@@ -45,18 +45,6 @@ public class AddCommand extends Command {
   }
 
   /**
-   * Prints a success or failure message for an operation.
-   *
-   * @param success A boolean indicating whether the operation was successful.
-   */
-  private void printOperationMessage(boolean success) {
-    if (success) {
-      outputHandler.printOperationSuccessMessage("added", userInputString);
-    } else
-      outputHandler.printOperationFailedMessage("add", userInputString);
-  }
-
-  /**
    * Adds a new storage entry specified by the user's input.
    * This method prompts the user for a storage name and attempts to add it
    * to the user's storage map. If the addition is successful, an operation
@@ -65,17 +53,15 @@ public class AddCommand extends Command {
   private void addStorage() {
     requestInputIfNeeded("Please enter new storage name:");
     inventoryManager.createStorage(userInputString);
-    printOperationMessage(true);
   }
 
   /**
    * Creates a new Ingredient using the inventory manager and adds it to the inventory.
    */
-  private void addIngredient() {
+  private void addIngredient() { //FIXME complete the method
     inventoryManager.assertInventoryIsAvailable();
     Ingredient createdIngredient = inventoryManager.createIngredient(userInputString);
     inventoryManager.addIngredient(createdIngredient);
-    outputHandler.printOperationSuccessMessage("added", createdIngredient.getName());
   }
 
   /**

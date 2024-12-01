@@ -4,6 +4,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Random;
  * name, amount, unit, expiry date, and standard unit price.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-12-01
  */
 public class Ingredient {
 
@@ -58,6 +59,26 @@ public class Ingredient {
   @Override
   public String toString() {
     return isExpired() ? getExpiredString() : getString();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, expiryDate, value, measurement);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    Ingredient ingredient = (Ingredient) obj;
+    return getName().equals(ingredient.getName())
+        && Float.compare(getValue(), ingredient.getValue()) == 0
+        && getExpiryDate().equals(ingredient.getExpiryDate())
+        && getMeasurement().equals(ingredient.getMeasurement());
   }
 
   /**
@@ -119,8 +140,6 @@ public class Ingredient {
     }
     this.name = name;
   }
-
-
 
   private String getString() {
     int dayTilExpiry = getDaysBetween(this.getExpiryDate());

@@ -10,7 +10,7 @@ import java.util.*;
  * stored in various named collections.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-12-01
  */
 public class IngredientStorage {
 
@@ -42,19 +42,20 @@ public class IngredientStorage {
     }
   }
 
-  /**
-   * Removes an ingredient from the storage if it is present and prints a success/failure message.
-   *
-   * @param name       the name of the ingredient to be removed
-   * @param expiryDate the expiry date of the ingredient to be removed
-   */
-  public boolean removeIngredient(String name, LocalDate expiryDate) {
-    List<Ingredient> ingredientList = getIngredientList(name);
-    boolean result = ingredientList.remove(findIngredient(name, expiryDate));
-    if (ingredientList.isEmpty()) {
-      ingredientMap.remove(Utility.createKey(name));
+  public boolean removeIngredient(Ingredient ingredientToBeRemoved) {
+    if (ingredientToBeRemoved == null) {
+      return false;
     }
-    return result;
+
+    // remove the ingredient from the list
+    List<Ingredient> ingredientList = getIngredientList(ingredientToBeRemoved.getName());
+    boolean status = ingredientList.remove(ingredientToBeRemoved);
+
+    // clean up hashMap if arrayList(value) is empty
+    if (ingredientList.isEmpty()) {
+      ingredientMap.remove(Utility.createKey(ingredientToBeRemoved.getName()));
+    }
+    return status;
   }
 
   /**

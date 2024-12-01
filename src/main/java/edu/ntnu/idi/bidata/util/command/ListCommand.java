@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * recipes, ingredients, expired items, and available recipes.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-12-01
  */
 public class ListCommand extends Command {
   public ListCommand(User user) {
@@ -26,7 +26,7 @@ public class ListCommand extends Command {
   @Override
   protected void processSubcommand() {
     switch (userInputSubcommand) {
-      case "inventory" -> listInventory();
+      case "all" -> listAll();
       case "storage" -> listStorage();
       case "recipe" -> listRecipe();
       case "ingredient" -> listIngredient();
@@ -53,7 +53,7 @@ public class ListCommand extends Command {
    * This method retrieves the user's storage data as a formatted string
    * and then prints it to the console with a line of separator characters.
    */
-  private void listInventory() {
+  private void listAll() {
     outputHandler.printOutputWithLineBreak(inventoryManager.getInventoryString());
   }
 

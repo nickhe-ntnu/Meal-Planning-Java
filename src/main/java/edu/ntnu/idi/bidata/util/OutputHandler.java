@@ -9,7 +9,7 @@ import java.util.List;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-01
  */
 public class OutputHandler {
 
@@ -17,7 +17,8 @@ public class OutputHandler {
       Hello, %s
       Thank you for using the meal planning app!""";
 
-  public OutputHandler() {}
+  public OutputHandler() {
+  }
 
   /**
    * Prints the specified message to the console and follows it with a line of separator characters.
@@ -67,14 +68,27 @@ public class OutputHandler {
     printOutput("Thank you for using the application, goodbye!");
   }
 
-  public void printOperationFailedMessage(String operation, String name) {
-    printOutputWithLineBreak("Failed to " + operation + " " + name);
+  /**
+   * Prints a formatted message indicating the success or failure of an operation,
+   * followed by a line of separator characters.
+   *
+   * @param success   a boolean value indicating if the operation was successful
+   * @param operation the name of the operation performed
+   * @param name      the name associated with the operation
+   */
+  public void printEndResultWithLineBreak(boolean success, String operation, String name) {
+    if (success) {
+      printOutputWithLineBreak("Successfully " + operation + " " + name);
+    } else {
+      printOutputWithLineBreak("Failed to " + operation + " " + name);
+    }
   }
 
-  public void printOperationSuccessMessage(String operation, String name) {
-    printOutputWithLineBreak("Successfully " + operation + " " + name);
-  }
-
+  /**
+   * Prints a help message corresponding to the given command.
+   *
+   * @param command the command for which the help message should be printed
+   */
   public void printHelpMessage(String command) {
     switch (command) {
       case "unknown" -> printUnknownInstruction();

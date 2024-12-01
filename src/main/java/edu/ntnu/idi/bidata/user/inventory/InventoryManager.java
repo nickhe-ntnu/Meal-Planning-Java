@@ -7,14 +7,17 @@ import edu.ntnu.idi.bidata.util.Utility;
 import edu.ntnu.idi.bidata.util.command.ValidCommand;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * Manages multiple ingredient storages and provides functionalities
  * for ingredient and storage management.
  *
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-01
  */
 public class InventoryManager {
 
@@ -57,7 +60,7 @@ public class InventoryManager {
     int daysTilExpiry;
     do {
       outputHandler.printInputPrompt("Please enter the days until expiry:");
-      daysTilExpiry = (int) inputScanner.collectValidInt();
+      daysTilExpiry = inputScanner.collectValidInteger();
     } while (daysTilExpiry < -1);
     return daysTilExpiry;
   }
@@ -108,17 +111,33 @@ public class InventoryManager {
     currentStorage.addIngredient(ingredientToBeAdded);
   }
 
-  public List<String> findAllIngredient(String ingredientName) {
-    ArrayList<String> listOfStorageContainsIngredient = new ArrayList<>();
-    storageMap.values().forEach(storage -> {
-      if (storage.isIngredientPresent(ingredientName)) {
-        listOfStorageContainsIngredient.add(storage.getStorageName());
+  public void removeIngredientFromCurrent(String ingredientName) {
+    assertInventoryIsAvailable();
+    List<Ingredient> ingredientList = findIngredientFromCurrent(ingredientName);
+    if (ingredientList == null) {
+      outputHandler.printOutput("There is no " + ingredientName + " at " + currentStorage.getStorageName());
+    } else {
+      // passed all checks
+      outputHandler.printOutput("Please select the ingredient to delete:");
+      printList(ingredientList);
+      outputHandler.printInputPrompt();
+      int index = inputScanner.collectValidInteger();
+      if (index > ingredientList.size() || index < 1) {
+        throw new IllegalArgumentException("Invalid index, please try again:");
       }
-    });
-    return listOfStorageContainsIngredient;
+      // user input from 1, index starts from 0 (N.B. index -1)
+      currentStorage.removeIngredient(ingredientList.get(index - 1));
+      outputHandler.printEndResultWithLineBreak(true, "removed", ingredientName);
+    }
   }
 
-  public List<Ingredient> fingIngredientList(String ingredientName) {
+  private void printList(List<?> list) {
+    for (int index = 0; index < list.size(); index++) {
+      outputHandler.printOutput(index + 1 + ":" + list.get(index));
+    }
+  }
+
+  public List<Ingredient> findIngredientFromCurrent(String ingredientName) {
     assertInventoryIsAvailable();
     return currentStorage.getIngredientList(ingredientName);
   }
@@ -207,7 +226,7 @@ public class InventoryManager {
     return stringBuilder.toString();
   }
 
-  public float removeExpired() {
+  public float removeAllExpired() {
     assertInventoryIsAvailable();
     List<Ingredient> expired = currentStorage.getAllExpired();
     currentStorage.removeExpired();
