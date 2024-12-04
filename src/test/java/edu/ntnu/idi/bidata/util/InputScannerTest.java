@@ -1,7 +1,8 @@
 package edu.ntnu.idi.bidata.util;
 
-import edu.ntnu.idi.bidata.user.UserInput;
 import edu.ntnu.idi.bidata.util.command.ValidCommand;
+import edu.ntnu.idi.bidata.util.input.CommandInput;
+import edu.ntnu.idi.bidata.util.input.UnitInput;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -79,29 +80,29 @@ class InputScannerTest {
   void testFetchCommand() {
     System.setIn(new ByteArrayInputStream("lISt   testSuBcOmmand    test   uSEr iNput stRing   ".getBytes()));
     InputScanner inputScanner = new InputScanner();
-    UserInput userInput = inputScanner.fetchCommand();
-    assertEquals(ValidCommand.LIST, userInput.getCommand());
-    assertEquals("list", userInput.getCommand().name().toLowerCase());
-    assertEquals("testsubcommand", userInput.getSubcommand());
-    assertEquals("test   uSEr iNput stRing", userInput.getInputString());
+    CommandInput commandInput = inputScanner.fetchCommand();
+    assertEquals(ValidCommand.LIST, commandInput.getCommand());
+    assertEquals("list", commandInput.getCommand().name().toLowerCase());
+    assertEquals("testsubcommand", commandInput.getSubcommand());
+    assertEquals("test   uSEr iNput stRing", commandInput.getArgument());
   }
 
   @Test
   void testFetchCommandNegative() {
     System.setIn(new ByteArrayInputStream("lst something".getBytes()));
     InputScanner inputScanner = new InputScanner();
-    UserInput userInput = inputScanner.fetchCommand();
-    assertEquals(ValidCommand.UNKNOWN, userInput.getCommand());
-    assertEquals("something", userInput.getSubcommand());
+    CommandInput commandInput = inputScanner.fetchCommand();
+    assertEquals(ValidCommand.UNKNOWN, commandInput.getCommand());
+    assertEquals("something", commandInput.getSubcommand());
   }
 
   @Test
   void testFetchUnit() {
     System.setIn(new ByteArrayInputStream("123.45 kg".getBytes()));
     InputScanner inputScanner = new InputScanner();
-    UserInput userInput = inputScanner.fetchUnit();
-    assertEquals(123.45f, userInput.getAmount());
-    assertEquals(ValidUnit.KG, userInput.getUnit());
+    UnitInput input = inputScanner.fetchUnit();
+    assertEquals(123.45f, input.getAmount());
+    assertEquals(ValidUnit.KG, input.getUnit());
   }
 
   @Test

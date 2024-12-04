@@ -13,7 +13,7 @@ import java.util.List;
  * HELP - list of all commands.
  *
  * @author Nick Heggø
- * @version 2024-11-28
+ * @version 2024-12-04
  */
 public enum ValidCommand {
   EXIT,
@@ -21,6 +21,7 @@ public enum ValidCommand {
   REMOVE,
   GO,
   FIND,
+  CLEAR,
   LIST,
   HELP,
   UNKNOWN;
@@ -30,7 +31,9 @@ public enum ValidCommand {
         .filter(command -> command != HELP)
         .filter(command -> command != EXIT)
         .filter(command -> command != UNKNOWN)
+        .filter(command -> command != CLEAR)
         .map(ValidCommand::name)
+        .map(String::toLowerCase)
         .toList();
   }
 }

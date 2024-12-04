@@ -7,7 +7,7 @@ import edu.ntnu.idi.bidata.user.User;
  * This command provides help messages based on the presence of a subcommand or the main command itself.
  *
  * @author Nick Heggø
- * @version 2024-11-03
+ * @version 2024-12-04
  */
 public class HelpCommand extends Command {
 
@@ -28,9 +28,9 @@ public class HelpCommand extends Command {
   @Override
   protected void processSubcommand() {
     if (hasSubcommand()) {
-      outputHandler.printHelpMessage(userInputSubcommand);
+      getOutputHandler().printCommandHelpMessage(CommandRegistry.findCommand(getSubcommand()));
     } else {
-      outputHandler.printHelpMessage();
+      getOutputHandler().printHelpMessage();
     }
   }
 

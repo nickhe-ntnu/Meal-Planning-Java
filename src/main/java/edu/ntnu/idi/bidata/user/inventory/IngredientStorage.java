@@ -10,7 +10,7 @@ import java.util.*;
  * stored in various named collections.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-04
  */
 public class IngredientStorage {
 
@@ -40,6 +40,12 @@ public class IngredientStorage {
     } else {
       addToList(newIngredient);
     }
+  }
+
+  public List<String> getIngredientOverview() {
+    return ingredientMap.keySet().stream()
+        .map(Utility::capitalizeEachWord)
+        .toList();
   }
 
   public boolean removeIngredient(Ingredient ingredientToBeRemoved) {

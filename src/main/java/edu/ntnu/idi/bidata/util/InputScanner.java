@@ -1,7 +1,8 @@
 package edu.ntnu.idi.bidata.util;
 
-import edu.ntnu.idi.bidata.user.UserInput;
 import edu.ntnu.idi.bidata.util.command.CommandRegistry;
+import edu.ntnu.idi.bidata.util.input.CommandInput;
+import edu.ntnu.idi.bidata.util.input.UnitInput;
 import edu.ntnu.idi.bidata.util.unit.UnitRegistry;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
@@ -12,13 +13,11 @@ import java.util.Scanner;
  * It is designed to parse input into predefined commands, subcommands, and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-04
  */
 public class InputScanner {
-  private final Scanner scanner;
-  private final CommandRegistry commandRegistry;
-  private final UnitRegistry unitRegistry;
   private final OutputHandler outputHandler;
+  private final Scanner scanner;
 
   /**
    * Default constructor for InputScanner.
@@ -26,8 +25,6 @@ public class InputScanner {
    */
   public InputScanner() {
     scanner = new Scanner(System.in);
-    commandRegistry = new CommandRegistry();
-    unitRegistry = new UnitRegistry();
     outputHandler = new OutputHandler();
   }
 
@@ -39,8 +36,6 @@ public class InputScanner {
    */
   public InputScanner(OutputHandler outputHandler) {
     scanner = new Scanner(System.in);
-    commandRegistry = new CommandRegistry();
-    unitRegistry = new UnitRegistry();
     this.outputHandler = outputHandler;
   }
 
@@ -52,8 +47,6 @@ public class InputScanner {
    */
   public InputScanner(Scanner scannerSource) {
     scanner = scannerSource;
-    commandRegistry = new CommandRegistry();
-    unitRegistry = new UnitRegistry();
     outputHandler = new OutputHandler();
   }
 
@@ -63,7 +56,7 @@ public class InputScanner {
    *
    * @return a UserInput object representing the parsed command input.
    */
-  public UserInput fetchCommand() {
+  public CommandInput fetchCommand() {
     String scannedLine = nextLine();
     String[] tokenized = tokenizeInput(scannedLine);
     return createCommandInput(tokenized);
@@ -75,7 +68,7 @@ public class InputScanner {
    *
    * @return a UserInput object representing the parsed unit input.
    */
-  public UserInput fetchUnit() {
+  public UnitInput fetchUnit() {
     String scannedLine = nextLine();
     String[] tokenized = tokenizeInput(scannedLine);
     assertUnitInput(tokenized);
@@ -222,11 +215,11 @@ public class InputScanner {
    *               and the third as the full input string.
    * @return a UserInput object containing the parsed command, subcommand, and full input string.
    */
-  private UserInput createCommandInput(String[] tokens) {
+  private CommandInput createCommandInput(String[] tokens) {
     String command = (tokens.length > 0) ? tokens[0].toLowerCase() : null;
     String subcommand = (tokens.length > 1) ? tokens[1].toLowerCase() : null;
     String inputString = (tokens.length > 2) ? tokens[2] : null;
-    return new UserInput(commandRegistry.getCommandWord(command), subcommand, inputString);
+    return new CommandInput(CommandRegistry.findCommand(command), subcommand, inputString);
   }
 
   /**
@@ -237,10 +230,10 @@ public class InputScanner {
    *               and the second token should be the unit type.
    * @return a UserInput object containing the unit amount and its type.
    */
-  private UserInput createUnitInput(String[] tokens) {
+  private UnitInput createUnitInput(String[] tokens) {
     float unitAmount = (tokens.length > 0) ? Float.parseFloat(tokens[0]) : -1;
     String unitString = (tokens.length > 1) ? tokens[1].toLowerCase() : null;
-    ValidUnit unit = unitRegistry.getUnitType(unitString);
-    return new UserInput(unitAmount, unit);
+    ValidUnit unit = UnitRegistry.findUnit(unitString);
+    return new UnitInput(unitAmount, unit);
   }
 }

@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * delegates the removal operation to the appropriate method.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-04
  */
 public class RemoveCommand extends Command {
   public RemoveCommand(User user) {
@@ -22,7 +22,7 @@ public class RemoveCommand extends Command {
    */
   @Override
   protected void processSubcommand() {
-    switch (userInputSubcommand) {
+    switch (getSubcommand()) {
       case "storage" -> removeStorage();
       case "ingredient" -> removeIngredient();
       case "expired" -> removeExpired();
@@ -32,27 +32,29 @@ public class RemoveCommand extends Command {
   }
 
   private void removeStorage() {
-    requestInputIfNeeded("Please enter the storage name to remove:");
-    boolean success = inventoryManager.removeStorage(userInputString);
+    setArgumentIfEmpty("Please enter the storage name to remove:");
+    boolean success = getInventoryManager().removeStorage(getArgument());
     if (success) {
-      outputHandler.printOutputWithLineBreak("Successfully removed " + userInputString + " from the application.");
+      getOutputHandler().printOutputWithLineBreak("Successfully removed " + getArgument() + " from the application.");
     } else {
-      outputHandler.printOutput("Failed to remove " + userInputString + ", please check if the name is misspelled.");
+      getOutputHandler().printOutput("Failed to remove " + getArgument() + ", please check if the name is misspelled.");
     }
   }
 
   private void removeExpired() {
-    float sum = inventoryManager.removeAllExpired();
-    outputHandler.printOutputWithLineBreak("Value of " + sum + " kr worth of food is now been deleted.");
+    float sum = getInventoryManager().removeAllExpired();
+    getOutputHandler().printOutputWithLineBreak("Value of " + sum + " kr worth of food is now been deleted.");
   }
 
   private void removeIngredient() {
-    String ingredientName = requestInputIfNeeded("Please enter the ingredient name:");
-    inventoryManager.removeIngredientFromCurrent(ingredientName);
+    getOutputHandler().printOutput("List of all stock ingredients:");
+    getOutputHandler().printList(getInventoryManager().getIngredientOverview(), "bullet");
+    setArgumentIfEmpty("Please enter the ingredient name:");
+    getInventoryManager().removeIngredientFromCurrent(getArgument());
   }
 
   private void removeRecipe() {
-    // TODO
+    //    recipeManager. //TODO
   }
 
 }

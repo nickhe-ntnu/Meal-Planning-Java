@@ -8,7 +8,7 @@ import edu.ntnu.idi.bidata.user.User;
  * recipes, ingredients, expired items, and available recipes.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-04
  */
 public class ListCommand extends Command {
   public ListCommand(User user) {
@@ -25,14 +25,14 @@ public class ListCommand extends Command {
    */
   @Override
   protected void processSubcommand() {
-    switch (userInputSubcommand) {
+    switch (getSubcommand()) {
       case "all" -> listAll();
       case "storage" -> listStorage();
       case "recipe" -> listRecipe();
       case "ingredient" -> listIngredient();
       case "expired" -> listExpired();
       case "available" -> listAvailableRecipe();
-      case "command", "commands" -> outputHandler.printHelpMessage();
+      case "command", "commands" -> getOutputHandler().printHelpMessage();
       case "name" -> listName();
       case "value", "values" -> listValue();
       default -> illegalCommand();
@@ -40,12 +40,12 @@ public class ListCommand extends Command {
   }
 
   private void listValue() {
-    String message = inventoryManager.getTotalValue();
-    outputHandler.printOutput(message);
+    String message = getInventoryManager().getTotalValue();
+    getOutputHandler().printOutput(message);
   }
 
   private void listName() {
-    outputHandler.printOutputWithLineBreak(inventoryManager.getStorageNameString());
+    getOutputHandler().printOutputWithLineBreak(getInventoryManager().getStorageNameString());
   }
 
   /**
@@ -54,11 +54,11 @@ public class ListCommand extends Command {
    * and then prints it to the console with a line of separator characters.
    */
   private void listAll() {
-    outputHandler.printOutputWithLineBreak(inventoryManager.getInventoryString());
+    getOutputHandler().printOutputWithLineBreak(getInventoryManager().getInventoryString());
   }
 
   private void listStorage() {
-    outputHandler.printOutputWithLineBreak(inventoryManager.getStorageString());
+    getOutputHandler().printOutputWithLineBreak(getInventoryManager().getStorageString());
   }
 
   private void listRecipe() {
@@ -70,7 +70,7 @@ public class ListCommand extends Command {
   }
 
   private void listExpired() {
-    outputHandler.printOutputWithLineBreak(inventoryManager.getExpiredString());
+    getOutputHandler().printOutputWithLineBreak(getInventoryManager().getExpiredString());
   }
 
   private void listAvailableRecipe() {

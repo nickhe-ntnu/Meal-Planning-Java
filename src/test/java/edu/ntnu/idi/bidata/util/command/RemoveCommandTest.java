@@ -6,12 +6,13 @@ import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**/
 class RemoveCommandTest {
   User testUser;
   InventoryManager testInventoryManager;
@@ -23,17 +24,18 @@ class RemoveCommandTest {
   void beforeEach() {
     testUser = new User();
     testInventoryManager = testUser.getInventoryManager();
-    testInventoryManager.createStorage(storageName);
+    testInventoryManager.createIngredientStorage(storageName);
     testInventoryManager.setCurrentStorage(storageName);
-    testInventoryManager.addIngredient(new Ingredient(ingredientName, 200, ValidUnit.G, 23, 23));
+    testInventoryManager.addIngredientToCurrentStorage(new Ingredient(ingredientName, 200, ValidUnit.G, 23, 23));
   }
 
-  //  @Test
+  @Disabled //Printing messages before running the app.
+  @Test
   void testRemoveIngredient() {
     ByteArrayInputStream in = new ByteArrayInputStream(("remove ingredient " + ingredientName).getBytes());
     System.setIn(in);
     InputScanner inputScanner = new InputScanner();
-    testUser.setInput(inputScanner.fetchCommand());
+    testUser.setCommandInput(inputScanner.fetchCommand());
     assertEquals(storageName, testInventoryManager.getCurrentStorage().getStorageName());
     assertTrue(testInventoryManager.getCurrentStorage().isIngredientPresent(ingredientName));
     new RemoveCommand(testUser);

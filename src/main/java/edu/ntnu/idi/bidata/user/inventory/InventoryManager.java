@@ -1,10 +1,9 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
-import edu.ntnu.idi.bidata.user.UserInput;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
 import edu.ntnu.idi.bidata.util.Utility;
-import edu.ntnu.idi.bidata.util.command.ValidCommand;
+import edu.ntnu.idi.bidata.util.input.UnitInput;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.HashMap;
@@ -17,7 +16,7 @@ import java.util.Stack;
  * for ingredient and storage management.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-04
  */
 public class InventoryManager {
 
@@ -33,7 +32,6 @@ public class InventoryManager {
     this.outputHandler = outputHandler;
     storageMap = new HashMap<>();
     history = new Stack<>();
-    history.add(null);
   }
 
   public IngredientStorage getStorage(String storageName) {
@@ -46,14 +44,34 @@ public class InventoryManager {
    */
   public Ingredient createIngredient(String ingredientName) {
     outputHandler.printOutput("#### Add ingredient ####");
-    String name = collectIngredientName(ingredientName);
-    UserInput amountAndUnit = collectAmountAndUnit();
+    UnitInput amountAndUnit = collectAmountAndUnit();
     float amount = amountAndUnit.getAmount();
     ValidUnit unit = amountAndUnit.getUnit();
     float value = collectIngredientValue();
     int daysUntilExpiry = collectDaysUntilExpiry();
 
-    return new Ingredient(name, amount, unit, value, daysUntilExpiry);
+    return new Ingredient(ingredientName, amount, unit, value, daysUntilExpiry);
+  }
+
+  /**
+   * Retrieves an overview of ingredients in the current storage.
+   *
+   * @return A list of strings representing the names of ingredients in the current storage.
+   */
+  public List<String> getIngredientOverview() {
+    assertInventoryIsAvailable();
+    return currentStorage.getIngredientOverview();
+  }
+
+  /**
+   * Retrieves the names of all ingredient storages in the inventory.
+   *
+   * @return A list containing the names of all storages currently in the storage map.
+   */
+  public List<String> getStorageOverview() {
+    return storageMap.values().stream()
+        .map(IngredientStorage::getStorageName)
+        .toList();
   }
 
   private int collectDaysUntilExpiry() {
@@ -74,31 +92,19 @@ public class InventoryManager {
     return value;
   }
 
-  private UserInput collectAmountAndUnit() {
-    UserInput userInput = null;
+  private UnitInput collectAmountAndUnit() {
+    UnitInput input = null;
     boolean validInput = false;
     while (!validInput) {
       outputHandler.printInputPrompt("Please enter the amount with unit:");
       try {
-        userInput = inputScanner.fetchUnit();
-        if (userInput.getCommand() == ValidCommand.UNKNOWN) {
-          throw new IllegalArgumentException("");
-        }
+        input = inputScanner.fetchUnit();
         validInput = true;
       } catch (IllegalArgumentException ignored) {
       }
     }
 
-    return userInput;
-  }
-
-  private String collectIngredientName(String inputName) {
-    String name = inputName;
-    if (inputName == null) {
-      outputHandler.printInputPrompt("Please enter the ingredient name:");
-      name = inputScanner.collectValidString();
-    }
-    return name;
+    return input;
   }
 
   /**
@@ -106,7 +112,7 @@ public class InventoryManager {
    *
    * @param ingredientToBeAdded The ingredient to be added to the storage.
    */
-  public void addIngredient(Ingredient ingredientToBeAdded) {
+  public void addIngredientToCurrentStorage(Ingredient ingredientToBeAdded) {
     assertInventoryIsAvailable();
     currentStorage.addIngredient(ingredientToBeAdded);
   }
@@ -115,11 +121,15 @@ public class InventoryManager {
     assertInventoryIsAvailable();
     List<Ingredient> ingredientList = findIngredientFromCurrent(ingredientName);
     if (ingredientList == null) {
-      outputHandler.printOutput("There is no " + ingredientName + " at " + currentStorage.getStorageName());
+      throw new IllegalArgumentException("There is no " + ingredientName + " at " + currentStorage.getStorageName());
+    }
+
+    // passed all checks
+    if (ingredientList.size() == 1) {
+      currentStorage.removeIngredient(ingredientList.getFirst());
     } else {
-      // passed all checks
       outputHandler.printOutput("Please select the ingredient to delete:");
-      printList(ingredientList);
+      outputHandler.printList(ingredientList, "numbered");
       outputHandler.printInputPrompt();
       int index = inputScanner.collectValidInteger();
       if (index > ingredientList.size() || index < 1) {
@@ -127,14 +137,8 @@ public class InventoryManager {
       }
       // user input from 1, index starts from 0 (N.B. index -1)
       currentStorage.removeIngredient(ingredientList.get(index - 1));
-      outputHandler.printEndResultWithLineBreak(true, "removed", ingredientName);
     }
-  }
-
-  private void printList(List<?> list) {
-    for (int index = 0; index < list.size(); index++) {
-      outputHandler.printOutput(index + 1 + ":" + list.get(index));
-    }
+    outputHandler.printOperationStatus(true, "removed", ingredientName);
   }
 
   public List<Ingredient> findIngredientFromCurrent(String ingredientName) {
@@ -152,16 +156,6 @@ public class InventoryManager {
 
   public boolean removeStorage(String storageName) {
     return storageMap.remove(Utility.createKey(storageName)) != null;
-  }
-
-  /**
-   * Adds a new storage to the user's storage map if it is not already present.
-   *
-   * @param storageName The name of the storage to be added.
-   * @return true if the storage was successfully added; false otherwise.
-   */
-  public void createStorage(String storageName) {
-    creatMapEntry(storageName);
   }
 
   public String getInventoryString() {
@@ -241,7 +235,7 @@ public class InventoryManager {
    *
    * @param storageName The name of the storage to be added.
    */
-  private void creatMapEntry(String storageName) {
+  public void createIngredientStorage(String storageName) {
     storageMap.put(Utility.createKey(storageName), new IngredientStorage(storageName));
   }
 
@@ -250,7 +244,7 @@ public class InventoryManager {
    *
    * @throws IllegalArgumentException if no inventory is currently selected.
    */
-  public void assertInventoryIsAvailable() {
+  private void assertInventoryIsAvailable() {
     if (currentStorage == null) {
       throw new IllegalArgumentException("You are currently not in an inventory, please use the 'go' command.");
     }

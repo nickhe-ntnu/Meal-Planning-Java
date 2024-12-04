@@ -9,7 +9,7 @@ import java.util.List;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-04
  */
 public class OutputHandler {
 
@@ -76,11 +76,29 @@ public class OutputHandler {
    * @param operation the name of the operation performed
    * @param name      the name associated with the operation
    */
-  public void printEndResultWithLineBreak(boolean success, String operation, String name) {
+  public void printOperationStatus(boolean success, String operation, String name) {
     if (success) {
       printOutputWithLineBreak("Successfully " + operation + " " + name);
     } else {
       printOutputWithLineBreak("Failed to " + operation + " " + name);
+    }
+  }
+
+  public void printList(List<?> listToPrint, String style) {
+    if (listToPrint == null || listToPrint.isEmpty()) {
+      throw new IllegalArgumentException("List is empty!");
+    }
+    switch (style.strip().toLowerCase()) {
+      case "bullet" -> {
+        for (int index = 0; index < listToPrint.size(); index++) {
+          printOutput(" * " + listToPrint.get(index));
+        }
+      }
+      case "numbered" -> {
+        for (int index = 0; index < listToPrint.size(); index++) {
+          printOutput(" " + index + 1 + Utility.getOrdinalSuffix(index + 1) + listToPrint.get(index));
+        }
+      }
     }
   }
 
@@ -89,16 +107,16 @@ public class OutputHandler {
    *
    * @param command the command for which the help message should be printed
    */
-  public void printHelpMessage(String command) {
+  public void printCommandHelpMessage(ValidCommand command) {
     switch (command) {
-      case "unknown" -> printUnknownInstruction();
-      case "help" -> printHelpMessage();
-      case "list" -> printListInstruction();
-      case "go" -> printGoInstruction();
-      case "add" -> printAddInstruction();
-      case "remove" -> printRemoveInstruction();
-      case "find" -> printFindInstruction();
-      case "exit" -> printOutput("This command will terminate the application.");
+      case UNKNOWN -> printUnknownInstruction();
+      case HELP -> printHelpMessage();
+      case LIST -> printListInstruction();
+      case GO -> printGoInstruction();
+      case ADD -> printAddInstruction();
+      case REMOVE -> printRemoveInstruction();
+      case FIND -> printFindInstruction();
+      case EXIT -> printOutput("This command will terminate the application.");
       default -> printHelpInstruction();
     }
   }
@@ -111,9 +129,15 @@ public class OutputHandler {
     printOutput("Unknown command, see 'help'");
   }
 
+  public void clearScreen() {
+    for (int i = 0; i < 40; i++) {
+      System.out.println("");
+    }
+  }
+
   private String formatCommands() {
     List<String> commands = ValidCommand.getCommands();
-    return " help | " + String.join(" | ", commands) + " | exit";
+    return " help | " + String.join(" | ", commands) + " | clear | exit";
   }
 
   private void printHelpInstruction() {

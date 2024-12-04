@@ -12,7 +12,7 @@ import java.util.List;
  * "find" subcommands.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-04
  */
 public class FindCommand extends Command {
 
@@ -28,15 +28,12 @@ public class FindCommand extends Command {
   }
 
   /**
-   * Handles the processing of subcommands for the "find" command.
-   * This method determines the specific search action to perform based
-   * on the user's input subcommand. It supports finding ingredients and recipes.
-   * If the user input subcommand is "ingredient", it delegates the action to {@link #findIngredient()}.
-   * If the user input subcommand is "recipe", it delegates the action to {@link #findRecipe()}.
+   * Processes the subcommand of the find command by determining the action to take
+   * based on the subcommand value.
    */
   @Override
   protected void processSubcommand() {
-    switch (userInputSubcommand) {
+    switch (getSubcommand()) {
       case "ingredient" -> findIngredient();
       case "recipe" -> findRecipe();
       default -> illegalCommand();
@@ -44,15 +41,15 @@ public class FindCommand extends Command {
   }
 
   private void findIngredient() {
-    String ingredientName = requestInputIfNeeded("Please enter the ingredient name to find:");
-    List<Ingredient> storageContainsIngredient = inventoryManager.findIngredientFromCurrent(ingredientName);
+    setArgumentIfEmpty("Please enter the ingredient name to find:");
+    List<Ingredient> storageContainsIngredient = getInventoryManager().findIngredientFromCurrent(getArgument());
     if (storageContainsIngredient.isEmpty()) {
-      outputHandler.printOutputWithLineBreak(ingredientName + " isn't present at any of the storages.");
+      getOutputHandler().printOutputWithLineBreak(getArgument() + " isn't present at any of the storages.");
     } else {
       StringBuilder stringBuilder = new StringBuilder();
-      stringBuilder.append(ingredientName).append(" is present at:");
+      stringBuilder.append(getArgument()).append(" is present at:");
       storageContainsIngredient.forEach(storageName -> stringBuilder.append("\n  * ").append(storageName));
-      outputHandler.printOutputWithLineBreak(stringBuilder.toString());
+      getOutputHandler().printOutputWithLineBreak(stringBuilder.toString());
     }
   }
 

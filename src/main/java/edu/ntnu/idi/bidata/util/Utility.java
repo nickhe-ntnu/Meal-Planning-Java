@@ -6,7 +6,7 @@ import edu.ntnu.idi.bidata.user.inventory.Ingredient;
  * A utility class providing methods to manipulate strings and objects.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-04
  */
 public class Utility {
 
@@ -55,5 +55,24 @@ public class Utility {
       case 3 -> "rd";
       default -> "th";
     };
+  }
+
+  public static String capitalizeEachWord(String input) {
+    if (input == null || input.isEmpty()) {
+      return input;
+    }
+
+    String[] words = input.split("\\s+");  // Splitting on spaces
+    StringBuilder capitalizedSentence = new StringBuilder();
+
+    for (String word : words) {
+      if (!word.isEmpty()) {
+        capitalizedSentence.append(Character.toUpperCase(word.charAt(0)))
+            .append(word.substring(1))
+            .append(" ");
+      }
+    }
+
+    return capitalizedSentence.toString().strip();  // Trim the trailing space
   }
 }

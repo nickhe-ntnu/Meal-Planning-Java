@@ -1,11 +1,11 @@
 package edu.ntnu.idi.bidata.util;
 
 import edu.ntnu.idi.bidata.user.User;
-import edu.ntnu.idi.bidata.user.UserInput;
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
 import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
 import edu.ntnu.idi.bidata.util.command.*;
+import edu.ntnu.idi.bidata.util.input.CommandInput;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 /**
@@ -13,7 +13,7 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-04
  */
 public class Application {
   private final User user;
@@ -25,7 +25,7 @@ public class Application {
    * Sets up the user, input scanner, and output handler.
    */
   public Application() {
-    user = userSetUp();
+    user = userSetup();
     inputScanner = user.getInputScanner();
     outputHandler = user.getOutputHandler();
   }
@@ -35,7 +35,7 @@ public class Application {
    * The loop continues until a command causes the application to exit.
    * It handles any exceptions by printing the error messages.
    */
-  public void initialize() {
+  public void run() {
     outputHandler.printWelcomeMessage(user.getName());
     outputHandler.printHelpMessage();
     startUpCondition();
@@ -49,17 +49,17 @@ public class Application {
    */
   private void startUpCondition() {
     InventoryManager inventoryManager = user.getInventoryManager();
-    inventoryManager.createStorage("Fridge");
+    inventoryManager.createIngredientStorage("Fridge");
     inventoryManager.setCurrentStorage(inventoryManager.getStorage("fridge"));
-    inventoryManager.addIngredient(new Ingredient("Chocolate", 300, ValidUnit.G, 10, 4));
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Chocolate", 300, ValidUnit.G, 10, 4));
     int amountOfExpiredIngredientToGenerate = 3;
     for (int generatedIngredient = 0; generatedIngredient < amountOfExpiredIngredientToGenerate; generatedIngredient++) {
-      inventoryManager.addIngredient(new Ingredient("expiredDemo"));
+      inventoryManager.addIngredientToCurrentStorage(new Ingredient("expiredDemo"));
     }
-    inventoryManager.createStorage("Cold Room");
+    inventoryManager.createIngredientStorage("Cold Room");
     inventoryManager.setCurrentStorage("CoLd RoOm");
-    inventoryManager.addIngredient(new Ingredient("Potato", 4, ValidUnit.KG, 40, 25));
-    inventoryManager.createStorage("Office Fridge");
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Potato", 4, ValidUnit.KG, 40, 25));
+    inventoryManager.createIngredientStorage("Office Fridge");
     inventoryManager.setCurrentStorage((IngredientStorage) null);
   }
 
@@ -73,13 +73,13 @@ public class Application {
     do {
       try {
         outputHandler.printCommandPrompt();
-        this.user.setInput(inputScanner.fetchCommand());
-        running = processUserCommand(user.getInput());
+        this.user.setCommandInput(inputScanner.fetchCommand());
+        running = processUserCommand(user.getCommandInput());
       } catch (IllegalArgumentException | AbortException e) {
         outputHandler.printOutput(e.getMessage());
       } catch (IllegalCommandCombinationException illegalCommandCombinationException) {
         outputHandler.printOutput(illegalCommandCombinationException.getMessage());
-        outputHandler.printHelpMessage(user.getInput().getCommand().name().toLowerCase());
+        outputHandler.printCommandHelpMessage(user.getCommandInput().getCommand());
       }
     } while (running);
   }
@@ -89,10 +89,10 @@ public class Application {
    *
    * @return the newly created user object.
    */
-  private User userSetUp() {
+  private User userSetup() {
     User createdUser = new User();
-    //    user.setName(inputScanner.getValidString().replaceAll("\\s", ""));
     createdUser.setName("Developer");
+    //FIXME replace with: createdUser.setName(inputScanner.getValidString().replaceAll("\\s", ""));
     return createdUser;
   }
 
@@ -100,22 +100,23 @@ public class Application {
    * Processes the user command and redirects to the appropriate function based on the command word.
    * Catches and handles IllegalArgumentExceptions that may occur during execution.
    *
-   * @param userInput The command entered by the user.
+   * @param commandInput The command entered by the user.
    * @return The running condition of the application. Returning false will cause the application to exit.
    */
-  private boolean processUserCommand(UserInput userInput) {
+  private boolean processUserCommand(CommandInput commandInput) {
     boolean running = true;
-    ValidCommand validCommand = userInput.getCommand();
-    switch (validCommand) {
-      case UNKNOWN -> processUnknownCommand(userInput);
+    ValidCommand command = commandInput.getCommand();
+    switch (command) {
+      case UNKNOWN -> outputHandler.printCommandHelpMessage(command);
       case HELP -> new HelpCommand(this.user);
       case LIST -> new ListCommand(this.user);
       case GO -> new GoCommand(this.user);
       case ADD -> new AddCommand(this.user);
       case REMOVE -> new RemoveCommand(this.user);
       case FIND -> new FindCommand(this.user);
+      case CLEAR -> outputHandler.clearScreen();
       case EXIT -> running = exitApplication();
-      default -> throw new IllegalArgumentException("Unexpected command: " + validCommand);
+      default -> throw new IllegalArgumentException("Unexpected command: " + command);
     }
     return running;
   }
@@ -123,10 +124,10 @@ public class Application {
   /**
    * Processes an unknown command by printing a help message specific to the command word.
    *
-   * @param userInput The command entered by the user.
+   * @param commandInput The command entered by the user.
    */
-  private void processUnknownCommand(UserInput userInput) {
-    outputHandler.printHelpMessage(userInput.getCommand().name().toLowerCase());
+  private void processUnknownCommand(CommandInput commandInput) {
+    outputHandler.printCommandHelpMessage(commandInput.getCommand());
   }
 
   /**

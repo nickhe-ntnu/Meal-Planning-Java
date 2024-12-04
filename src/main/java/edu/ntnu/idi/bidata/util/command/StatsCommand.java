@@ -9,7 +9,7 @@ public class StatsCommand extends Command {
 
   @Override
   protected void processSubcommand() {
-    switch (userInputSubcommand) {
+    switch (getSubcommand()) {
       default -> printStats();
     }
   }
