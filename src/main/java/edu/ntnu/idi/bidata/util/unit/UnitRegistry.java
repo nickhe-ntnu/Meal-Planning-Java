@@ -2,51 +2,69 @@ package edu.ntnu.idi.bidata.util.unit;
 
 import edu.ntnu.idi.bidata.util.Utility;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * The UnitRegistry class is used to manage valid measurement units within the application.
- * It provides functionality to initialize, validate, and retrieve information about measurement units.
+ * Registers and stores valid units for look-up and retrieval.
  *
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-04
  */
 public class UnitRegistry {
-  private final HashMap<String, ValidUnit> validUnits;
+  private static final Map<String, ValidUnit> UNIT_MAP = new HashMap<>();
 
-  /**
-   * Constructor - initialise the valid unit.
-   */
-  public UnitRegistry() {
-    validUnits = new HashMap<>();
-    for (ValidUnit unit : ValidUnit.values()) {
-      validUnits.put(Utility.createKey(unit.name()), unit);
-    }
+  private UnitRegistry() {
   }
 
-  public String getUnitList() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("Valid units are:");
-    for (String unitName : validUnits.keySet()) {
-      stringBuilder.append(" ").append(unitName);
-    }
-    return stringBuilder.toString();
+  static {
+    initializeValidUnits();
   }
 
   /**
-   * @param unitInput input to check if it is valid unit
-   * @return null if it does not exist in
+   * Finds and returns the corresponding ValidUnit for a given input string.
+   *
+   * @param input the string representation of a unit to be looked up.
+   * @return the matching ValidUnit if found; otherwise, ValidUnit.UNKNOWN.
    */
-  public ValidUnit getUnitType(String unitInput) {
-    ValidUnit unit = validUnits.get(Utility.createKey(unitInput));
-    if (unit != null) {
-      return unit;
-    } else {
-      return ValidUnit.UNKNOWN;
-    }
+  public static ValidUnit findUnit(String input) {
+    return UNIT_MAP.getOrDefault(Utility.createKey(input), ValidUnit.UNKNOWN);
   }
 
-  public boolean isUnit(String unitInput) {
-    return validUnits.containsKey(unitInput);
+  /**
+   * Retrieves a list of string representations for valid units.
+   * Each unit is converted into a standardized key format.
+   *
+   * @return a list of strings representing valid measurement unit keys.
+   */
+  public static List<String> getUnitList() {
+    return Arrays.stream(ValidUnit.values())
+        .map(Enum::name)
+        .map(Utility::createKey)
+        .toList();
   }
+
+  /**
+   * Initializes the UNIT_MAP by registering valid measurement units.
+   * Filters out the UNKNOWN unit and registers the rest into the map
+   * using the UnitRegistry::addUnitToMap method.
+   */
+  private static void initializeValidUnits() {
+    Arrays.stream(ValidUnit.values())
+        .filter(unit -> unit != ValidUnit.UNKNOWN)
+        .forEach(UnitRegistry::addUnitToMap);
+  }
+
+  /**
+   * Adds a ValidUnit to the UNIT_MAP using a generated key.
+   *
+   * @param unit the ValidUnit to be added to the map.
+   */
+  private static void addUnitToMap(ValidUnit unit) {
+    String key = Utility.createKey(unit.name());
+    UNIT_MAP.put(key, unit);
+  }
+
 }
