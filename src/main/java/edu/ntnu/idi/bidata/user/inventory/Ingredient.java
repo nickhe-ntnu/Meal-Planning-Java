@@ -12,12 +12,11 @@ import java.util.Random;
  * name, amount, unit, expiry date, and standard unit price.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-05
  */
 public class Ingredient {
 
   private final Measurement measurement;
-  private String name; // Ingredient Name
 
   private LocalDate expiryDate;
   private float value;
@@ -63,7 +62,7 @@ public class Ingredient {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, expiryDate, value, measurement);
+    return Objects.hash(getName(), getExpiryDate(), getValue(), getMeasurement());
   }
 
   @Override
@@ -124,7 +123,7 @@ public class Ingredient {
    * @return the name as a string.
    */
   public String getName() {
-    return (name != null) ? name : "";
+    return measurement.getName();
   }
 
   /**
@@ -138,7 +137,7 @@ public class Ingredient {
     if (name == null || name.isBlank()) {
       throw new IllegalArgumentException("Name cannot be null or empty");
     }
-    this.name = name;
+    measurement.setName(name);
   }
 
   private String getString() {
@@ -220,7 +219,7 @@ public class Ingredient {
    * @return the valid measurement unit as an instance of ValidUnit
    */
   private ValidUnit getMeasurementUnit() {
-    return measurement.getValidUnit();
+    return measurement.getUnit();
   }
 
   /**
@@ -260,7 +259,7 @@ public class Ingredient {
    * @throws IllegalArgumentException if the unit is null or UNKNOWN
    */
   public void setUnit(ValidUnit unit) {
-    measurement.setValidUnit(unit);
+    measurement.setUnit(unit);
   }
 
   /**

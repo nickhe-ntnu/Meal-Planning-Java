@@ -8,14 +8,16 @@ import java.util.List;
  * instructions and required ingredients.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-12-05
  */
 public class Recipe {
   private final List<Step> steps;
   private String name;
   private String description;
-  // first dimension of the list: each step in the recipe
-  // second dimension of the list: ingredients that will be used in the current step
+
+  public Recipe() {
+    steps = new ArrayList<>();
+  }
 
   /**
    * Constructs a Recipe with the specified name.
@@ -24,7 +26,7 @@ public class Recipe {
    */
   public Recipe(String name) {
     steps = new ArrayList<>();
-    setNameOfRecipe(name);
+    setName(name);
   }
 
   /**
@@ -42,9 +44,9 @@ public class Recipe {
    * @param name the new name to assign; must not be null
    * @throws IllegalArgumentException if the provided name is null
    */
-  public void setNameOfRecipe(String name) {
-    if (this.name == null) {
-      throw new IllegalArgumentException("Name can not be null.");
+  public void setName(String name) {
+    if (name == null) {
+      throw new IllegalArgumentException("Name cannot be null.");
     }
     this.name = name;
   }
@@ -66,10 +68,10 @@ public class Recipe {
    */
   public void setDescription(String description) {
     if (description == null) {
-      throw new IllegalArgumentException("Description can not be null.");
+      throw new IllegalArgumentException("Description cannot be null.");
     }
     if (description.isBlank()) {
-      throw new IllegalArgumentException("Description can not be empty.");
+      throw new IllegalArgumentException("Description cannot be empty.");
     }
     this.description = description;
   }
@@ -88,9 +90,13 @@ public class Recipe {
     steps.remove(stepNumber);
   }
 
-  public Step getStep(int stepNumber) {
-    assertIndexWithInBounds(stepNumber);
-    return steps.get(stepNumber);
+  /**
+   * Retrieves the list of steps in the recipe.
+   *
+   * @return a list of Step objects representing the steps in the recipe.
+   */
+  public List<Step> getSteps() {
+    return steps;
   }
 
   private void assertIndexWithInBounds(int index) {

@@ -1,10 +1,11 @@
 package edu.ntnu.idi.bidata.user.recipe;
 
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-04
  */
 public class CookBook {
 
@@ -32,5 +33,17 @@ public class CookBook {
       throw new IllegalArgumentException("Recipe already exist!");
     }
     recipes.add(recipe);
+  }
+
+  public List<Recipe> getRecipe(String name) {
+    return recipes.stream()
+        .filter(recipe -> recipe.getName().equalsIgnoreCase(name.strip()))
+        .toList();
+  }
+
+  public List<String> getRecipeOverview() {
+    return recipes.stream()
+        .map(Recipe::getName)
+        .toList();
   }
 }

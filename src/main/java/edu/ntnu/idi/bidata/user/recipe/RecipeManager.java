@@ -3,13 +3,14 @@ package edu.ntnu.idi.bidata.user.recipe;
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
-import edu.ntnu.idi.bidata.util.Utility;
+import edu.ntnu.idi.bidata.util.input.UnitInput;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-05
  */
 public class RecipeManager {
 
@@ -36,50 +37,42 @@ public class RecipeManager {
    *
    * @return the newly created Recipe object
    */
-  public Recipe createRecipe(String name) {
-    String recipeName = name;
-    if (recipeName == null) {
-      outputHandler.printInputPrompt("Please enter the recipe name:");
-      inputScanner.collectValidString();
-    }
-    Recipe createdRecipe = builder(new Recipe(name));
-    return createdRecipe;
-  }
-
-  private String getValidDescription() {
-    outputHandler.printOutput("Please enter the recipe description:");
-    return inputScanner.collectValidString();
-  }
-
-  /**
-   * Modifies the given recipe by updating its description and collecting ingredients.
-   *
-   * @param recipeToModify the Recipe object to be modified
-   */
-  private Recipe builder(Recipe recipeToModify) {
-    boolean finished = false;
-    recipeToModify.setDescription(getValidDescription());
+  public Recipe constructRecipe(RecipeBuilder recipeBuilder) {
+    outputHandler.printInputPrompt("Please enter the recipe name");
+    recipeBuilder.setName(inputScanner.collectValidString());
+    outputHandler.printInputPrompt("Please enter the recipe description:");
+    recipeBuilder.setDescription(inputScanner.collectValidString());
+    boolean completeAddingSteps = false;
     int stepCount = 1;
-    while (!finished) {
-      createStep(stepCount);
-      stepCount++;
-      outputHandler.printInputPrompt("Continue adding more steps? (Y/n)");
-      finished = !inputScanner.nextLine().equalsIgnoreCase("y");
+    while (!completeAddingSteps) {
+      outputHandler.printInputPrompt("Please enter the instruction for step " + stepCount + ":");
+      String instruction = inputScanner.collectValidString();
+      ArrayList<Measurement> measurements = getMeasurements(stepCount);
+      recipeBuilder.addStep(new Step(instruction, measurements));
+      outputHandler.printInputPrompt("Do you want to add more steps? (Y/n");
+      completeAddingSteps = !inputScanner.collectValidString().equalsIgnoreCase("y");
     }
-    return recipeToModify; //FIXME incomplete methods.
+    return recipeBuilder.getRecipe();
   }
 
-  private Step createStep(int stepCount) {
-    outputHandler.printInputPrompt("Please enter the "
-        + stepCount + Utility.getOrdinalSuffix(stepCount) + " step instruction:");
-    String instruction = inputScanner.collectValidString();
-    HashMap<String, Measurement> measurementMap = new HashMap<>();
-    boolean finished = false;
-    while (!finished) {
-
+  private ArrayList<Measurement> getMeasurements(int stepCount) {
+    boolean completeAddingMeasurements = false;
+    ArrayList<Measurement> measurements = null;
+    while (!completeAddingMeasurements) {
+      measurements = new ArrayList<>();
+      outputHandler.printInputPrompt("Please enter the ingredient name:");
+      String ingredientName = inputScanner.collectValidString();
+      outputHandler.printInputPrompt("Please enter the amount + unit:");
+      UnitInput unitInput = inputScanner.collectValidUnitInput();
+      measurements.add(new Measurement(ingredientName, unitInput));
+      outputHandler.printInputPrompt("Add more ingredients to step " + stepCount + " ? (Y/n)");
+      completeAddingMeasurements = !inputScanner.collectValidString().equalsIgnoreCase("y");
     }
+    return measurements;
+  }
 
-    return new Step(instruction, measurementMap); //FIXME incomplete method
+  public List<String> getRecipeOverview() {
+    return cookBook.getRecipeOverview();
   }
 
   /**
@@ -89,5 +82,9 @@ public class RecipeManager {
    */
   public void addRecipe(Recipe recipeToBeAdded) {
     cookBook.addRecipe(recipeToBeAdded);
+  }
+
+  public List<Recipe> findRecipe(String name) {
+    return cookBook.getRecipe(name);
   }
 }

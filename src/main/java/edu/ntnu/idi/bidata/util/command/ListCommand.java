@@ -1,6 +1,9 @@
 package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
+import edu.ntnu.idi.bidata.util.OutputHandler;
+
+import java.util.List;
 
 /**
  * ListCommand is a concrete implementation of the Command class that handles
@@ -8,7 +11,7 @@ import edu.ntnu.idi.bidata.user.User;
  * recipes, ingredients, expired items, and available recipes.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-05
  */
 public class ListCommand extends Command {
   public ListCommand(User user) {
@@ -62,7 +65,14 @@ public class ListCommand extends Command {
   }
 
   private void listRecipe() {
-    // TODO
+    List<String> recipeList = getRecipeManager().getRecipeOverview();
+    OutputHandler outputHandler = getOutputHandler();
+    if (recipeList == null || recipeList.isEmpty()) {
+      outputHandler.printOutput("There are currently 0 recipes in the system.");
+    } else {
+      outputHandler.printOutput("There are currently " + recipeList.size() + " recipes in the system.");
+      outputHandler.printList(recipeList, "bullet");
+    }
   }
 
   private void listIngredient() {

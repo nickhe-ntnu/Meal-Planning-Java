@@ -2,6 +2,9 @@ package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
+import edu.ntnu.idi.bidata.user.recipe.Recipe;
+import edu.ntnu.idi.bidata.user.recipe.Step;
+import edu.ntnu.idi.bidata.util.OutputHandler;
 
 import java.util.List;
 
@@ -12,7 +15,7 @@ import java.util.List;
  * "find" subcommands.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-05
  */
 public class FindCommand extends Command {
 
@@ -54,7 +57,31 @@ public class FindCommand extends Command {
   }
 
   private void findRecipe() {
-    // TODO
+    setArgumentIfEmpty("Please enter the recipe name:");
+    List<Recipe> matchingRecipes = getRecipeManager().findRecipe(getArgument());
+    OutputHandler outputHandler = getOutputHandler();
+    if (matchingRecipes.isEmpty()) {
+      outputHandler.printOutput("Cannot find matching recipe.");
+    } else if (matchingRecipes.size() == 1) {
+      printRecipeDetails(matchingRecipes.getFirst());
+    } else {
+      outputHandler.printList(matchingRecipes, "numbered");
+      int index = -1;
+      while (index >= matchingRecipes.size() || index < 1) {
+        outputHandler.printInputPrompt("Please choose the recipe to show details:");
+        index = getInputScanner().collectValidInteger();
+      }
+      printRecipeDetails(matchingRecipes.get(index - 1)); // Index start at 0, printed start at 1
+    }
+  }
+
+  private void printRecipeDetails(Recipe recipe) {
+    OutputHandler outputHandler = getOutputHandler();
+    outputHandler.printOutput(recipe.getName() + ":");
+    outputHandler.printOutput("\n" + recipe.getDescription() + "\n");
+    List<Step> steps = recipe.getSteps();
+    outputHandler.printList(steps, "bullet");
+    outputHandler.printLineBreak();
   }
 
 }

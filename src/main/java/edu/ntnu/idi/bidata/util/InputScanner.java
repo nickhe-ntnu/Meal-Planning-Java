@@ -13,7 +13,7 @@ import java.util.Scanner;
  * It is designed to parse input into predefined commands, subcommands, and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-05
  */
 public class InputScanner {
   private final OutputHandler outputHandler;
@@ -77,8 +77,20 @@ public class InputScanner {
 
   private void assertUnitInput(String[] tokens) {
     if (tokens.length < 2) {
-      throw new IllegalArgumentException("Missing inputs.");
+      throw new IllegalArgumentException("Missing unit inputs.");
     }
+  }
+
+  public UnitInput collectValidUnitInput() {
+    UnitInput unitInput = null;
+    while (unitInput == null) {
+      try {
+        unitInput = fetchUnit();
+      } catch (IllegalArgumentException e) {
+        outputHandler.printInputPrompt(e.getMessage());
+      }
+    }
+    return unitInput;
   }
 
   /**
@@ -89,51 +101,38 @@ public class InputScanner {
    * @return the valid input string provided by the user.
    */
   public String collectValidString() {
-    String result = null;
-    boolean validInput = false;
-
-    while (!validInput) {
+    String input = null;
+    while (input == null) {
       try {
-        assertEmptyLine();
-        result = nextLine();
-        validInput = true;
+        input = nextLine();
       } catch (IllegalArgumentException e) {
         outputHandler.printInputPrompt(e.getMessage());
       }
     }
-
-    return result;
+    return input;
   }
 
   public float collectValidFloat() {
-    float result = 0.0f;
-    boolean validInput = false;
-
-    while (!validInput) {
+    float input = -1.0f;
+    while (input < 0f) {
       try {
-        result = nextFloat();
-        validInput = true;
+        input = nextFloat();
       } catch (IllegalArgumentException illegalArgumentException) {
         outputHandler.printInputPrompt(illegalArgumentException.getMessage());
       }
     }
-
-    return result;
+    return input;
   }
 
   public int collectValidInteger() {
-    int result = 0;
-    boolean validInput = false;
-
-    while (!validInput) {
+    int result = -1;
+    while (result < 0) {
       try {
         result = nextInteger();
-        validInput = true;
       } catch (IllegalArgumentException illegalArgumentException) {
         outputHandler.printInputPrompt(illegalArgumentException.getMessage());
       }
     }
-
     return result;
   }
 
@@ -152,7 +151,7 @@ public class InputScanner {
   }
 
   private void assertAbort(String input) {
-    if (Utility.createKey(input).equals("abort")) {
+    if (input.strip().equalsIgnoreCase("abort")) {
       throw new AbortException();
     }
   }
@@ -181,7 +180,7 @@ public class InputScanner {
    */
   private void assertEmptyLine() {
     if (!scanner.hasNextLine()) {
-      throw new IllegalArgumentException("There are no lines to scan. (Error: Input Scanner)");
+      throw new IllegalArgumentException("There are no lines to scan.");
     }
   }
 
@@ -193,7 +192,7 @@ public class InputScanner {
    */
   private void assertEmptyInput(String input) {
     if (input.isBlank()) {
-      throw new IllegalArgumentException("Input can not be empty. (Error: Input Scanner)");
+      throw new IllegalArgumentException("Input cannot be empty.");
     }
   }
 

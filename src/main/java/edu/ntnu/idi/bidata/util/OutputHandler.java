@@ -9,7 +9,7 @@ import java.util.List;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-05
  */
 public class OutputHandler {
 
@@ -29,6 +29,11 @@ public class OutputHandler {
     printOutput(outputMessage);
     System.out.println("########################");
   }
+
+  public void printLineBreak() {
+    System.out.println("########################");
+  }
+
 
   public void printCommandPrompt() {
     System.out.print("> ");

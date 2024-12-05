@@ -13,7 +13,7 @@ import java.util.List;
  * enumeration which includes units for weight (KG, G) and volume (L, DL, ML).
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-12-05
  */
 public class UnitConverter {
 
@@ -137,7 +137,7 @@ public class UnitConverter {
    * @throws IllegalArgumentException if the conversion between the current unit and the target unit is not allowed
    */
   public static void autoMergeUnit(Measurement measurement, ValidUnit targetUnit) {
-    if (targetUnit != null && measurement.getValidUnit() != null) {
+    if (targetUnit != null && measurement.getUnit() != null) {
       switch (targetUnit) {
         case L -> convertToLiter(measurement);
         case DL -> convertToDeciLiter(measurement);
@@ -145,14 +145,14 @@ public class UnitConverter {
         case KG -> convertToKG(measurement);
         case G -> convertToGrams(measurement);
         default ->
-            throw new IllegalArgumentException("Illegal operation: cannot convert from " + measurement.getValidUnit() + " to " + targetUnit);
+            throw new IllegalArgumentException("Illegal operation: cannot convert from " + measurement.getUnit() + " to " + targetUnit);
       }
     }
   }
 
   public static void updateMeasurement(Measurement sourceMeasurement, List<Object> data) {
     sourceMeasurement.setAmount((Float) data.getFirst());
-    sourceMeasurement.setValidUnit((ValidUnit) data.getLast());
+    sourceMeasurement.setUnit((ValidUnit) data.getLast());
   }
 
   /**
@@ -167,7 +167,7 @@ public class UnitConverter {
    */
   private static List<Object> convertSolid(Measurement measurement, ValidUnit targetUnit, float factorFromKG, float factorFromG) {
     float amount = measurement.getAmount();
-    ValidUnit currentUnit = measurement.getValidUnit();
+    ValidUnit currentUnit = measurement.getUnit();
     switch (currentUnit) {
       case KG -> amount *= factorFromKG;
       case G -> amount *= factorFromG;
@@ -191,7 +191,7 @@ public class UnitConverter {
    */
   private static List<Object> convertLiquid(Measurement sourceMeasurement, ValidUnit targetUnit, float factorFromL, float factorFromDL, float factorFromML) {
     float amount = sourceMeasurement.getAmount();
-    ValidUnit currentUnit = sourceMeasurement.getValidUnit();
+    ValidUnit currentUnit = sourceMeasurement.getUnit();
     switch (currentUnit) {
       case L -> amount *= factorFromL;
       case DL -> amount *= factorFromDL;

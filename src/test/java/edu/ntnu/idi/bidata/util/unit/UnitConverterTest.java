@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * functionality of unit conversion methods within the UnitConverter class.
  *
  * @author Nick Heggø
- * @version 2024-11-29
+ * @version 2024-12-05
  */
 class UnitConverterTest {
 
@@ -22,8 +22,8 @@ class UnitConverterTest {
 
   @BeforeEach
   void beforeEach() {
-    solidMeasurement = new Measurement(12345.6f, ValidUnit.G);
-    liquidMeasurement = new Measurement(123.456f, ValidUnit.DL);
+    solidMeasurement = new Measurement("test1", 12345.6f, ValidUnit.G);
+    liquidMeasurement = new Measurement("test2", 123.456f, ValidUnit.DL);
   }
 
   @Test
@@ -31,23 +31,23 @@ class UnitConverterTest {
     UnitConverter.convertToStandard(solidMeasurement);
     UnitConverter.convertToStandard(liquidMeasurement);
     assertEquals(12.35f, solidMeasurement.getAmount());
-    assertEquals(ValidUnit.KG, solidMeasurement.getValidUnit());
+    assertEquals(ValidUnit.KG, solidMeasurement.getUnit());
     assertEquals(12.35f, liquidMeasurement.getAmount());
-    assertEquals(ValidUnit.L, liquidMeasurement.getValidUnit());
+    assertEquals(ValidUnit.L, liquidMeasurement.getUnit());
   }
 
   @Test
   void convertToGrams() {
     UnitConverter.convertToGrams(solidMeasurement);
     assertEquals(12345.6f, solidMeasurement.getAmount());
-    assertEquals(ValidUnit.G, solidMeasurement.getValidUnit());
+    assertEquals(ValidUnit.G, solidMeasurement.getUnit());
   }
 
   @Test
   void convertToKG() {
     UnitConverter.convertToKG(solidMeasurement);
     assertEquals(12.35f, solidMeasurement.getAmount());
-    assertEquals(ValidUnit.KG, solidMeasurement.getValidUnit());
+    assertEquals(ValidUnit.KG, solidMeasurement.getUnit());
   }
 
   @Test
@@ -60,13 +60,13 @@ class UnitConverterTest {
   void convertToDeciLiter() {
     UnitConverter.convertToDeciLiter(liquidMeasurement);
     assertEquals(123.46f, liquidMeasurement.getAmount());
-    assertEquals(ValidUnit.DL, liquidMeasurement.getValidUnit());
+    assertEquals(ValidUnit.DL, liquidMeasurement.getUnit());
   }
 
   @Test
   void convertToMilliLiter() {
     UnitConverter.convertToMilliLiter(liquidMeasurement);
     assertEquals(12345.6f, liquidMeasurement.getAmount());
-    assertEquals(ValidUnit.ML, liquidMeasurement.getValidUnit());
+    assertEquals(ValidUnit.ML, liquidMeasurement.getUnit());
   }
 }

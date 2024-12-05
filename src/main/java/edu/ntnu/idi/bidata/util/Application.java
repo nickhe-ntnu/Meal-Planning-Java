@@ -4,16 +4,22 @@ import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
 import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
+import edu.ntnu.idi.bidata.user.inventory.Measurement;
+import edu.ntnu.idi.bidata.user.recipe.RecipeBuilder;
+import edu.ntnu.idi.bidata.user.recipe.RecipeManager;
+import edu.ntnu.idi.bidata.user.recipe.Step;
 import edu.ntnu.idi.bidata.util.command.*;
 import edu.ntnu.idi.bidata.util.input.CommandInput;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
+
+import java.util.List;
 
 /**
  * The Application class represents the main execution for the meal planning application.
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-05
  */
 public class Application {
   private final User user;
@@ -61,6 +67,20 @@ public class Application {
     inventoryManager.addIngredientToCurrentStorage(new Ingredient("Potato", 4, ValidUnit.KG, 40, 25));
     inventoryManager.createIngredientStorage("Office Fridge");
     inventoryManager.setCurrentStorage((IngredientStorage) null);
+
+    // Default recipe
+    RecipeManager recipeManager = user.getRecipeManager();
+    RecipeBuilder builder = new RecipeBuilder();
+    builder.setName("Cookie Dough");
+    builder.setDescription("Best cookie you will ever taste.");
+    List<Measurement> measurements = List.of(
+        new Measurement("Flour", 500, ValidUnit.G),
+        new Measurement("Chocolate chips", 100, ValidUnit.G),
+        new Measurement("Milk", 4, ValidUnit.DL)
+    );
+    builder.addStep(new Step("Combine everything in a bowl", measurements));
+    builder.addStep(new Step("And enjoy!", null));
+    recipeManager.addRecipe(builder.getRecipe());
   }
 
   /**

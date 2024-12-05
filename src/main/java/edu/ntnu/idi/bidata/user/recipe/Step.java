@@ -2,21 +2,36 @@ package edu.ntnu.idi.bidata.user.recipe;
 
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Represents a step in a recipe with cooking instructions and ingredients.
+ * Each step requires the instruction, but the list of measurements is optional.
  *
  * @author Nick Heggø
- * @version 2024-11-30
+ * @version 2024-12-05
  */
 public class Step {
   private String instruction;
-  private Map<String, Measurement> measurementMap;
+  private List<Measurement> measurements;
 
-  public Step(String instruction, Map<String, Measurement> measurementMap) {
-    setMeasurementMap(measurementMap);
+  public Step(String instruction, List<Measurement> measurements) {
+    setMeasurements(measurements);
     setInstruction(instruction);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(getInstruction());
+    if (hasMeasurements()) {
+      measurements.forEach(measurement -> stringBuilder.append("\n   - ").append(measurement));
+    }
+    return stringBuilder.toString();
+  }
+
+  private boolean hasMeasurements() {
+    return getMeasurements() != null && !getMeasurements().isEmpty();
   }
 
   /**
@@ -24,22 +39,17 @@ public class Step {
    *
    * @return a map where the key is a string representing the ingredient name, and the value is a Measurement object.
    */
-  public Map<String, Measurement> getMeasurementMap() {
-    return measurementMap;
+  public List<Measurement> getMeasurements() {
+    return measurements;
   }
 
   /**
-   * Sets the map of ingredient measurements for this step.
+   * Sets the list of measurements for the step.
    *
-   * @param measurementMap a map where the key is a string representing the ingredient name,
-   *                       and the value is a Measurement object; must not be null
-   * @throws IllegalArgumentException if measurementMap is null
+   * @param measurements the list of Measurement objects to set can be null or empty.
    */
-  private void setMeasurementMap(Map<String, Measurement> measurementMap) {
-    if (measurementMap == null) {
-      throw new IllegalArgumentException("Measurements cannot be null.");
-    }
-    this.measurementMap = measurementMap;
+  private void setMeasurements(List<Measurement> measurements) {
+    this.measurements = measurements;
   }
 
   /**

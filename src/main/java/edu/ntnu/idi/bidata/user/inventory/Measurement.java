@@ -1,5 +1,6 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
+import edu.ntnu.idi.bidata.util.input.UnitInput;
 import edu.ntnu.idi.bidata.util.unit.UnitConverter;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
@@ -10,32 +11,39 @@ import java.util.Objects;
  * Represents a measurement with a name, amount, unit, and ingredient type.
  *
  * @author Nick Heggø
- * @version 2024-12-01
+ * @version 2024-12-05
  */
 public class Measurement {
+  private String name; // Ingredient Name
   private float amount;
-  private ValidUnit validUnit;
+  private ValidUnit unit;
   private IngredientType ingredientType; // set automatically, based on ValidUnit.
 
-  /**
-   * Default constructor for the Measurement class.
-   * Initializes an empty Measurement instance.
-   *
-   * @author Nick Heggø
-   * @version 2024-11-30
-   */
   public Measurement() {
+  }
+
+  public Measurement(String name, UnitInput input) {
+    setName(name);
+    setAmount(input.getAmount());
+    setUnit(input.getUnit());
   }
 
   /**
    * Constructs a Measurement with the specified name, amount, and unit.
    *
-   * @param amount    the amount of the measurement must be non-negative
-   * @param validUnit the unit of measurement must not be null or unknown
+   * @param amount the amount of the measurement must be non-negative
+   * @param unit   the unit of measurement must not be null or unknown
    */
-  public Measurement(float amount, ValidUnit validUnit) {
+  public Measurement(String name, float amount, ValidUnit unit) {
+    setName(name);
     setAmount(amount);
-    setValidUnit(validUnit);
+    setUnit(unit);
+  }
+
+  @Override
+  public String toString() {
+
+    return getAmount() + " " + getUnit().name().toLowerCase() + " " + getName();
   }
 
   /**
@@ -44,8 +52,9 @@ public class Measurement {
    * @return an integer hash code derived from amount, validUnit, and ingredientType.
    */
   @Override
+
   public int hashCode() {
-    return Objects.hash(amount, validUnit, ingredientType);
+    return Objects.hash(name, amount, unit, ingredientType);
   }
 
   /**
@@ -64,7 +73,16 @@ public class Measurement {
     }
     Measurement m = (Measurement) obj;
     return Float.compare(getAmount(), m.getAmount()) == 0
-        && getValidUnit().equals(m.getValidUnit());
+        && getName().equals(m.getName())
+        && getUnit().equals(m.getUnit());
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public List<Object> getStandardMeasurement() {
@@ -85,7 +103,7 @@ public class Measurement {
       throw new IllegalArgumentException("Measurement cannot be null!");
     }
 
-    UnitConverter.autoMergeUnit(measurementToMerge, this.validUnit);
+    UnitConverter.autoMergeUnit(measurementToMerge, this.unit);
     float mergedAmount = this.getAmount() + measurementToMerge.getAmount();
     this.setAmount(mergedAmount);
     if (mergedAmount >= 1000) {
@@ -129,24 +147,24 @@ public class Measurement {
    *
    * @return the valid unit as an instance of ValidUnit.
    */
-  public ValidUnit getValidUnit() {
-    return validUnit;
+  public ValidUnit getUnit() {
+    return unit;
   }
 
   /**
    * Sets the valid unit for this measurement.
    *
-   * @param validUnit the unit of measurement
+   * @param unit the unit of measurement
    * @throws IllegalArgumentException if the unit is null or UNKNOWN
    */
-  public void setValidUnit(ValidUnit validUnit) {
-    if (validUnit == null) {
+  public void setUnit(ValidUnit unit) {
+    if (unit == null) {
       throw new IllegalArgumentException("Unit cannot be null.");
     }
-    if (validUnit == ValidUnit.UNKNOWN) {
+    if (unit == ValidUnit.UNKNOWN) {
       throw new IllegalArgumentException("Invalid unit, please try again.");
     }
-    this.validUnit = validUnit;
+    this.unit = unit;
     autoSetIngredientType();
   }
 
@@ -155,11 +173,11 @@ public class Measurement {
    * Throws IllegalArgumentException if the valid unit is null or unknown.
    */
   private void autoSetIngredientType() {
-    if (validUnit == null) {
+    if (unit == null) {
       throw new IllegalArgumentException("Ingredient type cannot be null.");
     }
 
-    switch (getValidUnit()) {
+    switch (getUnit()) {
       case KG, G -> this.ingredientType = IngredientType.SOLID;
       case L, DL, ML -> this.ingredientType = IngredientType.LIQUID;
       default -> throw new IllegalArgumentException("Measurement Unit is unknown.");
