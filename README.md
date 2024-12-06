@@ -137,13 +137,16 @@ mvn -q clean install && mvn -q exec:java
 
 ![](unitTest.gif)
 
-Maven allows simply running:
+When using `mvn install` Maven already automatically ran all the test files before building from source.
+However, if one wishes to only run the test files,
+Maven allows simply running
 
 ```bash
 mvn test
 ```
 
-while in the project root directory, and it will automatically run all the test files within the project.
+in the terminal while in the project root directory,
+and it will run all the test files within the project.
 
 ## References
 
