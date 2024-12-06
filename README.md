@@ -6,7 +6,6 @@ STUDENT ID = "134132"
 
 ## Project description
 
-[//]: # (TODO: Write a short description of your project/product here.)
 This project is a Meal Planning application developed as a part of the IDATG1003 course.
 The application allows users to create, track, remove both Recipes and Ingredients.
 The goal of this project was to help achieve the UN's sustainability goal by reducing food waste.
@@ -84,11 +83,13 @@ The goal of this project was to help achieve the UN's sustainability goal by red
 │                                   └── UnitConverterTest.java
 ```
 
-[//]: # (TODO: Describe the structure of your project here. How have you used packages in your structure. Where are all sourcefiles stored. Where are all JUnit-test classes stored. etc.)
-The project is divided into two parts, package `user` && `util`.
+In a Maven project, the source code and unit tests are kept in different directories.
+The source code is located in `src/main`, while test code is located in `src/test`.
 
-* In the package `user` you can find all relevant classes that are connected with class User.
-* In the package `util` you can find all the related classed related to the application's helper class and command
+Project source code is divided into two parts, package `user` && `util`.
+
+* In the package `user` you can find all the relevant classes that have dependency on the `User` class.
+* In the package `util` you can find all the application's helper class and command
   layer.
 
 ## Link to repository
@@ -97,19 +98,33 @@ The project is divided into two parts, package `user` && `util`.
 
 ## How to run the project
 
+This project requires [Java SE 21](https://whichjdk.com/),
+and [Apache Maven](https://maven.apache.org/) to be installed on the system.
+
+![](version.png)
+Before running any commands, check if the correct version is installed on the system by typing:
+
+```bash
+java --version
+```
+
+and
+
+```bash
+mvn --version
+```
+
 ![](run.gif)
 
-The `main()` method is called from the class `Launcher`,
-where it creates a `new Application` and run the `run()` method.
+If everything looks good, we can move on to build the project from source.
 
-This project uses [Maven](https://maven.apache.org/) as the project build system.
-Running this project will require Maven to be installed on the system.
-(Developed with Maven version 3.9.9)
+The `main()` method is called from the class `Launcher`,
+where it creates a `new Application` and invoke the `run()` method.
 
 1. Go to the project directory.
 
 ```bash
-cd .
+cd {{PATH_TO_ROOT_DIRECTORY}}
 ```
 
 2. Run the following command in the terminal to build and run the project.
@@ -120,7 +135,7 @@ mvn -q clean install && mvn -q exec:java
 
 ## How to run the tests
 
-![unitTest](unitTest.gif)
+![](unitTest.gif)
 
 Maven allows simply running:
 
@@ -128,11 +143,9 @@ Maven allows simply running:
 mvn test
 ```
 
-while in the project root directory and will automatically run all the test files.
+while in the project root directory, and it will automatically run all the test files within the project.
 
 ## References
-
-[//]: # (TODO: Include references here, if any. For example, if you have used code from the course book, include a reference to the chapter. Or if you have used code from a website or other source, include a link to the source.)
 
 ### Builder design pattern
 
