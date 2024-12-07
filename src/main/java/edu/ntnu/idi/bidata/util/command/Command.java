@@ -4,6 +4,7 @@ import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
 import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
 import edu.ntnu.idi.bidata.user.recipe.RecipeManager;
+import edu.ntnu.idi.bidata.util.Application;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
 import edu.ntnu.idi.bidata.util.input.CommandInput;
@@ -16,18 +17,11 @@ import java.util.Stack;
  * process commands and subcommands.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-07
  */
 public abstract class Command {
 
-  private InventoryManager inventoryManager;
-  private RecipeManager recipeManager;
-  private Stack<IngredientStorage> history;
-
-  private OutputHandler outputHandler;
-  private InputScanner inputScanner;
-
-  private CommandInput commandInput;
+  private User user;
 
   /**
    * Constructs a new Command object, initializes various components, and processes the command.
@@ -35,142 +29,52 @@ public abstract class Command {
    * @param user The user for whom the command is being created and processed.
    */
   protected Command(User user) {
-    initializeCommand(user);
-    processCommand();
+    setUser(user);
+  }
+
+  public static Command of(User user, Application app) {
+    ValidCommand command = user.getCommandInput().getCommand();
+    return switch (command) {
+      case HELP -> new HelpCommand(user);
+      case LIST -> new ListCommand(user);
+      case GO -> new GoCommand(user);
+      case ADD -> new AddCommand(user);
+      case REMOVE -> new RemoveCommand(user);
+      case FIND -> new FindCommand(user);
+      case CLEAR -> new ClearCommand(user);
+      case EXIT -> new ExitCommand(user, app);
+      case UNKNOWN -> new UnknownCommand(user);
+    };
   }
 
   /**
-   * Initializes the command with the given User object, setting up the necessary user input.
-   *
-   * @param user The User object which contains the necessary information and input for the command.
+   * Executes the command action defined in the subclass.
+   * This method must be implemented by subclasses to provide
+   * specific command execution behavior.
    */
-  public void initializeCommand(User user) {
-    setInputScanner(user.getInputScanner());
-    setOutputHandler(user.getOutputHandler());
-    setInventoryManager(user.getInventoryManager());
-    setRecipeManager(user.getRecipeManager());
-    setHistory(getInventoryManager().getHistory());
-    setCommandInput(user.getCommandInput());
-  }
+  public abstract void execute();
 
   /**
-   * Retrieves the current instance of the InputScanner used for input operations.
+   * Processes an unknown command by printing a help message specific to the command word.
    *
-   * @return the instance of InputScanner associated with the command.
+   * @param commandInput The command entered by the user.
    */
-  protected InputScanner getInputScanner() {
-    return inputScanner;
+  protected void processUnknownCommand(CommandInput commandInput) {
+    getOutputHandler().printCommandHelpMessage(commandInput.getCommand());
   }
-
   /**
-   * Sets the InputScanner object used to handle user input for the command.
-   *
-   * @param inputScanner The InputScanner object to be associated with this command.
+   * Processes the user command by determining if a subcommand is present. If a subcommand
+   * is present, the method delegates the processing to the abstract method processSubcommand.
+   * If no subcommand is present, it prints the instruction related to the command.
    */
-  private void setInputScanner(InputScanner inputScanner) {
-    this.inputScanner = inputScanner;
-  }
-
-  /**
-   * Sets the output handler for handling command outputs.
-   *
-   * @param outputHandler the OutputHandler object to be associated with the command
-   */
-  private void setOutputHandler(OutputHandler outputHandler) {
-    this.outputHandler = outputHandler;
-  }
-
-  /**
-   * Retrieves the current instance of the OutputHandler used for handling command outputs.
-   *
-   * @return the OutputHandler associated with the command.
-   */
-  protected OutputHandler getOutputHandler() {
-    return outputHandler;
-  }
-
-  /**
-   * Retrieves the current instance of InventoryManager used for managing inventory-related operations.
-   *
-   * @return the InventoryManager associated with this command.
-   */
-  protected InventoryManager getInventoryManager() {
-    return inventoryManager;
-  }
-
-  /**
-   * Sets the inventory manager associated with the command.
-   *
-   * @param inventoryManager The InventoryManager object to be associated with this command.
-   */
-  private void setInventoryManager(InventoryManager inventoryManager) {
-    this.inventoryManager = inventoryManager;
-  }
-
-  /**
-   * Retrieves the current instance of RecipeManager associated with this command.
-   *
-   * @return the RecipeManager associated with the command.
-   */
-  protected RecipeManager getRecipeManager() {
-    return recipeManager;
-  }
-
-  /**
-   * Retrieves the history of ingredient storage changes.
-   *
-   * @return a stack containing the history of ingredient storage instances.
-   */
-  protected Stack<IngredientStorage> getHistory() {
-    return history;
-  }
-
-  /**
-   * Sets the history stack of ingredient storages for the command.
-   *
-   * @param history the stack to be used as the history of ingredient storage changes.
-   */
-  public void setHistory(Stack<IngredientStorage> history) {
-    this.history = history;
-  }
-
-  /**
-   * Retrieves the subcommand from the command input.
-   *
-   * @return the subcommand as a string, or null if no subcommand is present.
-   */
-  protected String getSubcommand() {
-    return commandInput.getSubcommand();
-  }
 
   /**
    * Checks if the current command input contains a subcommand.
    *
    * @return true if a subcommand is present, false otherwise.
    */
-  public boolean hasSubcommand() {
-    return commandInput.hasSubcommand();
-  }
-
-  /**
-   * Retrieves the command argument from the input.
-   *
-   * @return the input string representing the user command argument.
-   */
-  protected String getArgument() {
-    return commandInput.getArgument();
-  }
-
-  /**
-   * Sets the command input argument to a valid string provided by the user if it is currently null.
-   *
-   * @param message the prompt message to display to the user if the argument is empty.
-   */
-  protected void setArgumentIfEmpty(String message) {
-    if (commandInput.getArgument() == null) {
-      outputHandler.printInputPrompt(message);
-      commandInput.setArgument(inputScanner.collectValidString());
-    }
+  protected boolean hasSubcommand() {
+    return getCommandInput().hasSubcommand();
   }
 
   /**
@@ -179,26 +83,95 @@ public abstract class Command {
    * @throws IllegalCommandCombinationException indicating an illegal combination of command and subcommand.
    */
   protected void illegalCommand() {
-    throw new IllegalCommandCombinationException(commandInput.getCommand(), commandInput.getSubcommand());
+    throw new IllegalCommandCombinationException(user.getCommandInput().getCommand(), user.getCommandInput().getSubcommand());
   }
 
   /**
-   * Handles the processing of a subcommand associated with a user command.
-   * Implementations of this method should define the specific behaviors
-   * that occur when a subcommand is detected and needs to be processed.
+   * Retrieves the current instance of the InputScanner used for input operations.
+   *
+   * @return the instance of InputScanner associated with the command.
    */
-  protected abstract void processSubcommand();
+  protected InputScanner getInputScanner() {
+    return user.getInputScanner();
+  }
 
   /**
-   * Processes the user command by determining if a subcommand is present. If a subcommand
-   * is present, the method delegates the processing to the abstract method processSubcommand.
-   * If no subcommand is present, it prints the instruction related to the command.
+   * Retrieves the current instance of the OutputHandler used for handling command outputs.
+   *
+   * @return the OutputHandler associated with the command.
    */
-  private void processCommand() {
-    if (hasSubcommand()) {
-      processSubcommand();
-    } else {
-      printCommandHelpMessage();
+  protected OutputHandler getOutputHandler() {
+    return user.getOutputHandler();
+  }
+
+  /**
+   * Retrieves the current instance of InventoryManager used for managing inventory-related operations.
+   *
+   * @return the InventoryManager associated with this command.
+   */
+  protected InventoryManager getInventoryManager() {
+    return user.getInventoryManager();
+  }
+
+  /**
+   * Retrieves the current instance of RecipeManager associated with this command.
+   *
+   * @return the RecipeManager associated with the command.
+   */
+  protected RecipeManager getRecipeManager() {
+    return user.getRecipeManager();
+  }
+
+  /**
+   * Retrieves the history of ingredient storage changes.
+   *
+   * @return a stack containing the history of ingredient storage instances.
+   */
+  protected Stack<IngredientStorage> getHistory() {
+    return user.getInventoryManager().getHistory();
+  }
+
+  protected CommandInput getCommandInput() {
+    return user.getCommandInput();
+  }
+
+  protected ValidCommand getCommand() {
+    return getCommandInput().getCommand();
+  }
+
+  /**
+   * Retrieves the subcommand from the command input.
+   *
+   * @return the subcommand as a string, or null if no subcommand is present.
+   */
+  protected String getSubcommand() {
+    return user.getCommandInput().getSubcommand();
+  }
+
+  /**
+   * Retrieves the command argument from the input.
+   *
+   * @return the input string representing the user command argument.
+   */
+  protected String getArgument() {
+    return user.getCommandInput().getArgument();
+  }
+
+  private void setUser(User user) {
+    this.user = user;
+  }
+
+  /**
+   * Sets the command input argument to a valid string provided by the user if it is currently null.
+   *
+   * @param message the prompt message to display to the user if the argument is empty.
+   */
+  protected void setArgumentIfEmpty(String message) {
+    CommandInput commandInput = getCommandInput();
+    if (commandInput.getArgument() == null) {
+      getOutputHandler().printInputPrompt(message);
+      String argument = getInputScanner().collectValidString();
+      commandInput.setArgument(argument);
     }
   }
 
@@ -208,27 +181,7 @@ public abstract class Command {
    * and delegates the printing of the help message to the output handler.
    */
   private void printCommandHelpMessage() {
-    outputHandler.printCommandHelpMessage(commandInput.getCommand());
-  }
-
-  /**
-   * Sets the RecipeManager instance associated with this command.
-   *
-   * @param recipeManager The RecipeManager object to be set. Must not be null.
-   */
-  public void setRecipeManager(RecipeManager recipeManager) {
-    if (recipeManager != null) {
-      this.recipeManager = recipeManager;
-    }
-  }
-
-  /**
-   * Sets the command input for the current command.
-   *
-   * @param commandInput The CommandInput object representing the user's command input details.
-   */
-  private void setCommandInput(CommandInput commandInput) {
-    this.commandInput = commandInput;
+    getOutputHandler().printCommandHelpMessage(getCommandInput().getCommand());
   }
 
 }

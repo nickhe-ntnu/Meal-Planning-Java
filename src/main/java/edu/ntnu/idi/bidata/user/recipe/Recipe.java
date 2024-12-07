@@ -1,5 +1,7 @@
 package edu.ntnu.idi.bidata.user.recipe;
 
+import edu.ntnu.idi.bidata.util.Utility;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +10,7 @@ import java.util.List;
  * instructions and required ingredients.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-07
  */
 public class Recipe {
   private final List<Step> steps;
@@ -27,6 +29,35 @@ public class Recipe {
   public Recipe(String name) {
     steps = new ArrayList<>();
     setName(name);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(getName()).append(":")
+        .append("\n").append("\n").append(getDescription()).append("\n");
+    List<Step> stepList = getSteps();
+    for (int i = 0; i < stepList.size(); i++) {
+      int index = i + 1;
+      stringBuilder.append("\n").append(index).append(Utility.getOrdinalSuffix(index)).append(" step: ")
+          .append(stepList.get(i));
+    }
+    // the output will look like -> "1st step: " + step.toString()
+    return stringBuilder.toString();
+  }
+
+  /**
+   * Adds a cooking step to the recipe.
+   *
+   * @param step the step to be added, which includes instructions and ingredients
+   */
+  public void addStep(Step step) {
+    steps.add(step);
+  }
+
+  public void removeStep(int stepNumber) {
+    assertIndexWithInBounds(stepNumber);
+    steps.remove(stepNumber);
   }
 
   /**
@@ -74,20 +105,6 @@ public class Recipe {
       throw new IllegalArgumentException("Description cannot be empty.");
     }
     this.description = description;
-  }
-
-  /**
-   * Adds a cooking step to the recipe.
-   *
-   * @param step the step to be added, which includes instructions and ingredients
-   */
-  public void addStep(Step step) {
-    steps.add(step);
-  }
-
-  public void removeStep(int stepNumber) {
-    assertIndexWithInBounds(stepNumber);
-    steps.remove(stepNumber);
   }
 
   /**

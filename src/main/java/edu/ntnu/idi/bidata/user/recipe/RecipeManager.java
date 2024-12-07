@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-07
  */
 public class RecipeManager {
 
@@ -85,6 +85,6 @@ public class RecipeManager {
   }
 
   public List<Recipe> findRecipe(String name) {
-    return cookBook.getRecipe(name);
+    return cookBook.findRecipesContainingName(name);
   }
 }

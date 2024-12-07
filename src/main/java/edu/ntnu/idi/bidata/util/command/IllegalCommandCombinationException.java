@@ -1,6 +1,7 @@
 package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.util.Utility;
+import edu.ntnu.idi.bidata.util.input.CommandInput;
 
 /**
  * Exception thrown to indicate an illegal combination of command and subcommand.
@@ -10,10 +11,15 @@ import edu.ntnu.idi.bidata.util.Utility;
  * is printed using the provided OutputHandler instance.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-07
  */
 public class IllegalCommandCombinationException extends RuntimeException {
   public IllegalCommandCombinationException(ValidCommand command, String subcommand) {
     super("Invalid command combination: '" + Utility.createKey(command.name()) + "' + '" + subcommand + "'");
+  }
+
+  public IllegalCommandCombinationException(CommandInput commandInput) {
+    super("Invalid command combination: '" + Utility.createKey(commandInput.getCommand().name())
+        + "' + '" + commandInput.getSubcommand() + "'");
   }
 }

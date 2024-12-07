@@ -8,8 +8,8 @@ import edu.ntnu.idi.bidata.user.inventory.Measurement;
 import edu.ntnu.idi.bidata.user.recipe.RecipeBuilder;
 import edu.ntnu.idi.bidata.user.recipe.RecipeManager;
 import edu.ntnu.idi.bidata.user.recipe.Step;
-import edu.ntnu.idi.bidata.util.command.*;
-import edu.ntnu.idi.bidata.util.input.CommandInput;
+import edu.ntnu.idi.bidata.util.command.Command;
+import edu.ntnu.idi.bidata.util.command.IllegalCommandCombinationException;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.util.List;
@@ -19,12 +19,13 @@ import java.util.List;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-07
  */
 public class Application {
   private final User user;
   private final InputScanner inputScanner;
   private final OutputHandler outputHandler;
+  private boolean running;
 
   /**
    * Initializes a new instance of the Application
@@ -45,7 +46,24 @@ public class Application {
     outputHandler.printWelcomeMessage(user.getName());
     outputHandler.printHelpMessage();
     startUpCondition();
+    running = true;
     engine();
+  }
+
+  public void terminate() {
+    outputHandler.printGoodbyeMessage();
+    running = false;
+  }
+
+  /**
+   * Instantiates and executes a user command.
+   * Uses the user instance and the current application context
+   * to determine and perform the relevant command action.
+   */
+  private Command getCommand() {
+    outputHandler.printCommandPrompt();
+    user.setCommandInput(inputScanner.fetchCommand());
+    return Command.of(user, this);
   }
 
   /**
@@ -71,92 +89,52 @@ public class Application {
     // Default recipe
     RecipeManager recipeManager = user.getRecipeManager();
     RecipeBuilder builder = new RecipeBuilder();
-    builder.setName("Cookie Dough");
-    builder.setDescription("Best cookie you will ever taste.");
     List<Measurement> measurements = List.of(
         new Measurement("Flour", 500, ValidUnit.G),
         new Measurement("Chocolate chips", 100, ValidUnit.G),
         new Measurement("Milk", 4, ValidUnit.DL)
     );
+    builder.setName("Cookie Dough");
+    builder.setDescription("Best cookie you will ever taste.");
+    builder.addStep(new Step("Combine everything in a bowl", measurements));
+    builder.addStep(new Step("And enjoy!", null));
+    recipeManager.addRecipe(builder.getRecipe());
+    // second recipe
+    builder.setName("Cookie Dough v2");
+    builder.setDescription("Best cookie you will ever taste.");
     builder.addStep(new Step("Combine everything in a bowl", measurements));
     builder.addStep(new Step("And enjoy!", null));
     recipeManager.addRecipe(builder.getRecipe());
   }
 
   /**
-   * Runs the main loop of the application, continually processing user commands until
-   * a termination command is received. The method fetches user input through an input scanner,
-   * processes the command, and prints any exceptions encountered.
+   * Continuously processes and executes user commands while the application is running.
+   * Catches and handles exceptions related to invalid commands or aborted operations.
+   * Uses the output handler to display error messages and command help.
    */
   private void engine() {
-    boolean running = true;
-    do {
+    while (running) {
       try {
-        outputHandler.printCommandPrompt();
-        this.user.setCommandInput(inputScanner.fetchCommand());
-        running = processUserCommand(user.getCommandInput());
+        Command command = getCommand();
+        command.execute();
       } catch (IllegalArgumentException | AbortException e) {
         outputHandler.printOutput(e.getMessage());
       } catch (IllegalCommandCombinationException illegalCommandCombinationException) {
         outputHandler.printOutput(illegalCommandCombinationException.getMessage());
         outputHandler.printCommandHelpMessage(user.getCommandInput().getCommand());
       }
-    } while (running);
+    }
   }
 
   /**
-   * Set up the current
+   * Sets up a new User instance, initializing it with an input name.
    *
-   * @return the newly created user object.
+   * @return an initialized User object.
    */
   private User userSetup() {
     User createdUser = new User();
     createdUser.setName("Developer");
     //FIXME replace with: createdUser.setName(inputScanner.getValidString().replaceAll("\\s", ""));
     return createdUser;
-  }
-
-  /**
-   * Processes the user command and redirects to the appropriate function based on the command word.
-   * Catches and handles IllegalArgumentExceptions that may occur during execution.
-   *
-   * @param commandInput The command entered by the user.
-   * @return The running condition of the application. Returning false will cause the application to exit.
-   */
-  private boolean processUserCommand(CommandInput commandInput) {
-    boolean running = true;
-    ValidCommand command = commandInput.getCommand();
-    switch (command) {
-      case UNKNOWN -> outputHandler.printCommandHelpMessage(command);
-      case HELP -> new HelpCommand(this.user);
-      case LIST -> new ListCommand(this.user);
-      case GO -> new GoCommand(this.user);
-      case ADD -> new AddCommand(this.user);
-      case REMOVE -> new RemoveCommand(this.user);
-      case FIND -> new FindCommand(this.user);
-      case CLEAR -> outputHandler.clearScreen();
-      case EXIT -> running = exitApplication();
-      default -> throw new IllegalArgumentException("Unexpected command: " + command);
-    }
-    return running;
-  }
-
-  /**
-   * Processes an unknown command by printing a help message specific to the command word.
-   *
-   * @param commandInput The command entered by the user.
-   */
-  private void processUnknownCommand(CommandInput commandInput) {
-    outputHandler.printCommandHelpMessage(commandInput.getCommand());
-  }
-
-  /**
-   * Method to exit the endless loop.
-   *
-   * @return the running condition of the application will cause the app to exit.
-   */
-  private boolean exitApplication() {
-    outputHandler.printGoodbyeMessage();
-    return false;
   }
 }

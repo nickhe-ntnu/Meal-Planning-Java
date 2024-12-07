@@ -10,7 +10,7 @@ import java.util.List;
  * to the previous directory for a user.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-07
  */
 public class GoCommand extends Command {
 
@@ -29,7 +29,7 @@ public class GoCommand extends Command {
    * Processes the current subcommand and executes the corresponding method.
    */
   @Override
-  protected void processSubcommand() {
+  public void execute() {
     switch (getSubcommand()) {
       case "to" -> goTo();
       case "back" -> goBack();

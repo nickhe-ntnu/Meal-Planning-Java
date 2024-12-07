@@ -3,7 +3,6 @@ package edu.ntnu.idi.bidata.util.command;
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 import edu.ntnu.idi.bidata.user.recipe.Recipe;
-import edu.ntnu.idi.bidata.user.recipe.Step;
 import edu.ntnu.idi.bidata.util.OutputHandler;
 
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
  * "find" subcommands.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-07
  */
 public class FindCommand extends Command {
 
@@ -35,7 +34,7 @@ public class FindCommand extends Command {
    * based on the subcommand value.
    */
   @Override
-  protected void processSubcommand() {
+  public void execute() {
     switch (getSubcommand()) {
       case "ingredient" -> findIngredient();
       case "recipe" -> findRecipe();
@@ -46,6 +45,7 @@ public class FindCommand extends Command {
   private void findIngredient() {
     setArgumentIfEmpty("Please enter the ingredient name to find:");
     List<Ingredient> storageContainsIngredient = getInventoryManager().findIngredientFromCurrent(getArgument());
+    // first case, none matching.
     if (storageContainsIngredient.isEmpty()) {
       getOutputHandler().printOutputWithLineBreak(getArgument() + " isn't present at any of the storages.");
     } else {
@@ -60,12 +60,17 @@ public class FindCommand extends Command {
     setArgumentIfEmpty("Please enter the recipe name:");
     List<Recipe> matchingRecipes = getRecipeManager().findRecipe(getArgument());
     OutputHandler outputHandler = getOutputHandler();
+
     if (matchingRecipes.isEmpty()) {
+      // first case, none matching.
       outputHandler.printOutput("Cannot find matching recipe.");
     } else if (matchingRecipes.size() == 1) {
+      // in the second case, only one match found
       printRecipeDetails(matchingRecipes.getFirst());
     } else {
-      outputHandler.printList(matchingRecipes, "numbered");
+      // final case, multiple matches found
+      List<String> names = matchingRecipes.stream().map(Recipe::getName).toList();
+      outputHandler.printList(names, "numbered");
       int index = -1;
       while (index >= matchingRecipes.size() || index < 1) {
         outputHandler.printInputPrompt("Please choose the recipe to show details:");
@@ -76,12 +81,7 @@ public class FindCommand extends Command {
   }
 
   private void printRecipeDetails(Recipe recipe) {
-    OutputHandler outputHandler = getOutputHandler();
-    outputHandler.printOutput(recipe.getName() + ":");
-    outputHandler.printOutput("\n" + recipe.getDescription() + "\n");
-    List<Step> steps = recipe.getSteps();
-    outputHandler.printList(steps, "bullet");
-    outputHandler.printLineBreak();
+    getOutputHandler().printOutput(recipe.toString());
   }
 
 }

@@ -9,7 +9,7 @@ import java.util.List;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-07
  */
 public class OutputHandler {
 
@@ -33,7 +33,6 @@ public class OutputHandler {
   public void printLineBreak() {
     System.out.println("########################");
   }
-
 
   public void printCommandPrompt() {
     System.out.print("> ");
@@ -93,16 +92,18 @@ public class OutputHandler {
     if (listToPrint == null || listToPrint.isEmpty()) {
       throw new IllegalArgumentException("List is empty!");
     }
-    switch (style.strip().toLowerCase()) {
-      case "bullet" -> {
-        for (int index = 0; index < listToPrint.size(); index++) {
-          printOutput(" * " + listToPrint.get(index));
-        }
+
+    if (style.strip().equalsIgnoreCase("bullet")) {
+      for (Object o : listToPrint) {
+        printOutput(" * " + o);
       }
-      case "numbered" -> {
-        for (int index = 0; index < listToPrint.size(); index++) {
-          printOutput(" " + index + 1 + Utility.getOrdinalSuffix(index + 1) + listToPrint.get(index));
-        }
+    } else if (style.strip().equalsIgnoreCase("numbered")) {
+      for (int index = 0; index < listToPrint.size(); index++) {
+        printOutput(" #" + (index + 1) + ": " + listToPrint.get(index));
+      }
+    } else if (style.strip().equalsIgnoreCase("suffix")) {
+      for (int index = 0; index < listToPrint.size(); index++) {
+        printOutput(" " + (index + 1) + Utility.getOrdinalSuffix(index + 1) + ": " + listToPrint.get(index));
       }
     }
   }

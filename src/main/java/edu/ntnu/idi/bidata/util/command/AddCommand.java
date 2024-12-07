@@ -11,7 +11,7 @@ import edu.ntnu.idi.bidata.user.recipe.RecipeBuilder;
  * such as locations and storage entries for a given user.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-07
  */
 public class AddCommand extends Command {
 
@@ -32,7 +32,7 @@ public class AddCommand extends Command {
    * If an unrecognized subcommand is provided, illegalCommand() is called.
    */
   @Override
-  protected void processSubcommand() {
+  public void execute() {
     switch (getSubcommand()) {
       case "storage", "inventory" -> addStorage();
       case "ingredient" -> addIngredient();

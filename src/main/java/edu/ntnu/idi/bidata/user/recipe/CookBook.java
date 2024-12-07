@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-07
  */
 public class CookBook {
 
@@ -35,9 +35,9 @@ public class CookBook {
     recipes.add(recipe);
   }
 
-  public List<Recipe> getRecipe(String name) {
+  public List<Recipe> findRecipesContainingName(String name) {
     return recipes.stream()
-        .filter(recipe -> recipe.getName().equalsIgnoreCase(name.strip()))
+        .filter(recipe -> recipe.getName().toLowerCase().contains(name.strip().toLowerCase()))
         .toList();
   }
 

@@ -11,7 +11,7 @@ import java.util.List;
  * recipes, ingredients, expired items, and available recipes.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-07
  */
 public class ListCommand extends Command {
   public ListCommand(User user) {
@@ -27,7 +27,7 @@ public class ListCommand extends Command {
    * @throws IllegalArgumentException if the provided subcommand is unexpected or not recognized.
    */
   @Override
-  protected void processSubcommand() {
+  public void execute() {
     switch (getSubcommand()) {
       case "all" -> listAll();
       case "storage" -> listStorage();
