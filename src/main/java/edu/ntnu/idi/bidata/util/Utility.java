@@ -2,15 +2,30 @@ package edu.ntnu.idi.bidata.util;
 
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 
+import java.util.Random;
+
 /**
  * A utility class providing methods to manipulate strings and objects.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-07
  */
 public class Utility {
+  private static Random random;
 
   private Utility() {
+  }
+
+  /**
+   * Returns a singleton instance of the Random class.
+   *
+   * @return a singleton Random object.
+   */
+  public static Random getInstanceOfRandom() {
+    if (random == null) {
+      random = new Random();
+    }
+    return random;
   }
 
   /**

@@ -36,12 +36,13 @@ public abstract class Command {
     ValidCommand command = user.getCommandInput().getCommand();
     return switch (command) {
       case HELP -> new HelpCommand(user);
-      case LIST -> new ListCommand(user);
-      case GO -> new GoCommand(user);
       case ADD -> new AddCommand(user);
-      case REMOVE -> new RemoveCommand(user);
       case FIND -> new FindCommand(user);
+      case GO -> new GoCommand(user);
+      case LIST -> new ListCommand(user);
+      case REMOVE -> new RemoveCommand(user);
       case CLEAR -> new ClearCommand(user);
+      case STATS -> new StatsCommand(user);
       case EXIT -> new ExitCommand(user, app);
       case UNKNOWN -> new UnknownCommand(user);
     };
@@ -174,14 +175,4 @@ public abstract class Command {
       commandInput.setArgument(argument);
     }
   }
-
-  /**
-   * Prints the instruction related to the user's input command.
-   * This method converts the user input command to a lower case string
-   * and delegates the printing of the help message to the output handler.
-   */
-  private void printCommandHelpMessage() {
-    getOutputHandler().printCommandHelpMessage(getCommandInput().getCommand());
-  }
-
 }

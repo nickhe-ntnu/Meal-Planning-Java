@@ -29,8 +29,8 @@ class RemoveCommandTest {
     testInventoryManager.addIngredientToCurrentStorage(new Ingredient(ingredientName, 200, ValidUnit.G, 23, 23));
   }
 
-  @Disabled //Printing messages before running the app.
   @Test
+  @Disabled("Prints messages before running the app.")
   void testRemoveIngredient() {
     ByteArrayInputStream in = new ByteArrayInputStream(("remove ingredient " + ingredientName).getBytes());
     System.setIn(in);

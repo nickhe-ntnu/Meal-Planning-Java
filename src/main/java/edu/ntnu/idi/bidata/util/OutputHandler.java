@@ -18,6 +18,7 @@ public class OutputHandler {
       Thank you for using the meal planning app!""";
 
   public OutputHandler() {
+    // default implementation
   }
 
   /**
@@ -39,9 +40,9 @@ public class OutputHandler {
   }
 
   public void printInputPrompt(String inputPrompt) {
-    System.out.print(inputPrompt);
-    System.out.println(" Type 'abort' to abort the operation.");
-    System.out.print("  ~ ");
+    String output = inputPrompt + " Type 'abort' to abort the operation."
+        + "\n" + "  ~ ";
+    System.out.print(output);
   }
 
   public void printInputPrompt() {
@@ -114,76 +115,22 @@ public class OutputHandler {
    * @param command the command for which the help message should be printed
    */
   public void printCommandHelpMessage(ValidCommand command) {
-    switch (command) {
-      case UNKNOWN -> printUnknownInstruction();
-      case HELP -> printHelpMessage();
-      case LIST -> printListInstruction();
-      case GO -> printGoInstruction();
-      case ADD -> printAddInstruction();
-      case REMOVE -> printRemoveInstruction();
-      case FIND -> printFindInstruction();
-      case EXIT -> printOutput("This command will terminate the application.");
-      default -> printHelpInstruction();
-    }
+    printOutput(command.getHelpString());
   }
 
   public void printHelpMessage() {
-    printOutput("Available commands are:" + "\n" + formatCommands());
-  }
-
-  public void printUnknownInstruction() {
-    printOutput("Unknown command, see 'help'");
+    printOutput("Available commands are:" + "\n" + getHelpMessage());
   }
 
   public void clearScreen() {
     for (int i = 0; i < 40; i++) {
-      System.out.println("");
+      System.out.println();
     }
   }
 
-  private String formatCommands() {
+  private String getHelpMessage() {
     List<String> commands = ValidCommand.getCommands();
     return " help | " + String.join(" | ", commands) + " | clear | exit";
-  }
-
-  private void printHelpInstruction() {
-    printOutput("""
-        Valid print commands are:
-         help | help {valid command}""");
-  }
-
-  private void printListInstruction() {
-    printOutput("""
-        Valid list commands are:
-         list inventory | list recipe | list ingredient
-         list expired | list available recipe""");
-
-  }
-
-  private void printGoInstruction() {
-    printOutput("""
-        Valid go commands are:
-         go to {storage name} | go back""");
-  }
-
-  private void printAddInstruction() {
-    printOutput("""
-        Valid add commands are:
-         add storage | add ingredient | add recipe""");
-  }
-
-  private void printRemoveInstruction() {
-    printOutput("""
-        Valid remove commands are:
-         remove storage {storage name}
-         remove ingredient {ingredient name}
-         remove recipe {recipe name}""");
-  }
-
-  private void printFindInstruction() {
-    printOutput("""
-        Valid find commands are:
-         find ingredient {ingredient name} | find recipe {recipe name}""");
   }
 
 }

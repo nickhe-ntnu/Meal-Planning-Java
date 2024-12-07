@@ -28,7 +28,8 @@ public class HelpCommand extends Command {
   @Override
   public void execute() {
     if (hasSubcommand()) {
-      getOutputHandler().printCommandHelpMessage(CommandRegistry.findCommand(getSubcommand()));
+      String subcommandInput = getSubcommand();
+      getOutputHandler().printCommandHelpMessage(CommandRegistry.findCommand(subcommandInput));
     } else {
       getOutputHandler().printHelpMessage();
     }

@@ -52,7 +52,7 @@ public class GoCommand extends Command {
       addToHistory(getInventoryManager().getCurrentStorage());
       getInventoryManager().setCurrentStorage(ingredientStorage);
     }
-    printOperationMessage(success, getArgument());
+    printOperationMessage(success);
   }
 
   /**
@@ -66,7 +66,7 @@ public class GoCommand extends Command {
     } else {
       getInventoryManager().setCurrentStorage(removeFromHistory());
       boolean status = getInventoryManager().getCurrentStorage() != null;
-      printOperationMessage(status, getInventoryManager().getCurrentStorage().getStorageName());
+      printOperationMessage(status);
     }
   }
 
@@ -94,7 +94,7 @@ public class GoCommand extends Command {
    * @param success      a boolean indicating whether the operation was successful
    * @param locationName the name of the location being attempted to access
    */
-  private void printOperationMessage(boolean success, String locationName) {
+  private void printOperationMessage(boolean success) {
     if (success) {
       getOutputHandler().printOutput("You are now at " + getInventoryManager().getCurrentStorage().getStorageName());
     } else {

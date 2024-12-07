@@ -10,7 +10,7 @@ import java.util.*;
  * stored in various named collections.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-07
  */
 public class IngredientStorage {
 
@@ -199,16 +199,6 @@ public class IngredientStorage {
       ingredientMap.computeIfAbsent(Utility.createKey(ingredientToAdd), key -> new ArrayList<>())
           .add(ingredientToAdd);
     }
-  }
-
-  /**
-   * Checks if the specified ingredient is present in the storage and if it has the same expiry date.
-   *
-   * @param ingredientToCheck The ingredient to be checked in the storage.
-   * @return true if the ingredient is present and has the same expiry date, false otherwise.
-   */
-  private boolean isIngredientPresent(Ingredient ingredientToCheck) {
-    return ingredientMap.containsKey(Utility.createKey(ingredientToCheck));
   }
 
   /**

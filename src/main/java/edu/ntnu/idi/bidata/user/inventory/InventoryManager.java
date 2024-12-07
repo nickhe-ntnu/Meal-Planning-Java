@@ -16,7 +16,7 @@ import java.util.Stack;
  * for ingredient and storage management.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-07
  */
 public class InventoryManager {
 
@@ -101,6 +101,7 @@ public class InventoryManager {
         input = inputScanner.fetchUnit();
         validInput = true;
       } catch (IllegalArgumentException ignored) {
+        // ignored
       }
     }
 

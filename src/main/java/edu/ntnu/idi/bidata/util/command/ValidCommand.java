@@ -5,26 +5,55 @@ import java.util.List;
 
 /**
  * Holds the every valid command.
- * UNKNOWN - non-valid command
- * GO - go to inventory, think of it like a file structure (CD)
- * ADD - add to currently located storage (MKDIR)
- * FIND - search if an ingredient/recipe exist with in the collection.
- * LIST - currently two use cases, list expired, list available recipe
- * HELP - list of all commands.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-07
  */
 public enum ValidCommand {
-  EXIT,
-  ADD,
-  REMOVE,
-  GO,
-  FIND,
-  CLEAR,
-  LIST,
-  HELP,
-  UNKNOWN;
+  UNKNOWN("Unknown command, see 'help'"),
+
+  HELP("""
+      Valid print commands are:
+       help | help {valid command}"""),
+
+  ADD("""
+      Valid add commands are:
+       add storage | add ingredient | add recipe"""),
+
+  FIND("""
+      Valid find commands are:
+       find ingredient {ingredient name} | find recipe {recipe name}"""),
+
+  STATS(""),
+
+  GO("""
+      Valid go commands are:
+       go to {storage name} | go back"""),
+
+  LIST("""
+      Valid list commands are:
+       list inventory | list recipe | list ingredient
+       list expired | list available recipe"""),
+
+  REMOVE("""
+      Valid remove commands are:
+       remove storage {storage name}
+       remove ingredient {ingredient name}
+       remove recipe {recipe name}"""),
+
+  CLEAR("This command will clear the terminal window."),
+
+  EXIT("This command will terminate the application.");
+
+  private final String helpString;
+
+  ValidCommand(String helpString) {
+    this.helpString = helpString;
+  }
+
+  public String getHelpString() {
+    return helpString;
+  }
 
   public static List<String> getCommands() {
     return Arrays.stream(ValidCommand.values())

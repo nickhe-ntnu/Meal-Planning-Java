@@ -7,11 +7,16 @@ import edu.ntnu.idi.bidata.util.Application;
  * It instantiates the Application class and starts the application by calling its initialize method.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-07
  */
 public class Launcher {
+
+  private Launcher() {
+  }
+
   public static void main(String[] args) {
     Application app = new Application();
     app.run();
   }
+
 }

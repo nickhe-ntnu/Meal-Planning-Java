@@ -1,5 +1,6 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
+import edu.ntnu.idi.bidata.util.Utility;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ import java.util.Random;
  * name, amount, unit, expiry date, and standard unit price.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-07
  */
 public class Ingredient {
 
@@ -81,17 +82,6 @@ public class Ingredient {
   }
 
   /**
-   * Calculate the number of days between the current date and a specified future date.
-   *
-   * @param untilDate the future date until which the number of days is to be calculated
-   * @return the number of days between the current date and the specified future date
-   * @throws IllegalArgumentException if the untilDate is null
-   */
-  private int getDaysBetween(LocalDate untilDate) {
-    return (int) ChronoUnit.DAYS.between(LocalDate.now(), untilDate);
-  }
-
-  /**
    * Merges the specified ingredient with the current one.
    *
    * @param ingredientToMerge the ingredient to merge into the current ingredient
@@ -106,6 +96,22 @@ public class Ingredient {
 
   public float getValue() {
     return value;
+  }
+
+  /**
+   * Sets the unit price of the ingredient.
+   *
+   * @param value the unit price of the ingredient
+   * @throws IllegalArgumentException if the unit price is negative or exceeds 1000
+   */
+  public void setValue(float value) {
+    if (value < 0) {
+      throw new IllegalArgumentException("Price cannot be negative");
+    } else if (value > 1000) {
+      throw new IllegalArgumentException("Please enter a more reasonable unit price (max 1000");
+    }
+
+    this.value = Math.round(value * 100) / 100.0f; // round it to 2 decimal places
   }
 
   /**
@@ -233,26 +239,6 @@ public class Ingredient {
   }
 
   /**
-   * Sets the unit price of the ingredient.
-   *
-   * @param value the unit price of the ingredient
-   * @throws IllegalArgumentException if the unit price is negative or exceeds 1000
-   */
-  public void setValue(float value) {
-    if (value < 0) {
-      throw new IllegalArgumentException("Price cannot be negative");
-    } else if (value > 1000) {
-      throw new IllegalArgumentException("Please enter a more reasonable unit price (max 1000");
-    }
-
-    this.value = Math.round(value * 100) / 100.0f; // round it to 2 decimal places
-  }
-
-  private float calculateUnitPrice() {
-    return getValue() / getAmount();
-  }
-
-  /**
    * Sets the valid unit for the measurement of the ingredient.
    *
    * @param unit the valid unit to be set
@@ -260,6 +246,17 @@ public class Ingredient {
    */
   public void setUnit(ValidUnit unit) {
     measurement.setUnit(unit);
+  }
+
+  /**
+   * Calculate the number of days between the current date and a specified future date.
+   *
+   * @param untilDate the future date until which the number of days is to be calculated
+   * @return the number of days between the current date and the specified future date
+   * @throws IllegalArgumentException if the untilDate is null
+   */
+  private int getDaysBetween(LocalDate untilDate) {
+    return (int) ChronoUnit.DAYS.between(LocalDate.now(), untilDate);
   }
 
   /**
@@ -271,7 +268,7 @@ public class Ingredient {
   private void validatePassword(String password) {
     final String EXPIRED_PASSWORD = "expiredDemo";
     if (!password.equals(EXPIRED_PASSWORD)) {
-      throw new RuntimeException("Wrong password for backdoor constructor, action not allowed.");
+      throw new IllegalArgumentException("Wrong password for demo constructor. Action prohibited.");
     }
   }
 
@@ -282,7 +279,7 @@ public class Ingredient {
    * Assigns a random expiry date within a specific range.
    */
   private void createExpiredIngredient() {
-    Random random = new Random();
+    Random random = Utility.getInstanceOfRandom();
     String[] expiredNames = {"Expired Milk", "Expired Chicken", "Expired Egg", "Moldy Bread"};
 
     String name = expiredNames[random.nextInt(expiredNames.length)];
