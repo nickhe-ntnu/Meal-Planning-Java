@@ -17,7 +17,7 @@ import java.util.Stack;
  * process commands and subcommands.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
 public abstract class Command {
 
@@ -63,11 +63,6 @@ public abstract class Command {
   protected void processUnknownCommand(CommandInput commandInput) {
     getOutputHandler().printCommandHelpMessage(commandInput.getCommand());
   }
-  /**
-   * Processes the user command by determining if a subcommand is present. If a subcommand
-   * is present, the method delegates the processing to the abstract method processSubcommand.
-   * If no subcommand is present, it prints the instruction related to the command.
-   */
 
   /**
    * Checks if the current command input contains a subcommand.
@@ -158,21 +153,30 @@ public abstract class Command {
     return user.getCommandInput().getArgument();
   }
 
-  private void setUser(User user) {
-    this.user = user;
-  }
-
   /**
    * Sets the command input argument to a valid string provided by the user if it is currently null.
    *
    * @param message the prompt message to display to the user if the argument is empty.
    */
-  protected void setArgumentIfEmpty(String message) {
-    CommandInput commandInput = getCommandInput();
-    if (commandInput.getArgument() == null) {
-      getOutputHandler().printInputPrompt(message);
-      String argument = getInputScanner().collectValidString();
-      commandInput.setArgument(argument);
-    }
+  protected void setArgument(String message) {
+    getOutputHandler().printInputPrompt(message);
+    String argument = getInputScanner().collectValidString();
+    getCommandInput().setArgument(argument);
   }
+
+  protected User getUser() {
+    return user;
+  }
+
+  private void setUser(User user) {
+    this.user = user;
+  }
+
+  protected boolean isArgumentEmpty() {
+    return getArgument() == null;
+  }
+
 }
+
+
+

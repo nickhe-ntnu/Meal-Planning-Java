@@ -9,7 +9,7 @@ import java.util.List;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
 public class OutputHandler {
 
@@ -89,6 +89,13 @@ public class OutputHandler {
     }
   }
 
+  /**
+   * Prints the items in the given list in a specified style format.
+   *
+   * @param listToPrint the list of items to be printed
+   * @param style       the style format for printing: "bullet", "numbered", or "suffix"
+   * @throws IllegalArgumentException if the list is empty or null
+   */
   public void printList(List<?> listToPrint, String style) {
     if (listToPrint == null || listToPrint.isEmpty()) {
       throw new IllegalArgumentException("List is empty!");

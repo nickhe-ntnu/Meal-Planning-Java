@@ -1,5 +1,6 @@
 package edu.ntnu.idi.bidata.util.command;
 
+import edu.ntnu.idi.bidata.user.Printable;
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 import edu.ntnu.idi.bidata.user.recipe.Recipe;
@@ -14,7 +15,7 @@ import java.util.List;
  * "find" subcommands.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
 public class FindCommand extends Command {
 
@@ -43,7 +44,11 @@ public class FindCommand extends Command {
   }
 
   private void findIngredient() {
-    setArgumentIfEmpty("Please enter the ingredient name to find:");
+    if (isArgumentEmpty()) {
+      List<String> overview = getInventoryManager().getIngredientOverview();
+      getOutputHandler().printList(overview, "bullet");
+      setArgument("Please enter the ingredient name to find:");
+    }
     List<Ingredient> storageContainsIngredient = getInventoryManager().findIngredientFromCurrent(getArgument());
     // first case, none matching.
     if (storageContainsIngredient.isEmpty()) {
@@ -57,31 +62,36 @@ public class FindCommand extends Command {
   }
 
   private void findRecipe() {
-    setArgumentIfEmpty("Please enter the recipe name:");
-    List<Recipe> matchingRecipes = getRecipeManager().findRecipe(getArgument());
-    OutputHandler outputHandler = getOutputHandler();
-
-    if (matchingRecipes.isEmpty()) {
-      // first case, none matching.
-      outputHandler.printOutput("Cannot find matching recipe.");
-    } else if (matchingRecipes.size() == 1) {
-      // in the second case, only one match found
-      printRecipeDetails(matchingRecipes.getFirst());
-    } else {
-      // final case, multiple matches found
-      List<String> names = matchingRecipes.stream().map(Recipe::getName).toList();
-      outputHandler.printList(names, "numbered");
-      int index = -1;
-      while (index >= matchingRecipes.size() || index < 1) {
-        outputHandler.printInputPrompt("Please choose the recipe to show details:");
-        index = getInputScanner().collectValidInteger();
-      }
-      printRecipeDetails(matchingRecipes.get(index - 1)); // Index start at 0, printed start at 1
+    if (isArgumentEmpty()) {
+      List<String> overview = getRecipeManager().getRecipeOverview();
+      getOutputHandler().printList(overview, "bullet");
+      setArgument("Please enter the recipe name:");
     }
+    List<Recipe> matchingRecipes = getRecipeManager().findRecipe(getArgument());
+    printDetails(matchingRecipes);
   }
 
-  private void printRecipeDetails(Recipe recipe) {
-    getOutputHandler().printOutput(recipe.toString());
+  private void printDetails(List<?> matchingObjects) {
+    OutputHandler outputHandler = getOutputHandler();
+    if (matchingObjects.stream().allMatch(Printable.class::isInstance)) {
+      List<Printable> printable = (List<Printable>) matchingObjects.stream()
+          .map(o -> (Printable) o)
+          .toList();
+      switch (printable.size()) {
+        case 0 -> outputHandler.printOutput("Cannot find any matching.");
+        case 1 -> outputHandler.printOutputWithLineBreak(matchingObjects.getFirst().toString() + "\n");
+        default -> {
+          List<String> names = matchingObjects.stream().map(o -> ((Printable) o).getName()).toList();
+          outputHandler.printList(names, "numbered");
+          int index = -1;
+          while (index >= matchingObjects.size() || index < 1) {
+            outputHandler.printInputPrompt("Please choose the recipe to show details:");
+            index = getInputScanner().collectValidInteger();
+          }
+          outputHandler.printOutputWithLineBreak(matchingObjects.get(index - 1).toString() + "\n"); // Index start at 0, printed start at 1
+        }
+      }
+    }
   }
 
 }

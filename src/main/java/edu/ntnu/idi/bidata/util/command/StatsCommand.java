@@ -7,9 +7,10 @@ import edu.ntnu.idi.bidata.user.User;
  * executing a command that prints user statistics.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
 public class StatsCommand extends Command {
+
   public StatsCommand(User user) {
     super(user);
   }
@@ -23,11 +24,14 @@ public class StatsCommand extends Command {
   }
 
   /**
-   * Prints user statistics related to inventory and other metrics.
-   * Currently calls inventoryManager to get inventory value.
+   * Prints the total value of wasted ingredients to the output handler.
+   * Retrieves the wasted value from the user and formats it into a string message.
+   * The message displays the total value in currency and uses the output handler to print the message.
    */
   private void printStats() {
-    //    inventoryManager.getInventoryValue();
+    float wastedValue = getUser().getWastedValue();
+    String output = "Ingredient of total value " + wastedValue + " kr has been wasted.";
+    getOutputHandler().printOutput(output);
   }
 
 }

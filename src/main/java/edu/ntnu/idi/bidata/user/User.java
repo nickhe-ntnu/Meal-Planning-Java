@@ -12,7 +12,7 @@ import edu.ntnu.idi.bidata.util.input.CommandInput;
  * methods to interact with and manage these attributes.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-08
  */
 public class User {
 
@@ -23,6 +23,7 @@ public class User {
   private final RecipeManager recipeManager;
 
   private String name;
+  private float wastedValue;
   private CommandInput commandInput;
 
   /**
@@ -38,6 +39,11 @@ public class User {
     inputScanner = new InputScanner(outputHandler);
     inventoryManager = new InventoryManager(inputScanner, outputHandler);
     recipeManager = new RecipeManager(inputScanner, outputHandler);
+    wastedValue = 0;
+  }
+
+  public void addWastedValue(float wastedValue) {
+    this.wastedValue += wastedValue;
   }
 
   /**
@@ -110,5 +116,9 @@ public class User {
    */
   public RecipeManager getRecipeManager() {
     return recipeManager;
+  }
+
+  public float getWastedValue() {
+    return wastedValue;
   }
 }

@@ -1,5 +1,6 @@
 package edu.ntnu.idi.bidata.user.recipe;
 
+import edu.ntnu.idi.bidata.user.Printable;
 import edu.ntnu.idi.bidata.util.Utility;
 
 import java.util.ArrayList;
@@ -10,9 +11,9 @@ import java.util.List;
  * instructions and required ingredients.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
-public class Recipe {
+public class Recipe implements Printable {
   private final List<Step> steps;
   private String name;
   private String description;
@@ -31,6 +32,24 @@ public class Recipe {
     setName(name);
   }
 
+  @Override
+  public final boolean equals(Object o) {
+    if (!(o instanceof Recipe recipe))
+      return false;
+
+    return steps.equals(recipe.steps) && name.equals(recipe.name) && description.equals(recipe.description);
+  }
+
+  // IntelliJ Generated
+  @Override
+  public int hashCode() {
+    int result = steps.hashCode();
+    result = 31 * result + name.hashCode();
+    result = 31 * result + description.hashCode();
+    return result;
+  }
+
+  // IntelliJ Generated
   @Override
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();

@@ -13,7 +13,7 @@ import java.util.Scanner;
  * It is designed to parse input into predefined commands, subcommands, and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-08
  */
 public class InputScanner {
   private final OutputHandler outputHandler;
@@ -75,19 +75,20 @@ public class InputScanner {
     return createUnitInput(tokenized);
   }
 
-  private void assertUnitInput(String[] tokens) {
-    if (tokens.length < 2) {
-      throw new IllegalArgumentException("Missing unit inputs.");
-    }
-  }
-
+  /**
+   * Continuously prompts the user for a valid unit input until a correct
+   * format is provided. If the input is invalid, prompts the user with
+   * an error message.
+   *
+   * @return a UnitInput object that represents the valid unit input.
+   */
   public UnitInput collectValidUnitInput() {
     UnitInput unitInput = null;
     while (unitInput == null) {
       try {
         unitInput = fetchUnit();
       } catch (IllegalArgumentException e) {
-        outputHandler.printInputPrompt(e.getMessage());
+        outputHandler.printInputPrompt("Invalid input format, accepted format are: {float} + {unit}");
       }
     }
     return unitInput;
@@ -150,12 +151,6 @@ public class InputScanner {
     return inputLine;
   }
 
-  private void assertAbort(String input) {
-    if (input.strip().equalsIgnoreCase("abort")) {
-      throw new AbortException();
-    }
-  }
-
   /**
    * Prompts the user for a floating-point number input.
    * If the input is blank or cannot be parsed as a float, an IllegalArgumentException is thrown.
@@ -171,6 +166,18 @@ public class InputScanner {
   public int nextInteger() {
     assertEmptyLine();
     return Integer.parseInt(nextLine());
+  }
+
+  private void assertUnitInput(String[] tokens) {
+    if (tokens.length < 2) {
+      throw new IllegalArgumentException("Missing unit inputs.");
+    }
+  }
+
+  private void assertAbort(String input) {
+    if (input.strip().equalsIgnoreCase("abort")) {
+      throw new AbortException();
+    }
   }
 
   /**

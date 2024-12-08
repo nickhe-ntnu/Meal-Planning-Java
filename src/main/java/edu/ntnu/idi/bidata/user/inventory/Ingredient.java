@@ -1,5 +1,6 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
+import edu.ntnu.idi.bidata.user.Printable;
 import edu.ntnu.idi.bidata.util.Utility;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
@@ -13,9 +14,9 @@ import java.util.Random;
  * name, amount, unit, expiry date, and standard unit price.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
-public class Ingredient {
+public class Ingredient implements Printable {
 
   private final Measurement measurement;
 
@@ -61,24 +62,22 @@ public class Ingredient {
     return isExpired() ? getExpiredString() : getString();
   }
 
+  // IntelliJ Generated
   @Override
-  public int hashCode() {
-    return Objects.hash(getName(), getExpiryDate(), getValue(), getMeasurement());
+  public final boolean equals(Object o) {
+    if (!(o instanceof Ingredient that))
+      return false;
+
+    return Float.compare(value, that.value) == 0 && Objects.equals(measurement, that.measurement) && Objects.equals(expiryDate, that.expiryDate);
   }
 
+  // IntelliJ Generated
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
-    Ingredient ingredient = (Ingredient) obj;
-    return getName().equals(ingredient.getName())
-        && Float.compare(getValue(), ingredient.getValue()) == 0
-        && getExpiryDate().equals(ingredient.getExpiryDate())
-        && getMeasurement().equals(ingredient.getMeasurement());
+  public int hashCode() {
+    int result = Objects.hashCode(measurement);
+    result = 31 * result + Objects.hashCode(expiryDate);
+    result = 31 * result + Float.hashCode(value);
+    return result;
   }
 
   /**

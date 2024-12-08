@@ -10,7 +10,7 @@ import java.util.List;
  * to the previous directory for a user.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
 public class GoCommand extends Command {
 
@@ -43,9 +43,12 @@ public class GoCommand extends Command {
    * Updates the current storage to the specified one if it exists, and prints a confirmation or failure message.
    */
   private void goTo() {
-    List<String> storageOverview = getInventoryManager().getStorageOverview();
-    getOutputHandler().printList(storageOverview, "bullet");
-    setArgumentIfEmpty("Please enter the storage name:");
+    if (isArgumentEmpty()) {
+      List<String> storageOverview = getInventoryManager().getStorageOverview();
+      getOutputHandler().printOutput("List of available storages:");
+      getOutputHandler().printList(storageOverview, "bullet");
+      setArgument("Please enter the storage name:");
+    }
     IngredientStorage ingredientStorage = getInventoryManager().getStorage(getArgument());
     boolean success = ingredientStorage != null;
     if (success) {

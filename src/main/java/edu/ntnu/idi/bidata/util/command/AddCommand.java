@@ -11,7 +11,7 @@ import edu.ntnu.idi.bidata.user.recipe.RecipeBuilder;
  * such as locations and storage entries for a given user.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
 public class AddCommand extends Command {
 
@@ -46,7 +46,9 @@ public class AddCommand extends Command {
    * creating the storage in the inventory manager, and printing the operation status.
    */
   private void addStorage() {
-    setArgumentIfEmpty("Please enter new storage name:");
+    if (isArgumentEmpty()) {
+      setArgument("Please enter a name for the new storage:");
+    }
     getInventoryManager().createIngredientStorage(getArgument());
     getOutputHandler().printOperationStatus(true, "added", getArgument());
   }
@@ -55,7 +57,9 @@ public class AddCommand extends Command {
    * Creates a new Ingredient using the inventory manager and adds it to the inventory.
    */
   private void addIngredient() {
-    setArgumentIfEmpty("Please enter the ingredient name:");
+    if (isArgumentEmpty()) {
+      setArgument("Please enter a name for the ingredient:");
+    }
     Ingredient createdIngredient = getInventoryManager().createIngredient(getArgument());
     getInventoryManager().addIngredientToCurrentStorage(createdIngredient);
     getOutputHandler().printOperationStatus(true, "added", getArgument());
@@ -66,6 +70,7 @@ public class AddCommand extends Command {
    */
   private void addRecipe() {
     Recipe createdRecipe = getRecipeManager().constructRecipe(new RecipeBuilder());
+    getOutputHandler().printOperationStatus(true, "added", createdRecipe.getName());
     getRecipeManager().addRecipe(createdRecipe);
   }
 

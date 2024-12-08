@@ -8,24 +8,12 @@ import java.util.Random;
  * A utility class providing methods to manipulate strings and objects.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
 public class Utility {
   private static Random random;
 
   private Utility() {
-  }
-
-  /**
-   * Returns a singleton instance of the Random class.
-   *
-   * @return a singleton Random object.
-   */
-  public static Random getInstanceOfRandom() {
-    if (random == null) {
-      random = new Random();
-    }
-    return random;
   }
 
   /**
@@ -89,5 +77,32 @@ public class Utility {
     }
 
     return capitalizedSentence.toString().strip();  // Trim the trailing space
+  }
+
+  /**
+   * Determines if the user wishes to continue based on the input string.
+   *
+   * @param input the input string from the user indicating their choice
+   * @return true if the input suggests continuation ('yes', 'y' or 'ja'), false otherwise
+   */
+  public static boolean isInputYes(String input) {
+    return switch (input) {
+      case String s when s.toLowerCase().contains("yes") -> true;
+      case String s when s.toLowerCase().contains("y") -> true;
+      case String s when s.toLowerCase().contains("ja") -> true;
+      case null, default -> false;
+    };
+  }
+
+  /**
+   * Returns a singleton instance of the Random class.
+   *
+   * @return a singleton Random object.
+   */
+  public static Random getInstanceOfRandom() {
+    if (random == null) {
+      random = new Random();
+    }
+    return random;
   }
 }

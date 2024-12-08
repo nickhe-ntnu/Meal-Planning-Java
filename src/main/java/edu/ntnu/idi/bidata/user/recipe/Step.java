@@ -3,13 +3,14 @@ package edu.ntnu.idi.bidata.user.recipe;
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a step in a recipe with cooking instructions and ingredients.
  * Each step requires the instruction, but the list of measurements is optional.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-08
  */
 public class Step {
   private String instruction;
@@ -28,6 +29,23 @@ public class Step {
       measurements.forEach(measurement -> stringBuilder.append("\n   - ").append(measurement));
     }
     return stringBuilder.toString();
+  }
+
+  // IntelliJ Generated
+  @Override
+  public final boolean equals(Object o) {
+    if (!(o instanceof Step step))
+      return false;
+
+    return Objects.equals(instruction, step.instruction) && Objects.equals(measurements, step.measurements);
+  }
+
+  // IntelliJ Generated
+  @Override
+  public int hashCode() {
+    int result = Objects.hashCode(instruction);
+    result = 31 * result + Objects.hashCode(measurements);
+    return result;
   }
 
   private boolean hasMeasurements() {

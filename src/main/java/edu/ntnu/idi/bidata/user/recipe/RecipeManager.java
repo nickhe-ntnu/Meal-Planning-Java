@@ -3,6 +3,7 @@ package edu.ntnu.idi.bidata.user.recipe;
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
+import edu.ntnu.idi.bidata.util.Utility;
 import edu.ntnu.idi.bidata.util.input.UnitInput;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-08
  */
 public class RecipeManager {
 
@@ -38,41 +39,10 @@ public class RecipeManager {
    * @return the newly created Recipe object
    */
   public Recipe constructRecipe(RecipeBuilder recipeBuilder) {
-    outputHandler.printInputPrompt("Please enter the recipe name");
-    recipeBuilder.setName(inputScanner.collectValidString());
-    outputHandler.printInputPrompt("Please enter the recipe description:");
-    recipeBuilder.setDescription(inputScanner.collectValidString());
-    boolean completeAddingSteps = false;
-    int stepCount = 1;
-    while (!completeAddingSteps) {
-      outputHandler.printInputPrompt("Please enter the instruction for step " + stepCount + ":");
-      String instruction = inputScanner.collectValidString();
-      ArrayList<Measurement> measurements = getMeasurements(stepCount);
-      recipeBuilder.addStep(new Step(instruction, measurements));
-      outputHandler.printInputPrompt("Do you want to add more steps? (Y/n");
-      completeAddingSteps = !inputScanner.collectValidString().equalsIgnoreCase("y");
-    }
+    initialRecipeName(recipeBuilder);
+    initialRecipeDescription(recipeBuilder);
+    initialSteps(recipeBuilder);
     return recipeBuilder.getRecipe();
-  }
-
-  private ArrayList<Measurement> getMeasurements(int stepCount) {
-    boolean completeAddingMeasurements = false;
-    ArrayList<Measurement> measurements = null;
-    while (!completeAddingMeasurements) {
-      measurements = new ArrayList<>();
-      outputHandler.printInputPrompt("Please enter the ingredient name:");
-      String ingredientName = inputScanner.collectValidString();
-      outputHandler.printInputPrompt("Please enter the amount + unit:");
-      UnitInput unitInput = inputScanner.collectValidUnitInput();
-      measurements.add(new Measurement(ingredientName, unitInput));
-      outputHandler.printInputPrompt("Add more ingredients to step " + stepCount + " ? (Y/n)");
-      completeAddingMeasurements = !inputScanner.collectValidString().equalsIgnoreCase("y");
-    }
-    return measurements;
-  }
-
-  public List<String> getRecipeOverview() {
-    return cookBook.getRecipeOverview();
   }
 
   /**
@@ -86,5 +56,95 @@ public class RecipeManager {
 
   public List<Recipe> findRecipe(String name) {
     return cookBook.findRecipesContainingName(name);
+  }
+
+  public List<String> getRecipeOverview() {
+    return cookBook.getRecipeOverview();
+  }
+
+  /**
+   * Prompts the user to input a name for the recipe and sets it in the RecipeBuilder.
+   *
+   * @param recipeBuilder the RecipeBuilder instance used to set the recipe's name
+   */
+  private void initialRecipeName(RecipeBuilder recipeBuilder) {
+    outputHandler.printInputPrompt("Please enter a name for the recipe:");
+    recipeBuilder.setName(inputScanner.collectValidString());
+  }
+
+  /**
+   * Prompts the user to enter a description for the recipe and sets it in the RecipeBuilder.
+   *
+   * @param recipeBuilder the RecipeBuilder instance used to set the recipe's description
+   */
+  private void initialRecipeDescription(RecipeBuilder recipeBuilder) {
+    outputHandler.printInputPrompt("Please enter the recipe description:");
+    recipeBuilder.setDescription(inputScanner.collectValidString());
+  }
+
+  /**
+   * Iteratively prompts the user to add steps to a recipe until the user opts to stop.
+   *
+   * @param recipeBuilder the RecipeBuilder instance used to construct the recipe by adding steps
+   */
+  private void initialSteps(RecipeBuilder recipeBuilder) {
+    boolean keepAdding = true;
+    int stepCount = 1;
+    while (keepAdding) {
+      initialIndividuateStep(recipeBuilder, stepCount);
+      outputHandler.printInputPrompt("Do you want to add more steps? (Y/n)");
+      keepAdding = Utility.isInputYes(inputScanner.collectValidString());
+      stepCount++;
+    }
+  }
+
+  /**
+   * Adds a step to the recipe being constructed using the given RecipeBuilder.
+   * Prompts the user for step instructions and associated measurements.
+   *
+   * @param recipeBuilder the RecipeBuilder instance for constructing the recipe
+   * @param stepCount     the current step number for which instructions are being added
+   */
+  private void initialIndividuateStep(RecipeBuilder recipeBuilder, int stepCount) {
+    outputHandler.printInputPrompt("Please enter the instruction for step " + stepCount + ":");
+    String instruction = inputScanner.collectValidString();
+    outputHandler.printInputPrompt("Does step nr " + stepCount + " have any ingredients? (Y/n)");
+    ArrayList<Measurement> measurements = null;
+    if (Utility.isInputYes(inputScanner.collectValidString())) {
+      measurements = getMeasurements(stepCount);
+    }
+    recipeBuilder.addStep(new Step(instruction, measurements));
+  }
+
+  /**
+   * Iteratively collects measurements from the user by prompting for ingredient details,
+   * until the user decides to stop.
+   *
+   * @param stepCount the current recipe step number for which measurements are being collected
+   * @return an ArrayList of Measurement objects representing the collected ingredient measurements
+   */
+  private ArrayList<Measurement> getMeasurements(int stepCount) {
+    boolean keepAdding = true;
+    ArrayList<Measurement> measurements = new ArrayList<>();
+    while (keepAdding) {
+      initialIndividuateMeasurement(measurements);
+      outputHandler.printInputPrompt("Add more ingredients to step " + stepCount + " ? (Y/n)");
+      keepAdding = Utility.isInputYes(inputScanner.collectValidString());
+    }
+    return measurements;
+  }
+
+  /**
+   * Prompts the user to input an ingredient name and a unit measurement,
+   * then adds a new Measurement to the provided list.
+   *
+   * @param measurements the list of Measurement objects to which a new measurement will be added
+   */
+  private void initialIndividuateMeasurement(ArrayList<Measurement> measurements) {
+    outputHandler.printInputPrompt("Please enter the ingredient name:");
+    String ingredientName = inputScanner.collectValidString();
+    outputHandler.printInputPrompt("Please enter the amount + unit:");
+    UnitInput unitInput = inputScanner.collectValidUnitInput();
+    measurements.add(new Measurement(ingredientName, unitInput));
   }
 }

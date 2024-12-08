@@ -11,7 +11,7 @@ import java.util.Objects;
  * Represents a measurement with a name, amount, unit, and ingredient type.
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-08
  */
 public class Measurement {
   private String name; // Ingredient Name
@@ -42,51 +42,26 @@ public class Measurement {
 
   @Override
   public String toString() {
-
     return getAmount() + " " + getUnit().name().toLowerCase() + " " + getName();
   }
 
-  /**
-   * Generates a hash code for the Measurement object based on its fields.
-   *
-   * @return an integer hash code derived from amount, validUnit, and ingredientType.
-   */
+  // IntelliJ Generated
   @Override
-
-  public int hashCode() {
-    return Objects.hash(name, amount, unit, ingredientType);
-  }
-
-  /**
-   * Compares this measurement to the specified object for equality.
-   *
-   * @param obj the object to compare with this measurement
-   * @return true if the specified object is equal to this measurement, false otherwise
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null || getClass() != obj.getClass()) {
+  public final boolean equals(Object o) {
+    if (!(o instanceof Measurement that))
       return false;
-    }
-    Measurement m = (Measurement) obj;
-    return Float.compare(getAmount(), m.getAmount()) == 0
-        && getName().equals(m.getName())
-        && getUnit().equals(m.getUnit());
+
+    return Float.compare(amount, that.amount) == 0 && Objects.equals(name, that.name) && unit == that.unit && ingredientType == that.ingredientType;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public List<Object> getStandardMeasurement() {
-    return UnitConverter.getStandardData(this);
+  // IntelliJ Generated
+  @Override
+  public int hashCode() {
+    int result = Objects.hashCode(name);
+    result = 31 * result + Float.hashCode(amount);
+    result = 31 * result + Objects.hashCode(unit);
+    result = 31 * result + Objects.hashCode(ingredientType);
+    return result;
   }
 
   /**
@@ -109,6 +84,18 @@ public class Measurement {
     if (mergedAmount >= 1000) {
       UnitConverter.convertToStandard(this);
     }
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public List<Object> getStandardMeasurement() {
+    return UnitConverter.getStandardData(this);
   }
 
   /**
