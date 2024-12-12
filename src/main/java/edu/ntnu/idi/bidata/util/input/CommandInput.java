@@ -6,7 +6,7 @@ import edu.ntnu.idi.bidata.util.command.ValidCommand;
  * Represents a command input consisting of a main command, a subcommand, and an argument.
  *
  * @author Nick Heggø
- * @version 2024-12-04
+ * @version 2024-12-12
  */
 public class CommandInput {
   private ValidCommand command;
@@ -14,7 +14,7 @@ public class CommandInput {
   private String argument;
 
   /**
-   * Constructs a Command object with the specified primary command word and an optional sub-command.
+   * Constructs a Command object with the specified primary command word and a sub-command.
    *
    * @param command    The main command word represented by the ValidCommand enum.
    * @param subcommand The optional sub-command as a string.

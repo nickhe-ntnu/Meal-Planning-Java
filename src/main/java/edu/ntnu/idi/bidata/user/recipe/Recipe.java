@@ -19,6 +19,10 @@ public class Recipe implements Printable {
   private String name;
   private String description;
 
+  /**
+   * Constructs a new Recipe with no name, description, or steps.
+   * Initializes an empty list for storing steps.
+   */
   public Recipe() {
     steps = new ArrayList<>();
   }
@@ -35,10 +39,12 @@ public class Recipe implements Printable {
 
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof Recipe recipe))
+    if (!(o instanceof Recipe recipe)) {
       return false;
-
-    return steps.equals(recipe.steps) && name.equals(recipe.name) && description.equals(recipe.description);
+    }
+    return steps.equals(recipe.steps)
+        && name.equals(recipe.name)
+        && description.equals(recipe.description);
   }
 
   // IntelliJ Generated
@@ -59,7 +65,8 @@ public class Recipe implements Printable {
     List<Step> stepList = getSteps();
     for (int i = 0; i < stepList.size(); i++) {
       int index = i + 1;
-      stringBuilder.append("\n").append(index).append(Utility.getOrdinalSuffix(index)).append(" step: ")
+      stringBuilder.append("\n").append(index)
+          .append(Utility.getOrdinalSuffix(index)).append(" step: ")
           .append(stepList.get(i));
     }
     // the output will look like -> "1st step: " + step.toString()
@@ -97,11 +104,23 @@ public class Recipe implements Printable {
     steps.add(step);
   }
 
+  /**
+   * Removes a specific step from the recipe based on its index.
+   *
+   * @param stepNumber the index of the step to remove; must be within the bounds of the steps list
+   * @throws IllegalArgumentException if the stepNumber is out of valid bounds
+   */
   public void removeStep(int stepNumber) {
     assertIndexWithInBounds(stepNumber);
     steps.remove(stepNumber);
   }
 
+  /**
+   * Retrieves all measurements from the list of steps in the recipe.
+   * Combines and returns all measurements found in the steps, if any.
+   *
+   * @return a list of Measurement objects collected from all steps in the recipe.
+   */
   public List<Measurement> getAllMeasurement() {
     ArrayList<Measurement> measurements = new ArrayList<>();
     for (Step step : steps) {

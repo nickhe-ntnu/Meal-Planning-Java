@@ -14,7 +14,7 @@ import java.util.Random;
  * name, amount, unit, expiry date, and standard unit price.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class Ingredient implements Printable {
 
@@ -65,10 +65,12 @@ public class Ingredient implements Printable {
   // IntelliJ Generated
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof Ingredient that))
+    if (!(o instanceof Ingredient that)) {
       return false;
-
-    return Float.compare(value, that.value) == 0 && Objects.equals(measurement, that.measurement) && Objects.equals(expiryDate, that.expiryDate);
+    }
+    return Float.compare(value, that.value) == 0
+        && Objects.equals(measurement, that.measurement)
+        && Objects.equals(expiryDate, that.expiryDate);
   }
 
   // IntelliJ Generated
@@ -78,6 +80,29 @@ public class Ingredient implements Printable {
     result = 31 * result + Objects.hashCode(expiryDate);
     result = 31 * result + Float.hashCode(value);
     return result;
+  }
+
+  /**
+   * Retrieves the name of the measurement.
+   *
+   * @return the name as a string.
+   */
+  public String getName() {
+    return measurement.getName();
+  }
+
+  /**
+   * Sets the name of the measurement.
+   * The name must not be null or empty.
+   *
+   * @param name the name of the measurement
+   * @throws IllegalArgumentException if the name is null or empty
+   */
+  public void setName(String name) {
+    if (name == null || name.isBlank()) {
+      throw new IllegalArgumentException("Name cannot be null or empty");
+    }
+    measurement.setName(name);
   }
 
   /**
@@ -122,38 +147,17 @@ public class Ingredient implements Printable {
     return LocalDate.now().isAfter(expiryDate);
   }
 
-  /**
-   * Retrieves the name of the measurement.
-   *
-   * @return the name as a string.
-   */
-  public String getName() {
-    return measurement.getName();
-  }
-
-  /**
-   * Sets the name of the measurement.
-   * The name must not be null or empty.
-   *
-   * @param name the name of the measurement
-   * @throws IllegalArgumentException if the name is null or empty
-   */
-  public void setName(String name) {
-    if (name == null || name.isBlank()) {
-      throw new IllegalArgumentException("Name cannot be null or empty");
-    }
-    measurement.setName(name);
-  }
-
   private String getString() {
     int dayTilExpiry = getDaysBetween(this.getExpiryDate());
     return "  - " + getName() + ": " + getAmount()
         + " " + getUnit()
-        + " - Best before: " + expiryDate + " (in " + dayTilExpiry + " days) Value: " + getValue() + " kr";
+        + " - Best before: " + expiryDate
+        + " (in " + dayTilExpiry + " days) Value: " + getValue() + " kr";
   }
 
   /**
-   * Generates a string detailing the ingredient's name, amount, unit, expiry date, and how many days it has been expired.
+   * Generates a string detailing the ingredient's name, amount, unit, expiry date,
+   * and how many days it has been expired.
    *
    * @return a formatted string describing the expired ingredient
    */
@@ -231,7 +235,6 @@ public class Ingredient implements Printable {
    * Retrieve the unit of the ingredient.
    *
    * @return the unit of the ingredient if it is set,
-   * otherwise returns {@code ValidUnit.UNKNOWN}
    */
   public ValidUnit getUnit() {
     return getMeasurementUnit();
@@ -265,8 +268,8 @@ public class Ingredient implements Printable {
    * @throws RuntimeException if the provided password does not match the required value
    */
   private void validatePassword(String password) {
-    final String EXPIRED_PASSWORD = "expiredDemo";
-    if (!password.equals(EXPIRED_PASSWORD)) {
+    final String expiredPassword = "expiredDemo";
+    if (!password.equals(expiredPassword)) {
       throw new IllegalArgumentException("Wrong password for demo constructor. Action prohibited.");
     }
   }
@@ -326,7 +329,8 @@ public class Ingredient implements Printable {
   }
 
   /**
-   * Checks if the expiry date of the current ingredient is the same as the expiry date of the specified ingredient.
+   * Checks if the expiry date of the current ingredient is the same as the expiry date
+   * of the specified ingredient.
    *
    * @param ingredientToMerge the ingredient to compare expiry dates with
    * @return true if both ingredients have the same expiry date, false otherwise

@@ -24,6 +24,13 @@ public class InventoryManager {
   private final Stack<IngredientStorage> history;
   private IngredientStorage currentStorage;
 
+  /**
+   * Constructs an InventoryManager object with the specified input and output handlers.
+   * Initializes the storage map and history for tracking inventory states.
+   *
+   * @param inputScanner  The InputScanner instance for reading user inputs.
+   * @param outputHandler The OutputHandler instance for displaying outputs.
+   */
   public InventoryManager(InputScanner inputScanner, OutputHandler outputHandler) {
     this.inputScanner = inputScanner;
     this.outputHandler = outputHandler;
@@ -31,6 +38,12 @@ public class InventoryManager {
     history = new Stack<>();
   }
 
+  /**
+   * Retrieves the ingredient storage associated with the specified storage name.
+   *
+   * @param storageName The name of the ingredient storage to retrieve.
+   * @return The corresponding IngredientStorage object if it exists in the storage map.
+   */
   public IngredientStorage getStorage(String storageName) {
     return storageMap.get(Utility.createKey(storageName));
   }
@@ -50,6 +63,12 @@ public class InventoryManager {
     return new Ingredient(ingredientName, amount, unit, value, daysUntilExpiry);
   }
 
+  /**
+   * Searches for the specified ingredient across all storages and displays the results,
+   * including the storage name and the list of matching ingredients in a bullet format.
+   *
+   * @param ingredientName The name of the ingredient to search for in all storages.
+   */
   public void findIngredientFromAll(String ingredientName) {
     for (IngredientStorage storage : storageMap.values()) {
       List<Ingredient> ingredientList = storage.findIngredient(ingredientName);
@@ -60,6 +79,14 @@ public class InventoryManager {
     }
   }
 
+  /**
+   * Identifies and returns the names of ingredient storages where all specified measurements
+   * are sufficiently available.
+   *
+   * @param measurements A list of Measurement objects representing the required ingredients
+   *                     and their quantities.
+   * @return A list of strings containing the names of storages that meet the requirements.
+   */
   public List<String> findSufficientStorages(List<Measurement> measurements) {
     ArrayList<IngredientStorage> listOfSufficientStorage = new ArrayList<>();
     for (IngredientStorage storage : storageMap.values()) {
@@ -82,11 +109,20 @@ public class InventoryManager {
     currentStorage.addIngredient(ingredientToBeAdded);
   }
 
+  /**
+   * Removes an ingredient from the current storage after validating its existence.
+   * If multiple ingredients match, prompts the user to select one.
+   *
+   * @param ingredientName The name of the ingredient to remove from the current storage.
+   * @throws IllegalArgumentException if the ingredient does not exist in the current storage,
+   *                                  or if an invalid index is provided during selection.
+   */
   public void removeIngredientFromCurrent(String ingredientName) {
     assertInventoryIsAvailable();
     List<Ingredient> ingredientList = findIngredientFromCurrent(ingredientName);
     if (ingredientList == null) {
-      throw new IllegalArgumentException("There is no " + ingredientName + " at " + currentStorage.getStorageName());
+      throw new IllegalArgumentException("There is no " + ingredientName + " at "
+          + currentStorage.getStorageName());
     }
 
     // passed all checks
@@ -106,15 +142,32 @@ public class InventoryManager {
     outputHandler.printOperationStatus(true, "removed", ingredientName);
   }
 
+  /**
+   * Finds and retrieves a list of ingredients from the current storage that match the name.
+   *
+   * @param ingredientName The name of the ingredient to search for in the current storage.
+   * @return A list of Ingredient objects matching the specified name found in the current storage.
+   */
   public List<Ingredient> findIngredientFromCurrent(String ingredientName) {
     assertInventoryIsAvailable();
     return currentStorage.getIngredientList(ingredientName);
   }
 
+  /**
+   * Removes the storage with the specified name from the storage map.
+   *
+   * @param storageName The name of the storage to be removed.
+   * @return true if the storage was successfully removed, or false if it did not exist.
+   */
   public boolean removeStorage(String storageName) {
     return storageMap.remove(Utility.createKey(storageName)) != null;
   }
 
+  /**
+   * Removes all expired ingredients from the current storage and calculates their total value.
+   *
+   * @return The total value of the removed expired ingredients as a float.
+   */
   public float removeAllExpired() {
     assertInventoryIsAvailable();
     List<Ingredient> expired = currentStorage.getAllExpired();
@@ -155,6 +208,12 @@ public class InventoryManager {
         .toList();
   }
 
+  /**
+   * Calculates the total value of all ingredients across all storages and returns it as a string.
+   *
+   * @return A string indicating the total value of the inventory rounded to two decimal places,
+   * followed by "kr."
+   */
   public String getTotalValue() {
     float sum = storageMap.values().stream()
         .map(IngredientStorage::getAllValue)
@@ -163,6 +222,12 @@ public class InventoryManager {
     return "Inventory has total value of: " + sum + " kr.";
   }
 
+  /**
+   * Compiles and returns a string representation of the entire inventory,
+   * including information from all storages in the inventory map.
+   *
+   * @return A formatted string detailing all storages and their respective contents.
+   */
   public String getInventoryString() {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append("###### Inventory #######");
@@ -171,10 +236,19 @@ public class InventoryManager {
     return stringBuilder.toString();
   }
 
+  /**
+   * Retrieves the history of previous ingredient storages.
+   *
+   * @return A stack containing the history of IngredientStorage objects.
+   */
   public Stack<IngredientStorage> getHistory() {
     return history;
   }
 
+  /**
+   * Retrieves a string representation of the current storage, including its contents and details.
+   * Throws an exception if no storage is currently selected.
+   **/
   public String getStorageString() {
     if (currentStorage == null) {
       throw new IllegalArgumentException("You're currently not in a storage, use the 'go' command");
@@ -185,6 +259,12 @@ public class InventoryManager {
     return stringBuilder.toString();
   }
 
+  /**
+   * Compiles and returns a formatted string listing all ingredient storages.
+   * The string contains a header and each storage name on a new line, prefixed with "# ".
+   *
+   * @return A string representation of all storage names, formatted with a header and prefixes.
+   */
   public String getStorageNameString() {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append("####### Storages #######");
@@ -194,14 +274,30 @@ public class InventoryManager {
     return stringBuilder.toString();
   }
 
+  /**
+   * Retrieves the currently selected ingredient storage.
+   *
+   * @return The current IngredientStorage object.
+   */
   public IngredientStorage getCurrentStorage() {
     return currentStorage;
   }
 
+  /**
+   * Sets the current storage to the specified IngredientStorage instance.
+   *
+   * @param storage The IngredientStorage object to be set as the current storage.
+   */
   public void setCurrentStorage(IngredientStorage storage) {
     currentStorage = storage;
   }
 
+  /**
+   * Sets the current storage to the specified storage by name.
+   * If a storage with the given name exists, it is set as the current storage.
+   *
+   * @param storageName The name of the storage to set as the current storage.
+   */
   public void setCurrentStorage(String storageName) {
     IngredientStorage storage = getStorage(Utility.createKey(storageName));
     if (storage != null) {
@@ -225,6 +321,12 @@ public class InventoryManager {
     return stringBuilder.toString();
   }
 
+  /**
+   * Collects and returns the number of days until expiry based on user input.
+   * Ensures the input is a valid integer greater than or equal to -1.
+   *
+   * @return The number of days until expiry as an integer.
+   */
   private int collectDaysUntilExpiry() {
     int daysTilExpiry;
     do {
@@ -234,6 +336,12 @@ public class InventoryManager {
     return daysTilExpiry;
   }
 
+  /**
+   * Collects a valid ingredient value from the user.
+   * Prompts the user until a non-negative float value is entered.
+   *
+   * @return The collected ingredient value as a float.
+   */
   private float collectIngredientValue() {
     float value;
     do {
@@ -243,6 +351,12 @@ public class InventoryManager {
     return value;
   }
 
+  /**
+   * Collects a numerical amount and its corresponding unit from user input.
+   * Repeatedly prompts the user until valid input is provided.
+   *
+   * @return A UnitInput object containing the parsed amount and unit.
+   */
   private UnitInput collectAmountAndUnit() {
     UnitInput input = null;
     boolean validInput = false;
@@ -266,7 +380,8 @@ public class InventoryManager {
    */
   private void assertInventoryIsAvailable() {
     if (currentStorage == null) {
-      throw new IllegalArgumentException("You are currently not in an inventory, please use the 'go' command.");
+      throw new IllegalArgumentException("You are currently not in an inventory,"
+          + " please use the 'go' command.");
     }
   }
 

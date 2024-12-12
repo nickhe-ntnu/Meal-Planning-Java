@@ -11,13 +11,28 @@ import edu.ntnu.idi.bidata.util.input.CommandInput;
  * is printed using the provided OutputHandler instance.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-12
  */
 public class IllegalCommandCombinationException extends RuntimeException {
+
+  /**
+   * Constructor for IllegalCommandCombinationException.
+   * Initializes an exception with a message indicating the invalid combination of commands.
+   *
+   * @param command    the main command that caused the exception
+   * @param subcommand the subcommand that caused the exception
+   */
   public IllegalCommandCombinationException(ValidCommand command, String subcommand) {
-    super("Invalid command combination: '" + Utility.createKey(command.name()) + "' + '" + subcommand + "'");
+    super("Invalid command combination: '"
+        + Utility.createKey(command.name()) + "' + '" + subcommand + "'");
   }
 
+  /**
+   * Constructs an IllegalCommandCombinationException with a message
+   * indicating an invalid combination of a command and subcommand.
+   *
+   * @param commandInput the input containing the main command and subcommand
+   */
   public IllegalCommandCombinationException(CommandInput commandInput) {
     super("Invalid command combination: '" + Utility.createKey(commandInput.getCommand().name())
         + "' + '" + commandInput.getSubcommand() + "'");

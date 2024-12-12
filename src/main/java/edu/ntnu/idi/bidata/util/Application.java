@@ -39,7 +39,8 @@ public class Application {
   }
 
   /**
-   * Starts the application by displaying the help string and entering a loop to process user commands.
+   * Starts the application by displaying the help string
+   * and entering a loop to process user commands.
    * The loop continues until a command causes the application to exit.
    * It handles any exceptions by printing the error messages.
    */
@@ -51,6 +52,9 @@ public class Application {
     engine();
   }
 
+  /**
+   * Terminates the application by displaying a goodbye message and stopping the execution loop.
+   */
   public void terminate() {
     outputHandler.printGoodbyeMessage();
     running = false;
@@ -91,7 +95,6 @@ public class Application {
     inventoryManager.setCurrentStorage((IngredientStorage) null);
 
     // Default recipe
-    RecipeManager recipeManager = user.getRecipeManager();
     RecipeBuilder builder = new RecipeBuilder();
     List<Measurement> measurements = List.of(
         new Measurement("Flour", 500, ValidUnit.G),
@@ -102,6 +105,7 @@ public class Application {
     builder.setDescription("Best cookie you will ever taste.");
     builder.addStep(new Step("Combine everything in a bowl", measurements));
     builder.addStep(new Step("And enjoy!", null));
+    RecipeManager recipeManager = user.getRecipeManager();
     recipeManager.addRecipe(builder.getRecipe());
     // second recipe
     builder.setName("Cookie Dough v2");

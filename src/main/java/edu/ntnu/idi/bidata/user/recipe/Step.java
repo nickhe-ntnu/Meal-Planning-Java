@@ -10,12 +10,18 @@ import java.util.Objects;
  * Each step requires the instruction, but the list of measurements is optional.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class Step {
   private String instruction;
   private List<Measurement> measurements;
 
+  /**
+   * Constructs a Step with the specified instruction and list of measurements.
+   *
+   * @param instruction  the cooking instruction for this step; must not be null or blank
+   * @param measurements the list of Measurement objects associated with this step
+   */
   public Step(String instruction, List<Measurement> measurements) {
     setMeasurements(measurements);
     setInstruction(instruction);
@@ -34,10 +40,12 @@ public class Step {
   // IntelliJ Generated
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof Step step))
+    if (!(o instanceof Step step)) {
       return false;
+    }
 
-    return Objects.equals(instruction, step.instruction) && Objects.equals(measurements, step.measurements);
+    return Objects.equals(instruction, step.instruction)
+        && Objects.equals(measurements, step.measurements);
   }
 
   // IntelliJ Generated
@@ -48,14 +56,11 @@ public class Step {
     return result;
   }
 
-  private boolean hasMeasurements() {
-    return getMeasurements() != null && !getMeasurements().isEmpty();
-  }
-
   /**
    * Retrieves the map of ingredient measurements for this step.
    *
-   * @return a map where the key is a string representing the ingredient name, and the value is a Measurement object.
+   * @return a map where the key is a string representing the ingredient name,
+   *         and the value is a Measurement object.
    */
   public List<Measurement> getMeasurements() {
     return measurements;
@@ -92,5 +97,9 @@ public class Step {
       throw new IllegalArgumentException("Step instruction cannot be blank.");
     }
     this.instruction = instruction;
+  }
+
+  private boolean hasMeasurements() {
+    return getMeasurements() != null && !getMeasurements().isEmpty();
   }
 }

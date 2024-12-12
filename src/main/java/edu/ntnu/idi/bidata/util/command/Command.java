@@ -85,10 +85,12 @@ public abstract class Command {
   /**
    * If command and subcommand don't match anything, it should be called this method.
    *
-   * @throws IllegalCommandCombinationException indicating an illegal combination of command and subcommand.
+   * @throws IllegalCommandCombinationException indicating an illegal combination
+   *                                            of command and subcommand.
    */
   protected void illegalCommand() {
-    throw new IllegalCommandCombinationException(user.getCommandInput().getCommand(), user.getCommandInput().getSubcommand());
+    throw new IllegalCommandCombinationException(user.getCommandInput().getCommand(),
+        user.getCommandInput().getSubcommand());
   }
 
   /**
@@ -112,7 +114,7 @@ public abstract class Command {
     getOutputHandler().printInputPrompt("Please select an option:");
     int index = -1;
     while (index < 0 || index > listSize - 1) {
-      index = getInputScanner().collectValidInteger() - 1; // index start at 0, displays to user from 1
+      index = getInputScanner().collectValidInteger() - 1; // index start at 0
     }
     return index;
   }
@@ -136,7 +138,8 @@ public abstract class Command {
   }
 
   /**
-   * Retrieves the current instance of InventoryManager used for managing inventory-related operations.
+   * Retrieves the current instance of InventoryManager
+   * used for managing inventory-related operations.
    *
    * @return the InventoryManager associated with this command.
    */

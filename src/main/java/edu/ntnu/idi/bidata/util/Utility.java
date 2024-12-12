@@ -58,7 +58,8 @@ public class Utility {
    * Capitalizes the first letter of each word in the provided input string.
    *
    * @param input the string to process, where each word's first letter will be capitalized
-   * @return a new string with each word's first letter capitalized, or the original string if it is null or empty
+   * @return a new string with each word's first letter capitalized,
+   *         or the original string if it is null or empty
    */
   public static String capitalizeEachWord(String input) {
     if (input == null || input.isEmpty()) {
@@ -106,6 +107,12 @@ public class Utility {
     return random;
   }
 
+  /**
+   * Rounds a float value to two decimal places.
+   *
+   * @param input the float value to be rounded
+   * @return the rounded float value with two decimal places
+   */
   public static float roundToTwoDecimal(float input) {
     return (float) Math.round(input * 100) / 100;
   }

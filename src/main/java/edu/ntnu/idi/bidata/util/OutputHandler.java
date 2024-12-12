@@ -17,6 +17,10 @@ public class OutputHandler {
       Hello, %s
       Thank you for using the meal planning app!""";
 
+  /**
+   * Default constructor for the OutputHandler class.
+   * Initializes an instance of OutputHandler for handling console output operations.
+   */
   public OutputHandler() {
     // default implementation
   }
@@ -125,7 +129,8 @@ public class OutputHandler {
       }
     } else if (style.strip().equalsIgnoreCase("suffix")) {
       for (int index = 0; index < listToPrint.size(); index++) {
-        printOutput(" " + (index + 1) + Utility.getOrdinalSuffix(index + 1) + ": " + listToPrint.get(index));
+        printOutput(" " + (index + 1) + Utility.getOrdinalSuffix(index + 1)
+            + ": " + listToPrint.get(index));
       }
     }
   }

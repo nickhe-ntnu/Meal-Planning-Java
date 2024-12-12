@@ -4,7 +4,7 @@ import edu.ntnu.idi.bidata.util.Application;
 
 /**
  * The Launcher class serves as the entry point for the meal planning application.
- * It instantiates the Application class and starts the application by calling its initialize method.
+ * It instantiates the Application class and starts the application.
  *
  * @author Nick Heggø
  * @version 2024-12-12

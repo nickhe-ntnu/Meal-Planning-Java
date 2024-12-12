@@ -38,7 +38,7 @@ public class GoCommand extends Command {
   }
 
   /**
-   * Processes the subcommand retrieved from the command input and executes the corresponding method.
+   * Processes the subcommand retrieved from the command input and executes the matching method.
    * If the subcommand is "to", it navigates to the specified storage using goTo().
    * If the subcommand is "back", it navigates to the previous storage using goBack().
    * If the subcommand is invalid or unrecognized, it invokes illegalCommand().
@@ -53,8 +53,9 @@ public class GoCommand extends Command {
 
   /**
    * Navigates to the specified ingredient storage within the inventory.
-   * Lists all available storages and prompts the user to enter the desired storage name if not provided.
-   * Updates the current storage to the specified one if it exists, and prints a confirmation or failure message.
+   * Lists all available storages and prompts the user to enter the storage name if not provided.
+   * Updates the current storage to the specified one if it exists,
+   * and prints a confirmation or failure message.
    */
   private void goTo() {
     if (isArgumentEmpty()) {
@@ -75,7 +76,7 @@ public class GoCommand extends Command {
   /**
    * Navigates back to the previous storage in the history.
    * If the history is empty, a message is printed indicating no available history to navigate.
-   * Updates the current storage and prints a message indicating the success or failure of the operation.
+   * Updates the current storage and prints a message indicating the status of the operation.
    */
   private void goBack() {
     if (getHistory().isEmpty()) {
@@ -112,7 +113,8 @@ public class GoCommand extends Command {
    */
   private void printOperationMessage(boolean success) {
     if (success) {
-      getOutputHandler().printOutput("You are now at " + getInventoryManager().getCurrentStorage().getStorageName());
+      getOutputHandler().printOutput("You are now at "
+          + getInventoryManager().getCurrentStorage().getStorageName());
     } else {
       getOutputHandler().printOutput("Fail to locate destination " + getArgument());
     }

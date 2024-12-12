@@ -9,11 +9,13 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 import java.util.Scanner;
 
 /**
- * The InputScanner class is responsible for reading and interpreting user input from the terminal window.
- * It is designed to parse input into predefined commands, subcommands, and additional input strings.
+ * The InputScanner class is responsible for reading
+ * and interpreting user input from the terminal window.
+ * It is designed to parse input into predefined commands, subcommands,
+ * and additional input strings.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class InputScanner {
   private final OutputHandler outputHandler;
@@ -88,7 +90,8 @@ public class InputScanner {
       try {
         unitInput = fetchUnit();
       } catch (IllegalArgumentException e) {
-        outputHandler.printInputPrompt("Invalid input format, accepted format are: {float} + {unit}");
+        outputHandler.printInputPrompt("Invalid input format,"
+            + " accepted format are: {float} + {unit}");
       }
     }
     return unitInput;
@@ -113,6 +116,13 @@ public class InputScanner {
     return input;
   }
 
+  /**
+   * Continuously prompts the user for a valid floating-point input
+   * until a non-negative value is provided.
+   * If the input is invalid, retries are prompted with an error message.
+   *
+   * @return a valid non-negative floating-point number entered by the user.
+   */
   public float collectValidFloat() {
     float input = -1.0f;
     while (input < 0f) {
@@ -125,6 +135,12 @@ public class InputScanner {
     return input;
   }
 
+  /**
+   * Continuously prompts the user until a valid non-negative integer is provided.
+   * Invalid inputs trigger an error message and re-prompt the user.
+   *
+   * @return a valid non-negative integer entered by the user.
+   */
   public int collectValidInteger() {
     int result = -1;
     while (result < 0) {
@@ -163,17 +179,36 @@ public class InputScanner {
     return Float.parseFloat(nextLine());
   }
 
+  /**
+   * Parses the next line of input and returns it as an integer.
+   *
+   * @return the next input line converted to an integer.
+   * @throws IllegalArgumentException if no input is found or the input cannot be parsed as an int.
+   */
   public int nextInteger() {
     assertEmptyLine();
     return Integer.parseInt(nextLine());
   }
 
+  /**
+   * Validates the provided tokens array to ensure it contains at least two elements.
+   *
+   * @param tokens an array of strings representing the user input tokens
+   * @throws IllegalArgumentException if the array has fewer than two elements
+   */
   private void assertUnitInput(String[] tokens) {
     if (tokens.length < 2) {
       throw new IllegalArgumentException("Missing unit inputs.");
     }
   }
 
+  /**
+   * Checks if the provided input is equal to "abort" (case-insensitive)
+   * and throws an AbortException if true.
+   *
+   * @param input the input string to be validated
+   * @throws AbortException if the input equals "abort" (ignoring case)
+   */
   private void assertAbort(String input) {
     if (input.strip().equalsIgnoreCase("abort")) {
       throw new AbortException();

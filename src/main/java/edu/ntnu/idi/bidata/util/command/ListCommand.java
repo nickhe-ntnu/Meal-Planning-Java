@@ -16,6 +16,13 @@ import java.util.List;
  * @version 2024-12-12
  */
 public class ListCommand extends Command {
+
+  /**
+   * Constructs a ListCommand for the specified user,
+   * enabling execution of commands related to listing resources.
+   *
+   * @param user The user associated with this command.
+   */
   public ListCommand(User user) {
     super(user);
   }
@@ -70,7 +77,8 @@ public class ListCommand extends Command {
 
   /**
    * Lists the names of the ingredient storages.
-   * Retrieves the names from the InventoryManager as a formatted string and prints it using the OutputHandler.
+   * Retrieves the names from the InventoryManager as a formatted string
+   * and prints it using the OutputHandler.
    */
   private void listName() {
     getOutputHandler().printOutputWithLineBreak(getInventoryManager().getStorageNameString());
@@ -106,7 +114,8 @@ public class ListCommand extends Command {
     if (recipeList == null || recipeList.isEmpty()) {
       outputHandler.printOutput("There are currently 0 recipes in the system.");
     } else {
-      outputHandler.printOutput("There are currently " + recipeList.size() + " recipes in the system.");
+      outputHandler.printOutput("There are currently "
+          + recipeList.size() + " recipes in the system.");
       outputHandler.printList(recipeList, "bullet");
     }
   }
@@ -136,14 +145,15 @@ public class ListCommand extends Command {
       boolean anyAvailable = false;
       for (Recipe recipe : recipeList) {
         List<Measurement> measurements = recipe.getAllMeasurement();
-        List<String> listOfSufficientStorages = getInventoryManager().findSufficientStorages(measurements);
+        List<String> listOfSufficientStorages = getInventoryManager()
+            .findSufficientStorages(measurements);
         if (!listOfSufficientStorages.isEmpty()) {
           outputHandler.printOutput("There is enough ingredient for " + recipe.getName() + " at:");
           outputHandler.printList(listOfSufficientStorages, "bullet");
           anyAvailable = true;
         }
       }
-      if (anyAvailable == false) {
+      if (!anyAvailable) {
         getOutputHandler().printOutput("You don't have enough ingredient at the moment.");
       }
     }

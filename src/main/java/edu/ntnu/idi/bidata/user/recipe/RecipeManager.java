@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Manages the creation, storage, and retrieval of recipes. Provides functionality
+ * for constructing recipes interactively, managing a recipe collection, and searching
+ * or modifying recipes in the cookbook.
+ *
  * @author Nick Heggø
  * @version 2024-12-12
  */
@@ -58,14 +62,30 @@ public class RecipeManager {
     cookBook.addRecipe(recipeToBeAdded);
   }
 
+  /**
+   * Finds and returns a list of recipes whose names contain the specified substring.
+   *
+   * @param name the name or part of a name to search for; must not be null or blank.
+   * @return a list of Recipe objects with names matching the specified substring.
+   */
   public List<Recipe> findRecipe(String name) {
     return cookBook.findRecipesContainingName(name);
   }
 
+  /**
+   * Retrieves an overview of all recipe names in the cookbook.
+   *
+   * @return a list of strings containing the names of all recipes in the cookbook.
+   */
   public List<String> getRecipeOverview() {
     return cookBook.getRecipeOverview();
   }
 
+  /**
+   * Removes a specified recipe from the cookbook.
+   *
+   * @param recipeToRemove the recipe to be removed; must not be null
+   */
   public void removeRecipe(Recipe recipeToRemove) {
     cookBook.removeRecipe(recipeToRemove);
   }

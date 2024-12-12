@@ -8,9 +8,15 @@ import edu.ntnu.idi.bidata.user.User;
  * for executing the command to clear the console output.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-12
  */
 public class ClearCommand extends Command {
+
+  /**
+   * Constructs a ClearCommand instance for the specified user.
+   *
+   * @param user the user associated with this command.
+   */
   protected ClearCommand(User user) {
     super(user);
   }

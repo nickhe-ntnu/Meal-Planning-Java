@@ -62,14 +62,17 @@ public class FindCommand extends Command {
       getOutputHandler().printList(overview, "bullet");
       setArgument("Please enter the ingredient name to find:");
     }
-    List<Ingredient> matchingIngredients = getInventoryManager().findIngredientFromCurrent(getArgument());
+    List<Ingredient> matchingIngredients = getInventoryManager()
+        .findIngredientFromCurrent(getArgument());
     // first case, none matching.
     if (matchingIngredients.isEmpty()) {
-      getOutputHandler().printOutputWithLineBreak(getArgument() + " isn't present at any of the storages.");
+      getOutputHandler().printOutputWithLineBreak(getArgument()
+          + " isn't present at any of the storages.");
     } else {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append(getArgument()).append(" is present at:");
-      matchingIngredients.forEach(storageName -> stringBuilder.append("\n  * ").append(storageName));
+      matchingIngredients.forEach(storageName ->
+          stringBuilder.append("\n  * ").append(storageName));
       getOutputHandler().printOutputWithLineBreak(stringBuilder.toString());
     }
   }
@@ -87,24 +90,35 @@ public class FindCommand extends Command {
   private void printDetails(List<?> matchingObjects) {
     OutputHandler outputHandler = getOutputHandler();
     if (matchingObjects.stream().allMatch(Printable.class::isInstance)) {
-      List<Printable> printable = (List<Printable>) matchingObjects.stream()
+      List<Printable> printable = matchingObjects.stream()
           .map(o -> (Printable) o)
           .toList();
       switch (printable.size()) {
         case 0 -> outputHandler.printOutput("Cannot find any matching.");
-        case 1 -> outputHandler.printOutputWithLineBreak(matchingObjects.getFirst().toString() + "\n");
-        default -> {
-          List<String> names = matchingObjects.stream().map(o -> ((Printable) o).getName()).toList();
-          outputHandler.printList(names, "numbered");
-          int index = -1;
-          while (index >= matchingObjects.size() || index < 1) {
-            outputHandler.printInputPrompt("Please choose the recipe to show details:");
-            index = getInputScanner().collectValidInteger();
-          }
-          outputHandler.printOutputWithLineBreak(matchingObjects.get(index - 1).toString() + "\n"); // Index start at 0, printed start at 1
-        }
+        case 1 -> outputHandler.printOutputWithLineBreak(matchingObjects.getFirst()
+            .toString() + "\n");
+        default -> printAll(matchingObjects, outputHandler);
       }
     }
+  }
+
+  /**
+   * Prints all matching objects as a numbered list and prompts the user to choose one for output.
+   *
+   * @param matchingObjects the list of objects to be displayed and selected from
+   * @param outputHandler   the handler responsible for printing output and receiving input
+   */
+  private void printAll(List<?> matchingObjects, OutputHandler outputHandler) {
+    List<String> names = matchingObjects.stream()
+        .map(o -> ((Printable) o).getName()).toList();
+    outputHandler.printList(names, "numbered");
+    int index = -1;
+    while (index >= matchingObjects.size() || index < 1) {
+      outputHandler.printInputPrompt("Please choose the recipe to show details:");
+      index = getInputScanner().collectValidInteger();
+    }
+    outputHandler.printOutputWithLineBreak(matchingObjects.get(index - 1)
+        .toString() + "\n"); // Index start at 0, printed start at 1
   }
 
 }

@@ -11,7 +11,7 @@ import java.util.Objects;
  * Represents a measurement with a name, amount, unit, and ingredient type.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class Measurement {
   private String name; // Ingredient Name
@@ -19,9 +19,19 @@ public class Measurement {
   private ValidUnit unit;
   private IngredientType ingredientType; // set automatically, based on ValidUnit.
 
+  /**
+   * Default constructor for the Measurement class.
+   * Initializes a new instance of Measurement with default values.
+   */
   public Measurement() {
   }
 
+  /**
+   * Constructs a Measurement with the specified name and input details.
+   *
+   * @param name  the name of the measurement
+   * @param input the unit input containing amount and unit details, must not be null
+   */
   public Measurement(String name, UnitInput input) {
     setName(name);
     setAmount(input.getAmount());
@@ -48,10 +58,13 @@ public class Measurement {
   // IntelliJ Generated
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof Measurement that))
+    if (!(o instanceof Measurement that)) {
       return false;
-
-    return Float.compare(amount, that.amount) == 0 && Objects.equals(name, that.name) && unit == that.unit && ingredientType == that.ingredientType;
+    }
+    return Float.compare(amount, that.amount) == 0
+        && Objects.equals(name, that.name)
+        && unit == that.unit
+        && ingredientType == that.ingredientType;
   }
 
   // IntelliJ Generated

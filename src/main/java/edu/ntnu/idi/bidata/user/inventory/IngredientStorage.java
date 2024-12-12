@@ -43,6 +43,13 @@ public class IngredientStorage {
     }
   }
 
+  /**
+   * Checks if the given list of measurements has sufficient ingredients available in the storage.
+   *
+   * @param measurements a list of Measurement objects representing the required ingredients
+   *                     and their amounts
+   * @return true if measurements can be fulfilled with the available ingredients, false otherwise
+   */
   public boolean isIngredientEnough(List<Measurement> measurements) {
     boolean hasSufficientIngredients = true;
     boolean finished = false;
@@ -59,6 +66,12 @@ public class IngredientStorage {
     return hasSufficientIngredients;
   }
 
+  /**
+   * Removes the specified ingredient from the storage, including cleanup if necessary.
+   *
+   * @param ingredientToBeRemoved The ingredient to be removed from the storage.
+   * @return true if the ingredient was successfully removed; false otherwise.
+   */
   public boolean removeIngredient(Ingredient ingredientToBeRemoved) {
     if (ingredientToBeRemoved == null) {
       return false;
@@ -75,8 +88,27 @@ public class IngredientStorage {
     return status;
   }
 
+  /**
+   * Finds and retrieves a list of ingredients matching the specified name.
+   *
+   * @param ingredientName The name of the ingredient to search for.
+   * @return A list of matching ingredients, or null if no match is found.
+   */
   public List<Ingredient> findIngredient(String ingredientName) {
     return ingredientMap.get(Utility.createKey(ingredientName));
+  }
+
+  /**
+   * Retrieves an ingredient matching the specified name and expiry date.
+   *
+   * @param ingredientName       the name of the ingredient to find
+   * @param ingredientExpiryDate the expiry date of the ingredient to match
+   * @return the matching Ingredient, or null if no match is found
+   */
+  public Ingredient findIngredient(String ingredientName, LocalDate ingredientExpiryDate) {
+    return ingredientMap.get(ingredientName.toLowerCase()).stream()
+        .filter(ingredient -> ingredient.getExpiryDate().isEqual(ingredientExpiryDate))
+        .findFirst().orElse(null);
   }
 
   /**
@@ -89,14 +121,32 @@ public class IngredientStorage {
     return ingredientMap.containsKey(Utility.createKey(ingredientName));
   }
 
+  /**
+   * Retrieves a list of ingredients matching the specified name.
+   *
+   * @param ingredientName the name of the ingredient to search for
+   * @return a list of ingredients corresponding to the given name, or null if no match is found
+   */
   public List<Ingredient> getIngredientList(String ingredientName) {
     return ingredientMap.get(Utility.createKey(ingredientName));
   }
 
+  /**
+   * Retrieves a list of ingredients corresponding to the specified ingredient's properties.
+   *
+   * @param ingredient the ingredient whose matching ingredients are to be retrieved
+   * @return a list of matching ingredients, or null if no matches are found
+   */
   public List<Ingredient> getIngredientList(Ingredient ingredient) {
     return ingredientMap.get(Utility.createKey(ingredient));
   }
 
+  /**
+   * Removes expired ingredients from the storage by checking their expiry date.
+   * If no ingredients exist, a message is logged. Expired ingredients are removed
+   * from the storage and logged to the console. If no expired ingredients are found,
+   * this is also logged.
+   */
   public void removeExpired() {
     if (ingredientMap.isEmpty()) {
       System.out.println("No ingredients available to check for expiry.");
@@ -121,19 +171,6 @@ public class IngredientStorage {
     } else {
       System.out.println("No expired ingredients were found.");
     }
-  }
-
-  /**
-   * Retrieves an ingredient matching the specified name and expiry date.
-   *
-   * @param ingredientName       the name of the ingredient to find
-   * @param ingredientExpiryDate the expiry date of the ingredient to match
-   * @return the matching Ingredient, or null if no match is found
-   */
-  public Ingredient findIngredient(String ingredientName, LocalDate ingredientExpiryDate) {
-    return ingredientMap.get(ingredientName.toLowerCase()).stream()
-        .filter(ingredient -> ingredient.getExpiryDate().isEqual(ingredientExpiryDate))
-        .findFirst().orElse(null);
   }
 
   public List<String> getIngredientOverview() {
@@ -234,15 +271,18 @@ public class IngredientStorage {
   }
 
   /**
-   * Checks if there is any ingredient in the storage with an expiry date matching the given ingredient.
+   * Checks if there is any ingredient in the storage
+   * with an expiry date matching the given ingredient.
    *
-   * @param ingredientToCheck The ingredient whose expiry date is to be checked against stored ingredients.
+   * @param ingredientToCheck The ingredient whose expiry date is to be checked
+   *                          against the stored ingredient
    * @return true if a matching expiry date is found; false otherwise.
    */
   private boolean hasMatchingExpiryDate(Ingredient ingredientToCheck) {
     List<Ingredient> ingredientList = getIngredientList(ingredientToCheck);
     return ingredientList != null && ingredientList.stream()
-        .anyMatch(ingredient -> getIngredientExpiryDate(ingredient).isEqual(getIngredientExpiryDate(ingredientToCheck)));
+        .anyMatch(ingredient -> getIngredientExpiryDate(ingredient)
+            .isEqual(getIngredientExpiryDate(ingredientToCheck)));
   }
 
   /**

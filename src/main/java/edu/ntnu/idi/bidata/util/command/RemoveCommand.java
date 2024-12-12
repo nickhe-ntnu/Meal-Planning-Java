@@ -16,6 +16,12 @@ import java.util.List;
  * @version 2024-12-12
  */
 public class RemoveCommand extends Command {
+
+  /**
+   * Constructs a new RemoveCommand instance for the specified user to handle "remove" operations.
+   *
+   * @param user The user associated with this command.
+   */
   public RemoveCommand(User user) {
     super(user);
   }
@@ -50,8 +56,9 @@ public class RemoveCommand extends Command {
   }
 
   /**
-   * Removes a storage location based on the provided argument. If no argument is supplied, prompts the user to input a storage name.
-   * Communicates success or failure of the operation to the user.
+   * Removes a storage location based on the provided argument.
+   * If no argument is supplied, prompts the user to input a storage name.
+   * Communicates the success or failure of the operation to the user.
    */
   private void removeStorage() {
     if (isArgumentEmpty()) {
@@ -59,9 +66,11 @@ public class RemoveCommand extends Command {
     }
     boolean success = getInventoryManager().removeStorage(getArgument());
     if (success) {
-      getOutputHandler().printOutputWithLineBreak("Successfully removed " + getArgument() + " from the application.");
+      getOutputHandler().printOutputWithLineBreak("Successfully removed "
+          + getArgument() + " from the application.");
     } else {
-      getOutputHandler().printOutput("Failed to remove " + getArgument() + ", please check if the name is misspelled.");
+      getOutputHandler().printOutput("Failed to remove " + getArgument()
+          + ", please check if the name is misspelled.");
     }
   }
 
@@ -72,12 +81,16 @@ public class RemoveCommand extends Command {
   private void removeExpired() {
     float sum = Utility.roundToTwoDecimal(getInventoryManager().removeAllExpired());
     getUser().addWastedValue(sum);
-    getOutputHandler().printOutputWithLineBreak("Value of " + sum + " kr worth of food is now been deleted.");
+    getOutputHandler().printOutputWithLineBreak("Value of " + sum
+        + " kr worth of food is now been deleted.");
   }
 
   /**
-   * Removes an ingredient from the current inventory storage. Displays a list of existing ingredients, prompts the user for an ingredient name if no argument is provided, and performs
-   * the removal operation. Handles errors if the ingredient is not found or input is invalid.
+   * Removes an ingredient from the current inventory storage.
+   * Displays a list of existing ingredients,
+   * prompts the user for an ingredient name if no argument is provided, and performs
+   * the removal operation.
+   * Handles errors if the ingredient is not found or input is invalid.
    */
   private void removeIngredient() {
     getOutputHandler().printOutput("List of all stock ingredients:");

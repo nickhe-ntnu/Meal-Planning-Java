@@ -12,7 +12,7 @@ import edu.ntnu.idi.bidata.util.input.CommandInput;
  * methods to interact with and manage these attributes.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class User {
 
@@ -42,6 +42,11 @@ public class User {
     wastedValue = 0;
   }
 
+  /**
+   * Adds a specified value to the user's wasted value tracker.
+   *
+   * @param wastedValue the value to be added to the wasted value total.
+   */
   public void addWastedValue(float wastedValue) {
     this.wastedValue += wastedValue;
   }

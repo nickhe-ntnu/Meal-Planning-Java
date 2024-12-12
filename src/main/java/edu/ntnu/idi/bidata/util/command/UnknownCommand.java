@@ -8,10 +8,15 @@ import edu.ntnu.idi.bidata.user.User;
  * that corresponds to the unrecognized command input.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-12
  */
 public class UnknownCommand extends Command {
 
+  /**
+   * Constructs an UnknownCommand instance tied to a specific user.
+   *
+   * @param user The user associated with this unknown command.
+   */
   public UnknownCommand(User user) {
     super(user);
   }
