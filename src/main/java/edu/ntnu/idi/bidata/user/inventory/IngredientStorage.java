@@ -36,6 +36,9 @@ public class IngredientStorage {
    * @param newIngredient The ingredient to be added to the storage.
    */
   public void addIngredient(Ingredient newIngredient) {
+    if (newIngredient == null) {
+      throw new IllegalArgumentException("Ingredient cannot be null");
+    }
     if (hasMatchingExpiryDate(newIngredient)) {
       mergeIngredient(newIngredient);
     } else {
