@@ -6,17 +6,14 @@ import edu.ntnu.idi.bidata.util.Utility;
 import edu.ntnu.idi.bidata.util.input.UnitInput;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Manages multiple ingredient storages and provides functionalities
  * for ingredient and storage management.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-12
  */
 public class InventoryManager {
 
@@ -53,59 +50,26 @@ public class InventoryManager {
     return new Ingredient(ingredientName, amount, unit, value, daysUntilExpiry);
   }
 
-  /**
-   * Retrieves an overview of ingredients in the current storage.
-   *
-   * @return A list of strings representing the names of ingredients in the current storage.
-   */
-  public List<String> getIngredientOverview() {
-    assertInventoryIsAvailable();
-    return currentStorage.getIngredientOverview();
-  }
-
-  /**
-   * Retrieves the names of all ingredient storages in the inventory.
-   *
-   * @return A list containing the names of all storages currently in the storage map.
-   */
-  public List<String> getStorageOverview() {
-    return storageMap.values().stream()
-        .map(IngredientStorage::getStorageName)
-        .toList();
-  }
-
-  private int collectDaysUntilExpiry() {
-    int daysTilExpiry;
-    do {
-      outputHandler.printInputPrompt("Please enter the days until expiry:");
-      daysTilExpiry = inputScanner.collectValidInteger();
-    } while (daysTilExpiry < -1);
-    return daysTilExpiry;
-  }
-
-  private float collectIngredientValue() {
-    float value;
-    do {
-      outputHandler.printInputPrompt("Please enter the ingredient value:");
-      value = inputScanner.collectValidFloat();
-    } while (value < 0.0f);
-    return value;
-  }
-
-  private UnitInput collectAmountAndUnit() {
-    UnitInput input = null;
-    boolean validInput = false;
-    while (!validInput) {
-      outputHandler.printInputPrompt("Please enter the amount with unit:");
-      try {
-        input = inputScanner.fetchUnit();
-        validInput = true;
-      } catch (IllegalArgumentException ignored) {
-        // ignored
+  public void findIngredientFromAll(String ingredientName) {
+    for (IngredientStorage storage : storageMap.values()) {
+      List<Ingredient> ingredientList = storage.findIngredient(ingredientName);
+      if (ingredientList != null && !ingredientList.isEmpty()) {
+        outputHandler.printOutput(storage.getStorageName() + ":");
+        outputHandler.printList(ingredientList, "bullet");
       }
     }
+  }
 
-    return input;
+  public List<String> findSufficientStorages(List<Measurement> measurements) {
+    ArrayList<IngredientStorage> listOfSufficientStorage = new ArrayList<>();
+    for (IngredientStorage storage : storageMap.values()) {
+      if (storage.isIngredientEnough(measurements)) {
+        listOfSufficientStorage.add(storage);
+      }
+    }
+    return listOfSufficientStorage.stream()
+        .map(IngredientStorage::getStorageName)
+        .toList();
   }
 
   /**
@@ -147,16 +111,56 @@ public class InventoryManager {
     return currentStorage.getIngredientList(ingredientName);
   }
 
+  public boolean removeStorage(String storageName) {
+    return storageMap.remove(Utility.createKey(storageName)) != null;
+  }
+
+  public float removeAllExpired() {
+    assertInventoryIsAvailable();
+    List<Ingredient> expired = currentStorage.getAllExpired();
+    currentStorage.removeExpired();
+    return expired.stream()
+        .map(Ingredient::getValue)
+        .reduce(0.0f, Float::sum);
+  }
+
+  /**
+   * Adds a new ingredient storage to the storage map with the provided name.
+   * The storage name is converted to lowercase before being used as the key in the map.
+   *
+   * @param storageName The name of the storage to be added.
+   */
+  public void createIngredientStorage(String storageName) {
+    storageMap.put(Utility.createKey(storageName), new IngredientStorage(storageName));
+  }
+
+  /**
+   * Retrieves an overview of ingredients in the current storage.
+   *
+   * @return A list of strings representing the names of ingredients in the current storage.
+   */
+  public List<String> getIngredientOverview() {
+    assertInventoryIsAvailable();
+    return currentStorage.getIngredientOverview();
+  }
+
+  /**
+   * Retrieves the names of all ingredient storages in the inventory.
+   *
+   * @return A list containing the names of all storages currently in the storage map.
+   */
+  public List<String> getStorageOverview() {
+    return storageMap.values().stream()
+        .map(IngredientStorage::getStorageName)
+        .toList();
+  }
+
   public String getTotalValue() {
     float sum = storageMap.values().stream()
         .map(IngredientStorage::getAllValue)
         .reduce(0.0f, Float::sum);
     sum = Math.round(sum * 100) / 100.0f;
     return "Inventory has total value of: " + sum + " kr.";
-  }
-
-  public boolean removeStorage(String storageName) {
-    return storageMap.remove(Utility.createKey(storageName)) != null;
   }
 
   public String getInventoryString() {
@@ -221,23 +225,38 @@ public class InventoryManager {
     return stringBuilder.toString();
   }
 
-  public float removeAllExpired() {
-    assertInventoryIsAvailable();
-    List<Ingredient> expired = currentStorage.getAllExpired();
-    currentStorage.removeExpired();
-    return expired.stream()
-        .map(Ingredient::getValue)
-        .reduce(0.0f, Float::sum);
+  private int collectDaysUntilExpiry() {
+    int daysTilExpiry;
+    do {
+      outputHandler.printInputPrompt("Please enter the days until expiry:");
+      daysTilExpiry = inputScanner.collectValidInteger();
+    } while (daysTilExpiry < -1);
+    return daysTilExpiry;
   }
 
-  /**
-   * Adds a new ingredient storage to the storage map with the provided name.
-   * The storage name is converted to lowercase before being used as the key in the map.
-   *
-   * @param storageName The name of the storage to be added.
-   */
-  public void createIngredientStorage(String storageName) {
-    storageMap.put(Utility.createKey(storageName), new IngredientStorage(storageName));
+  private float collectIngredientValue() {
+    float value;
+    do {
+      outputHandler.printInputPrompt("Please enter the ingredient value:");
+      value = inputScanner.collectValidFloat();
+    } while (value < 0.0f);
+    return value;
+  }
+
+  private UnitInput collectAmountAndUnit() {
+    UnitInput input = null;
+    boolean validInput = false;
+    while (!validInput) {
+      outputHandler.printInputPrompt("Please enter the amount with unit:");
+      try {
+        input = inputScanner.fetchUnit();
+        validInput = true;
+      } catch (IllegalArgumentException ignored) {
+        // ignored
+      }
+    }
+
+    return input;
   }
 
   /**

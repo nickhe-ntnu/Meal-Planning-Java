@@ -7,7 +7,7 @@ import java.util.List;
  * Holds the every valid command.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-12
  */
 public enum ValidCommand {
   UNKNOWN("Unknown command, see 'help'"),
@@ -32,14 +32,15 @@ public enum ValidCommand {
 
   LIST("""
       Valid list commands are:
-       list inventory | list recipe | list ingredient
-       list expired | list available recipe"""),
+       list all | list storage | list recipe | list ingredient
+       list expired | list available | list value | list name"""),
 
   REMOVE("""
       Valid remove commands are:
        remove storage {storage name}
        remove ingredient {ingredient name}
-       remove recipe {recipe name}"""),
+       remove recipe {recipe name}
+       remove expired"""),
 
   CLEAR("This command will clear the terminal window."),
 

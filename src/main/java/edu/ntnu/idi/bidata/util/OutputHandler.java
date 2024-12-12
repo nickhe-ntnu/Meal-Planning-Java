@@ -9,7 +9,7 @@ import java.util.List;
  * to the user, including a welcome message that encourages environmental responsibility.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class OutputHandler {
 
@@ -28,23 +28,37 @@ public class OutputHandler {
    */
   public void printOutputWithLineBreak(String outputMessage) {
     printOutput(outputMessage);
-    System.out.println("########################");
+    printLineBreak();
   }
 
+  /**
+   * Prints a line of separator characters to the console.
+   */
   public void printLineBreak() {
     System.out.println("########################");
   }
 
+  /**
+   * Prints a simple command prompt symbol ("> ") to the console.
+   */
   public void printCommandPrompt() {
     System.out.print("> ");
   }
 
+  /**
+   * Prints an input prompt message to the console, appending instructions to abort the operation.
+   *
+   * @param inputPrompt the prompt message to display to the user
+   */
   public void printInputPrompt(String inputPrompt) {
     String output = inputPrompt + " Type 'abort' to abort the operation."
         + "\n" + "  ~ ";
     System.out.print(output);
   }
 
+  /**
+   * Prints a generic input prompt to the console.
+   */
   public void printInputPrompt() {
     System.out.print("  ~ ");
   }
@@ -125,16 +139,29 @@ public class OutputHandler {
     printOutput(command.getHelpString());
   }
 
+  /**
+   * Prints a help message containing a list of available commands.
+   * Uses the getHelpMessage() method to generate the command list.
+   */
   public void printHelpMessage() {
     printOutput("Available commands are:" + "\n" + getHelpMessage());
   }
 
+  /**
+   * Clears the console screen by printing multiple blank lines.
+   * This method does not actually clear the terminal screen but creates the effect of doing so.
+   */
   public void clearScreen() {
     for (int i = 0; i < 40; i++) {
       System.out.println();
     }
   }
 
+  /**
+   * Generates a help message containing valid commands for the application.
+   *
+   * @return a string consisting of available commands separated by pipe symbols.
+   */
   private String getHelpMessage() {
     List<String> commands = ValidCommand.getCommands();
     return " help | " + String.join(" | ", commands) + " | clear | exit";

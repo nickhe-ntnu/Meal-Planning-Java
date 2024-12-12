@@ -15,7 +15,7 @@ import java.util.List;
  * "find" subcommands.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class FindCommand extends Command {
 
@@ -36,6 +36,19 @@ public class FindCommand extends Command {
    */
   @Override
   public void execute() {
+    if (hasSubcommand()) {
+      processSubcommand();
+    } else {
+      new HelpCommand(getUser(), getCommand());
+    }
+  }
+
+  /**
+   * Determines and processes the action to take based on the subcommand value.
+   * Delegates to the appropriate method for "ingredient" and "recipe" subcommands.
+   * Calls illegalCommand() for unsupported subcommands.
+   */
+  private void processSubcommand() {
     switch (getSubcommand()) {
       case "ingredient" -> findIngredient();
       case "recipe" -> findRecipe();
@@ -49,14 +62,14 @@ public class FindCommand extends Command {
       getOutputHandler().printList(overview, "bullet");
       setArgument("Please enter the ingredient name to find:");
     }
-    List<Ingredient> storageContainsIngredient = getInventoryManager().findIngredientFromCurrent(getArgument());
+    List<Ingredient> matchingIngredients = getInventoryManager().findIngredientFromCurrent(getArgument());
     // first case, none matching.
-    if (storageContainsIngredient.isEmpty()) {
+    if (matchingIngredients.isEmpty()) {
       getOutputHandler().printOutputWithLineBreak(getArgument() + " isn't present at any of the storages.");
     } else {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append(getArgument()).append(" is present at:");
-      storageContainsIngredient.forEach(storageName -> stringBuilder.append("\n  * ").append(storageName));
+      matchingIngredients.forEach(storageName -> stringBuilder.append("\n  * ").append(storageName));
       getOutputHandler().printOutputWithLineBreak(stringBuilder.toString());
     }
   }

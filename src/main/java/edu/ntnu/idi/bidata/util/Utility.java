@@ -8,7 +8,7 @@ import java.util.Random;
  * A utility class providing methods to manipulate strings and objects.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class Utility {
   private static Random random;
@@ -36,18 +36,12 @@ public class Utility {
     return (o == null) ? null : o.getName().strip().toLowerCase();
   }
 
-  public static void assertNoneNull(Object o) {
-    if (o == null) {
-      throw new IllegalArgumentException("Null is prohibited.");
-    }
-  }
-
-  public static void assertNoneBlank(String o) {
-    if (o.isBlank()) {
-      throw new IllegalArgumentException("String cannot be blank.");
-    }
-  }
-
+  /**
+   * Determines the ordinal suffix for a given number.
+   *
+   * @param number the number to determine the ordinal suffix for
+   * @return a string representing the ordinal suffix ("st", "nd", "rd", or "th")
+   */
   public static String getOrdinalSuffix(int number) {
     if (number % 100 >= 11 && number % 100 <= 13) {
       return "th";
@@ -60,6 +54,12 @@ public class Utility {
     };
   }
 
+  /**
+   * Capitalizes the first letter of each word in the provided input string.
+   *
+   * @param input the string to process, where each word's first letter will be capitalized
+   * @return a new string with each word's first letter capitalized, or the original string if it is null or empty
+   */
   public static String capitalizeEachWord(String input) {
     if (input == null || input.isEmpty()) {
       return input;
@@ -80,12 +80,12 @@ public class Utility {
   }
 
   /**
-   * Determines if the user wishes to continue based on the input string.
+   * Determines if the given input indicates continuation based on specific keywords.
    *
-   * @param input the input string from the user indicating their choice
-   * @return true if the input suggests continuation ('yes', 'y' or 'ja'), false otherwise
+   * @param input the input string to check for continuation confirmation; can be null
+   * @return true if the input contains confirmation keywords ("yes", "y", "ja"), false otherwise
    */
-  public static boolean isInputYes(String input) {
+  public static boolean isContinuationConfirmed(String input) {
     return switch (input) {
       case String s when s.toLowerCase().contains("yes") -> true;
       case String s when s.toLowerCase().contains("y") -> true;
@@ -104,5 +104,9 @@ public class Utility {
       random = new Random();
     }
     return random;
+  }
+
+  public static float roundToTwoDecimal(float input) {
+    return (float) Math.round(input * 100) / 100;
   }
 }

@@ -1,6 +1,8 @@
 package edu.ntnu.idi.bidata.user.inventory;
 
 import edu.ntnu.idi.bidata.util.Utility;
+import edu.ntnu.idi.bidata.util.unit.UnitConverter;
+import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -10,7 +12,7 @@ import java.util.*;
  * stored in various named collections.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-12
  */
 public class IngredientStorage {
 
@@ -34,7 +36,6 @@ public class IngredientStorage {
    * @param newIngredient The ingredient to be added to the storage.
    */
   public void addIngredient(Ingredient newIngredient) {
-    Utility.assertNoneNull(newIngredient);
     if (hasMatchingExpiryDate(newIngredient)) {
       mergeIngredient(newIngredient);
     } else {
@@ -42,10 +43,20 @@ public class IngredientStorage {
     }
   }
 
-  public List<String> getIngredientOverview() {
-    return ingredientMap.keySet().stream()
-        .map(Utility::capitalizeEachWord)
-        .toList();
+  public boolean isIngredientEnough(List<Measurement> measurements) {
+    boolean hasSufficientIngredients = true;
+    boolean finished = false;
+    Iterator<Measurement> it = measurements.iterator();
+    while (!finished && it.hasNext()) {
+      Measurement measurement = it.next();
+      List<Ingredient> ingredientList = ingredientMap.get(Utility.createKey(measurement.getName()));
+      if (ingredientList == null || !isAmountEnough(ingredientList, measurement)) {
+        hasSufficientIngredients = false;
+        finished = true;
+      }
+    }
+
+    return hasSufficientIngredients;
   }
 
   public boolean removeIngredient(Ingredient ingredientToBeRemoved) {
@@ -62,6 +73,10 @@ public class IngredientStorage {
       ingredientMap.remove(Utility.createKey(ingredientToBeRemoved.getName()));
     }
     return status;
+  }
+
+  public List<Ingredient> findIngredient(String ingredientName) {
+    return ingredientMap.get(Utility.createKey(ingredientName));
   }
 
   /**
@@ -121,6 +136,12 @@ public class IngredientStorage {
         .findFirst().orElse(null);
   }
 
+  public List<String> getIngredientOverview() {
+    return ingredientMap.keySet().stream()
+        .map(Utility::capitalizeEachWord)
+        .toList();
+  }
+
   /**
    * Builds and returns a string representation of the storage.
    * The string begins with the storage name followed by each ingredient's details.
@@ -172,6 +193,17 @@ public class IngredientStorage {
         .flatMap(List::stream)
         .filter(ingredient -> ingredient.getExpiryDate().isBefore(LocalDate.now()))
         .toList();
+  }
+
+  private boolean isAmountEnough(List<Ingredient> ingredientList, Measurement measurement) {
+    float targetAmount = measurement.getAmount();
+    ValidUnit targetUnit = measurement.getUnit();
+    float sum = 0;
+    for (Ingredient ingredient : ingredientList) {
+      UnitConverter.convertIngredient(ingredient, targetUnit);
+      sum += ingredient.getAmount();
+    }
+    return sum >= targetAmount;
   }
 
   /**

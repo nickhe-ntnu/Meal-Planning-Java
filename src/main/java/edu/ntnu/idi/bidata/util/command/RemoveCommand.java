@@ -1,6 +1,11 @@
 package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
+import edu.ntnu.idi.bidata.user.recipe.Recipe;
+import edu.ntnu.idi.bidata.user.recipe.RecipeManager;
+import edu.ntnu.idi.bidata.util.Utility;
+
+import java.util.List;
 
 /**
  * The RemoveCommand class extends the Command class to handle "remove" operations
@@ -8,7 +13,7 @@ import edu.ntnu.idi.bidata.user.User;
  * delegates the removal operation to the appropriate method.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class RemoveCommand extends Command {
   public RemoveCommand(User user) {
@@ -22,6 +27,19 @@ public class RemoveCommand extends Command {
    */
   @Override
   public void execute() {
+    if (hasSubcommand()) {
+      processSubcommand();
+    } else {
+      new HelpCommand(getUser(), getCommand());
+    }
+  }
+
+  /**
+   * Processes the subcommand for the "remove" command and delegates the operation
+   * to the appropriate method based on the specified subcommand. If the subcommand
+   * is invalid, an exception is thrown.
+   */
+  private void processSubcommand() {
     switch (getSubcommand()) {
       case "storage" -> removeStorage();
       case "ingredient" -> removeIngredient();
@@ -31,6 +49,10 @@ public class RemoveCommand extends Command {
     }
   }
 
+  /**
+   * Removes a storage location based on the provided argument. If no argument is supplied, prompts the user to input a storage name.
+   * Communicates success or failure of the operation to the user.
+   */
   private void removeStorage() {
     if (isArgumentEmpty()) {
       setArgument("Please enter the storage name to remove:");
@@ -43,12 +65,20 @@ public class RemoveCommand extends Command {
     }
   }
 
+  /**
+   * Removes all expired items from the inventory, adds their total value
+   * to the user's wasted value tracker, and outputs a summary of the removed value.
+   */
   private void removeExpired() {
-    float sum = getInventoryManager().removeAllExpired();
+    float sum = Utility.roundToTwoDecimal(getInventoryManager().removeAllExpired());
     getUser().addWastedValue(sum);
     getOutputHandler().printOutputWithLineBreak("Value of " + sum + " kr worth of food is now been deleted.");
   }
 
+  /**
+   * Removes an ingredient from the current inventory storage. Displays a list of existing ingredients, prompts the user for an ingredient name if no argument is provided, and performs
+   * the removal operation. Handles errors if the ingredient is not found or input is invalid.
+   */
   private void removeIngredient() {
     getOutputHandler().printOutput("List of all stock ingredients:");
     getOutputHandler().printList(getInventoryManager().getIngredientOverview(), "bullet");
@@ -58,8 +88,23 @@ public class RemoveCommand extends Command {
     getInventoryManager().removeIngredientFromCurrent(getArgument());
   }
 
+  /**
+   * Removes a recipe based on user input. If no argument is provided, prompts the user
+   * to enter the recipe name. Displays a numbered list of search results for selection
+   * and removes the chosen recipe from the RecipeManager.
+   */
   private void removeRecipe() {
-    //    recipeManager. //TODO
+    RecipeManager recipeManager = getRecipeManager();
+    if (isArgumentEmpty()) {
+      getOutputHandler().printList(recipeManager.getRecipeOverview(), "bullet");
+      setArgument("Please enter the recipe name:");
+    }
+    List<Recipe> results = recipeManager.findRecipe(getArgument());
+    printNameOfFiltered(results);
+    int index = getIndex(results.size());
+    String recipeName = results.get(index).getName();
+    recipeManager.removeRecipe(results.get(index));
+    getOutputHandler().printOperationStatus(true, "removed", recipeName);
   }
 
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class RecipeManager {
 
@@ -45,6 +45,10 @@ public class RecipeManager {
     return recipeBuilder.getRecipe();
   }
 
+  public List<Recipe> getAllRecipe() {
+    return cookBook.getAllRecipe();
+  }
+
   /**
    * Adds a recipe to the cookbook.
    *
@@ -60,6 +64,10 @@ public class RecipeManager {
 
   public List<String> getRecipeOverview() {
     return cookBook.getRecipeOverview();
+  }
+
+  public void removeRecipe(Recipe recipeToRemove) {
+    cookBook.removeRecipe(recipeToRemove);
   }
 
   /**
@@ -93,7 +101,7 @@ public class RecipeManager {
     while (keepAdding) {
       initialIndividuateStep(recipeBuilder, stepCount);
       outputHandler.printInputPrompt("Do you want to add more steps? (Y/n)");
-      keepAdding = Utility.isInputYes(inputScanner.collectValidString());
+      keepAdding = Utility.isContinuationConfirmed(inputScanner.collectValidString());
       stepCount++;
     }
   }
@@ -110,7 +118,7 @@ public class RecipeManager {
     String instruction = inputScanner.collectValidString();
     outputHandler.printInputPrompt("Does step nr " + stepCount + " have any ingredients? (Y/n)");
     ArrayList<Measurement> measurements = null;
-    if (Utility.isInputYes(inputScanner.collectValidString())) {
+    if (Utility.isContinuationConfirmed(inputScanner.collectValidString())) {
       measurements = getMeasurements(stepCount);
     }
     recipeBuilder.addStep(new Step(instruction, measurements));
@@ -129,7 +137,7 @@ public class RecipeManager {
     while (keepAdding) {
       initialIndividuateMeasurement(measurements);
       outputHandler.printInputPrompt("Add more ingredients to step " + stepCount + " ? (Y/n)");
-      keepAdding = Utility.isInputYes(inputScanner.collectValidString());
+      keepAdding = Utility.isContinuationConfirmed(inputScanner.collectValidString());
     }
     return measurements;
   }

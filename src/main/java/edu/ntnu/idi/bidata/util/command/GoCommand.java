@@ -10,7 +10,7 @@ import java.util.List;
  * to the previous directory for a user.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class GoCommand extends Command {
 
@@ -30,6 +30,20 @@ public class GoCommand extends Command {
    */
   @Override
   public void execute() {
+    if (hasSubcommand()) {
+      processSubcommand();
+    } else {
+      new HelpCommand(getUser(), getCommand());
+    }
+  }
+
+  /**
+   * Processes the subcommand retrieved from the command input and executes the corresponding method.
+   * If the subcommand is "to", it navigates to the specified storage using goTo().
+   * If the subcommand is "back", it navigates to the previous storage using goBack().
+   * If the subcommand is invalid or unrecognized, it invokes illegalCommand().
+   */
+  private void processSubcommand() {
     switch (getSubcommand()) {
       case "to" -> goTo();
       case "back" -> goBack();
@@ -92,10 +106,9 @@ public class GoCommand extends Command {
   }
 
   /**
-   * Prints a message indicating the success or failure of a storage location operation.
+   * Prints a success or failure message based on the result of a navigation operation.
    *
-   * @param success      a boolean indicating whether the operation was successful
-   * @param locationName the name of the location being attempted to access
+   * @param success indicates whether the operation was successful (true) or unsuccessful (false).
    */
   private void printOperationMessage(boolean success) {
     if (success) {

@@ -2,7 +2,6 @@ package edu.ntnu.idi.bidata.util.unit;
 
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
-import edu.ntnu.idi.bidata.util.Utility;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
  * enumeration which includes units for weight (KG, G) and volume (L, DL, ML).
  *
  * @author Nick Heggø
- * @version 2024-12-05
+ * @version 2024-12-12
  */
 public class UnitConverter {
 
@@ -57,7 +56,6 @@ public class UnitConverter {
   }
 
   public static List<Object> getStandardData(Measurement measurement) {
-    Utility.assertNoneNull(measurement);
     String ingredientType = measurement.getIngredientType();
     List<Object> data = null;
     if (ingredientType.equals("SOLID")) {

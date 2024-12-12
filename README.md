@@ -95,6 +95,7 @@ Project source code is divided into two parts, package `user` && `util`.
 ## Link to repository
 
 [GitHub Repository](https://github.com/NTNU-BIDATA-IDATG1003-2024/meal-planning-nickhe-ntnu.git)
+[BackUP Repository](https://github.com/nickhe-ntnu/Meal-Planning-Java.git)
 
 ## How to run the project
 

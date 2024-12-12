@@ -1,5 +1,6 @@
 package edu.ntnu.idi.bidata.util.command;
 
+import edu.ntnu.idi.bidata.user.Printable;
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
 import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
@@ -9,6 +10,7 @@ import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
 import edu.ntnu.idi.bidata.util.input.CommandInput;
 
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -17,7 +19,7 @@ import java.util.Stack;
  * process commands and subcommands.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public abstract class Command {
 
@@ -32,6 +34,13 @@ public abstract class Command {
     setUser(user);
   }
 
+  /**
+   * Creates a specific Command object based on the user's command input.
+   *
+   * @param user The user for whom the command is being created and processed.
+   * @param app  The application context needed for specific commands like EXIT.
+   * @return An appropriate Command subclass instance based on the user's input.
+   */
   public static Command of(User user, Application app) {
     ValidCommand command = user.getCommandInput().getCommand();
     return switch (command) {
@@ -80,6 +89,32 @@ public abstract class Command {
    */
   protected void illegalCommand() {
     throw new IllegalCommandCombinationException(user.getCommandInput().getCommand(), user.getCommandInput().getSubcommand());
+  }
+
+  /**
+   * Prints the names of items in a filtered list of Printable objects in numbered format.
+   *
+   * @param printableList the list of Printable objects to be processed and printed
+   */
+  protected void printNameOfFiltered(List<?> printableList) {
+    List<String> names = printableList.stream()
+        .map(printable -> ((Printable) printable).getName())
+        .toList();
+    getOutputHandler().printList(names, "numbered");
+  }
+
+  /**
+   * Retrieves the zero-based index as input by the user, after displaying a prompt.
+   *
+   * @return the index selected by the user, adjusted to be zero-based.
+   */
+  protected int getIndex(int listSize) {
+    getOutputHandler().printInputPrompt("Please select an option:");
+    int index = -1;
+    while (index < 0 || index > listSize - 1) {
+      index = getInputScanner().collectValidInteger() - 1; // index start at 0, displays to user from 1
+    }
+    return index;
   }
 
   /**

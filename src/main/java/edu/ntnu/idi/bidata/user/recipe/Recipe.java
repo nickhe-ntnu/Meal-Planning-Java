@@ -1,6 +1,7 @@
 package edu.ntnu.idi.bidata.user.recipe;
 
 import edu.ntnu.idi.bidata.user.Printable;
+import edu.ntnu.idi.bidata.user.inventory.Measurement;
 import edu.ntnu.idi.bidata.util.Utility;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
  * instructions and required ingredients.
  *
  * @author Nick Heggø
- * @version 2024-12-08
+ * @version 2024-12-12
  */
 public class Recipe implements Printable {
   private final List<Step> steps;
@@ -66,20 +67,6 @@ public class Recipe implements Printable {
   }
 
   /**
-   * Adds a cooking step to the recipe.
-   *
-   * @param step the step to be added, which includes instructions and ingredients
-   */
-  public void addStep(Step step) {
-    steps.add(step);
-  }
-
-  public void removeStep(int stepNumber) {
-    assertIndexWithInBounds(stepNumber);
-    steps.remove(stepNumber);
-  }
-
-  /**
    * Retrieves the name of the recipe.
    *
    * @return the name of the recipe
@@ -99,6 +86,30 @@ public class Recipe implements Printable {
       throw new IllegalArgumentException("Name cannot be null.");
     }
     this.name = name;
+  }
+
+  /**
+   * Adds a cooking step to the recipe.
+   *
+   * @param step the step to be added, which includes instructions and ingredients
+   */
+  public void addStep(Step step) {
+    steps.add(step);
+  }
+
+  public void removeStep(int stepNumber) {
+    assertIndexWithInBounds(stepNumber);
+    steps.remove(stepNumber);
+  }
+
+  public List<Measurement> getAllMeasurement() {
+    ArrayList<Measurement> measurements = new ArrayList<>();
+    for (Step step : steps) {
+      if (step.getMeasurements() != null) {
+        measurements.addAll(step.getMeasurements());
+      }
+    }
+    return measurements.stream().toList();
   }
 
   /**

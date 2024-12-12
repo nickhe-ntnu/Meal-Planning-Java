@@ -1,6 +1,8 @@
 package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
+import edu.ntnu.idi.bidata.user.inventory.Measurement;
+import edu.ntnu.idi.bidata.user.recipe.Recipe;
 import edu.ntnu.idi.bidata.util.OutputHandler;
 
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
  * recipes, ingredients, expired items, and available recipes.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-12
  */
 public class ListCommand extends Command {
   public ListCommand(User user) {
@@ -28,6 +30,20 @@ public class ListCommand extends Command {
    */
   @Override
   public void execute() {
+    if (hasSubcommand()) {
+      processSubcommand();
+    } else {
+      new HelpCommand(getUser(), getCommand());
+    }
+  }
+
+  /**
+   * Processes the subcommand provided by the user and delegates execution to corresponding methods
+   * based on the subcommand type. Handles various subcommands related to listing features like
+   * inventory, storage, recipes, ingredients, expired items, available recipes, and other values.
+   * Calls an error handler for invalid or unrecognized subcommands.
+   */
+  private void processSubcommand() {
     switch (getSubcommand()) {
       case "all" -> listAll();
       case "storage" -> listStorage();
@@ -42,11 +58,20 @@ public class ListCommand extends Command {
     }
   }
 
+  /**
+   * Lists the total value of the inventory.
+   * Retrieves the inventory's total value from the InventoryManager
+   * and outputs it using the OutputHandler.
+   */
   private void listValue() {
     String message = getInventoryManager().getTotalValue();
     getOutputHandler().printOutput(message);
   }
 
+  /**
+   * Lists the names of the ingredient storages.
+   * Retrieves the names from the InventoryManager as a formatted string and prints it using the OutputHandler.
+   */
   private void listName() {
     getOutputHandler().printOutputWithLineBreak(getInventoryManager().getStorageNameString());
   }
@@ -60,10 +85,21 @@ public class ListCommand extends Command {
     getOutputHandler().printOutputWithLineBreak(getInventoryManager().getInventoryString());
   }
 
+  /**
+   * Lists the current storage details.
+   * Retrieves a formatted string of storage information from InventoryManager
+   * and outputs it using the OutputHandler with a line break.
+   */
   private void listStorage() {
     getOutputHandler().printOutputWithLineBreak(getInventoryManager().getStorageString());
   }
 
+  /**
+   * Lists the total number of recipes and their names.
+   * Retrieves an overview of all existing recipes from the RecipeManager.
+   * Outputs the count of recipes and their formatted names using the OutputHandler.
+   * If no recipes exist, notifies the user with a relevant message.
+   */
   private void listRecipe() {
     List<String> recipeList = getRecipeManager().getRecipeOverview();
     OutputHandler outputHandler = getOutputHandler();
@@ -75,8 +111,16 @@ public class ListCommand extends Command {
     }
   }
 
+  /**
+   * Lists all available ingredients in the user's inventory.
+   * Retrieves ingredient data from InventoryManager and displays
+   * the formatted list using the OutputHandler.
+   */
   private void listIngredient() {
-    // TODO
+    if (isArgumentEmpty()) {
+      setArgument("Please enter a ingredient name:");
+    }
+    getInventoryManager().findIngredientFromAll(getArgument());
   }
 
   private void listExpired() {
@@ -84,7 +128,25 @@ public class ListCommand extends Command {
   }
 
   private void listAvailableRecipe() {
-    // TODO
+    OutputHandler outputHandler = getOutputHandler();
+    List<Recipe> recipeList = getRecipeManager().getAllRecipe();
+    if (recipeList.isEmpty()) {
+      outputHandler.printOutput("There are no recipes at the moment.");
+    } else {
+      boolean anyAvailable = false;
+      for (Recipe recipe : recipeList) {
+        List<Measurement> measurements = recipe.getAllMeasurement();
+        List<String> listOfSufficientStorages = getInventoryManager().findSufficientStorages(measurements);
+        if (!listOfSufficientStorages.isEmpty()) {
+          outputHandler.printOutput("There is enough ingredient for " + recipe.getName() + " at:");
+          outputHandler.printList(listOfSufficientStorages, "bullet");
+          anyAvailable = true;
+        }
+      }
+      if (anyAvailable == false) {
+        getOutputHandler().printOutput("You don't have enough ingredient at the moment.");
+      }
+    }
   }
 
 }

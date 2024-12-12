@@ -19,7 +19,7 @@ import java.util.List;
  * It initializes user data, including storage, and manages user inputs to process commands.
  *
  * @author Nick Heggø
- * @version 2024-12-07
+ * @version 2024-12-12
  */
 public class Application {
   private final User user;
@@ -35,6 +35,7 @@ public class Application {
     user = userSetup();
     inputScanner = user.getInputScanner();
     outputHandler = user.getOutputHandler();
+    userSetup();
   }
 
   /**
@@ -76,6 +77,9 @@ public class Application {
     inventoryManager.createIngredientStorage("Fridge");
     inventoryManager.setCurrentStorage(inventoryManager.getStorage("fridge"));
     inventoryManager.addIngredientToCurrentStorage(new Ingredient("Chocolate", 300, ValidUnit.G, 10, 4));
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Flour", 50, ValidUnit.KG, 10, 4));
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Chocolate chips", 0.9f, ValidUnit.KG, 10, 4));
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Milk", 0.4f, ValidUnit.L, 10, 4));
     int amountOfExpiredIngredientToGenerate = 3;
     for (int generatedIngredient = 0; generatedIngredient < amountOfExpiredIngredientToGenerate; generatedIngredient++) {
       inventoryManager.addIngredientToCurrentStorage(new Ingredient("expiredDemo"));
@@ -127,14 +131,13 @@ public class Application {
   }
 
   /**
-   * Sets up a new User instance, initializing it with an input name.
+   * Sets up and initializes a new User instance with default configurations.
    *
-   * @return an initialized User object.
+   * @return a User object with the default name set to "User".
    */
   private User userSetup() {
     User createdUser = new User();
-    createdUser.setName("Developer");
-    //FIXME replace with: createdUser.setName(inputScanner.getValidString().replaceAll("\\s", ""));
+    createdUser.setName("User");
     return createdUser;
   }
 }
