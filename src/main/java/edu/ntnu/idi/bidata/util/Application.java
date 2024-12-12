@@ -6,7 +6,6 @@ import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
 import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
 import edu.ntnu.idi.bidata.user.recipe.RecipeBuilder;
-import edu.ntnu.idi.bidata.user.recipe.RecipeManager;
 import edu.ntnu.idi.bidata.user.recipe.Step;
 import edu.ntnu.idi.bidata.util.command.Command;
 import edu.ntnu.idi.bidata.util.command.IllegalCommandCombinationException;
@@ -47,7 +46,7 @@ public class Application {
   public void run() {
     outputHandler.printWelcomeMessage(user.getName());
     outputHandler.printHelpMessage();
-    startUpCondition();
+    startUpCondition(); // If wish to start as a blank app, remove this method.
     running = true;
     engine();
   }
@@ -81,8 +80,13 @@ public class Application {
     inventoryManager.createIngredientStorage("Fridge");
     inventoryManager.setCurrentStorage(inventoryManager.getStorage("fridge"));
     inventoryManager.addIngredientToCurrentStorage(new Ingredient("Chocolate", 300, ValidUnit.G, 10, 4));
-    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Flour", 50, ValidUnit.KG, 10, 4));
-    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Chocolate chips", 0.9f, ValidUnit.KG, 10, 4));
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Flour", 5, ValidUnit.KG, 10, 4));
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Chocolate Chips", 0.9f, ValidUnit.KG, 10, 4));
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Butter", 0.9f, ValidUnit.KG, 10, 4));
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Granulated Sugar", 0.9f, ValidUnit.KG, 10, 4));
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Brown Sugar", 0.9f, ValidUnit.KG, 10, 4));
+
+    inventoryManager.addIngredientToCurrentStorage(new Ingredient("Vanilla Extract", 0.9f, ValidUnit.DL, 10, 4));
     inventoryManager.addIngredientToCurrentStorage(new Ingredient("Milk", 0.4f, ValidUnit.L, 10, 4));
     int amountOfExpiredIngredientToGenerate = 3;
     for (int generatedIngredient = 0; generatedIngredient < amountOfExpiredIngredientToGenerate; generatedIngredient++) {
@@ -96,23 +100,35 @@ public class Application {
 
     // Default recipe
     RecipeBuilder builder = new RecipeBuilder();
-    List<Measurement> measurements = List.of(
-        new Measurement("Flour", 500, ValidUnit.G),
-        new Measurement("Chocolate chips", 100, ValidUnit.G),
-        new Measurement("Milk", 4, ValidUnit.DL)
-    );
     builder.setName("Cookie Dough");
-    builder.setDescription("Best cookie you will ever taste.");
-    builder.addStep(new Step("Combine everything in a bowl", measurements));
-    builder.addStep(new Step("And enjoy!", null));
-    RecipeManager recipeManager = user.getRecipeManager();
-    recipeManager.addRecipe(builder.getRecipe());
-    // second recipe
-    builder.setName("Cookie Dough v2");
-    builder.setDescription("Best cookie you will ever taste.");
-    builder.addStep(new Step("Combine everything in a bowl", measurements));
-    builder.addStep(new Step("And enjoy!", null));
-    recipeManager.addRecipe(builder.getRecipe());
+    builder.setDescription("Perfect for midnight cravings, stress-baking without the baking, " +
+        "or impressing your friends with your no-bake skills. Warning: You may not want to share.");
+
+    List<Measurement> step1 = List.of(
+        new Measurement("Butter", 115, ValidUnit.G),
+        new Measurement("Granulated Sugar", 100, ValidUnit.G),
+        new Measurement("Brown Sugar", 50, ValidUnit.G)
+    );
+    builder.addStep(new Step("In a mixing bowl, beat the softened butter, granulated sugar, and brown sugar until smooth and fluffy.", step1));
+
+    List<Measurement> step2 = List.of(
+        new Measurement("Milk", 30, ValidUnit.ML),
+        new Measurement("Vanilla Extract", 15, ValidUnit.ML)
+    );
+    builder.addStep(new Step("Mix in the vanilla extract and milk until well combined.", step2));
+
+    List<Measurement> step3 = List.of(
+        new Measurement("Flour", 125, ValidUnit.G)
+    );
+    builder.addStep(new Step("Gradually add the heat-treated flour and salt, mixing until smooth.", step3));
+
+    List<Measurement> step4 = List.of(
+        new Measurement("Chocolate Chips", 90, ValidUnit.G)
+    );
+    builder.addStep(new Step("Stir in the chocolate chips or other desired mix-ins.", step4));
+
+    builder.addStep(new Step("Enjoy the cookie dough immediately, or refrigerate it in an airtight container for up to 5 days.", null));
+    user.getRecipeManager().addRecipe(builder.getRecipe());
   }
 
   /**
