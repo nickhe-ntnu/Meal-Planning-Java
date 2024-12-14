@@ -1,9 +1,3 @@
-# Portfolio project IDATG1003
-
-STUDENT NAME = "Nick Heggø"
-
-STUDENT ID = "134132"
-
 ## Project description
 
 This project is a Meal Planning application developed as a part of the IDATG1003 course.
@@ -14,10 +8,9 @@ The goal of this project was to help achieve the UN's sustainability goal by red
 
 ```aiignore
 .
-├── IDATG1003-Mappe-meal-planning.iml
-├── Meal-Planning-Nick-Heggø.iml
 ├── README.md
 ├── pom.xml
+├── run.gif
 ├── src
 │   ├── main
 │   │   └── java
@@ -27,6 +20,7 @@ The goal of this project was to help achieve the UN's sustainability goal by red
 │   │                   └── bidata
 │   │                       ├── Launcher.java
 │   │                       ├── user
+│   │                       │   ├── Printable.java
 │   │                       │   ├── User.java
 │   │                       │   ├── inventory
 │   │                       │   │   ├── Ingredient.java
@@ -47,8 +41,10 @@ The goal of this project was to help achieve the UN's sustainability goal by red
 │   │                           ├── Utility.java
 │   │                           ├── command
 │   │                           │   ├── AddCommand.java
+│   │                           │   ├── ClearCommand.java
 │   │                           │   ├── Command.java
 │   │                           │   ├── CommandRegistry.java
+│   │                           │   ├── ExitCommand.java
 │   │                           │   ├── FindCommand.java
 │   │                           │   ├── GoCommand.java
 │   │                           │   ├── HelpCommand.java
@@ -56,7 +52,7 @@ The goal of this project was to help achieve the UN's sustainability goal by red
 │   │                           │   ├── ListCommand.java
 │   │                           │   ├── RemoveCommand.java
 │   │                           │   ├── StatsCommand.java
-│   │                           │   ├── SubcommandRegistry.java
+│   │                           │   ├── UnknownCommand.java
 │   │                           │   └── ValidCommand.java
 │   │                           ├── input
 │   │                           │   ├── CommandInput.java
@@ -81,6 +77,10 @@ The goal of this project was to help achieve the UN's sustainability goal by red
 │                               │   └── RemoveCommandTest.java
 │                               └── unit
 │                                   └── UnitConverterTest.java
+├── unitTest.gif
+└── version.png
+
+26 directories, 46 files
 ```
 
 In a Maven project, the source code and unit tests are kept in different directories.
@@ -100,7 +100,7 @@ Project source code is divided into two parts, package `user` && `util`.
 ## How to run the project
 
 This project requires [Java SE 21](https://whichjdk.com/),
-and [Apache Maven](https://maven.apache.org/) to be installed on the system.
+and [Apache Maven 3.9.x](https://maven.apache.org/) to be installed on the system.
 
 ![](version.png)
 Before running any commands, check if the correct version is installed on the system by typing:
