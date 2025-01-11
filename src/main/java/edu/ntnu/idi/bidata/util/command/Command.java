@@ -5,7 +5,8 @@ import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.inventory.IngredientStorage;
 import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
 import edu.ntnu.idi.bidata.user.recipe.RecipeManager;
-import edu.ntnu.idi.bidata.util.Application;
+import edu.ntnu.idi.bidata.AdvancedApplication;
+import edu.ntnu.idi.bidata.Application;
 import edu.ntnu.idi.bidata.util.InputScanner;
 import edu.ntnu.idi.bidata.util.OutputHandler;
 import edu.ntnu.idi.bidata.util.input.CommandInput;
@@ -23,7 +24,7 @@ import java.util.Stack;
  */
 public abstract class Command {
 
-  private User user;
+  private static User user;
 
   /**
    * Constructs a new Command object, initializes various components, and processes the command.
@@ -35,15 +36,40 @@ public abstract class Command {
   }
 
   /**
-   * Creates a specific Command object based on the user's command input.
+   * Creates and returns a Command instance for the provided user and application context.
+   * This method retrieves the command input from the user and processes it into a corresponding command.
    *
-   * @param user The user for whom the command is being created and processed.
-   * @param app  The application context needed for specific commands like EXIT.
-   * @return An appropriate Command subclass instance based on the user's input.
+   * @param user The user for whom the command is being created and executed.
+   * @param app  The application context providing necessary dependencies or information for the command.
+   * @return An instance of Command corresponding to the user's input and the application context.
    */
-  public static Command of(User user, Application app) {
+  public static Command of(User user, AdvancedApplication app) {
     ValidCommand command = user.getCommandInput().getCommand();
-    return switch (command) {
+    return getCommand(command, app, user);
+  }
+
+  /**
+   * Creates and returns a Command instance based on the provided command word and application context.
+   * This method streamlines the creation of commands by invoking a helper method to handle the details.
+   *
+   * @param commandWord The command word representing the type of command to create.
+   * @param app         The application context needed for specific commands, such as EXIT.
+   * @return An instance of a subclass of Command corresponding to the provided command word.
+   */
+  public static Command of(ValidCommand commandWord, Application app) {
+    return getCommand(commandWord, app, user);
+  }
+
+  /**
+   * Creates and returns a specific command instance based on the given command word, application context, and user.
+   *
+   * @param commandWord The command word representing the type of command to create.
+   * @param app         The application context needed for specific commands, such as EXIT.
+   * @param user        The user for whom the command is being created and processed.
+   * @return An instance of a subclass of Command corresponding to the provided command word.
+   */
+  private static Command getCommand(ValidCommand commandWord, Application app, User user) {
+    return switch (commandWord) {
       case HELP -> new HelpCommand(user);
       case ADD -> new AddCommand(user);
       case FIND -> new FindCommand(user);
@@ -207,7 +233,7 @@ public abstract class Command {
   }
 
   private void setUser(User user) {
-    this.user = user;
+    Command.user = user;
   }
 
   protected boolean isArgumentEmpty() {

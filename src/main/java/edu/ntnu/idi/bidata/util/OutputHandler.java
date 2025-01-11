@@ -17,6 +17,12 @@ public class OutputHandler {
       Hello, %s
       Thank you for using the meal planning app!""";
 
+
+  // private static final String SIMPLE_MODE_MENU = """
+  //   1. List inventory
+  //   2. UNFINISHED
+  //   """;
+
   /**
    * Default constructor for the OutputHandler class.
    * Initializes an instance of OutputHandler for handling console output operations.

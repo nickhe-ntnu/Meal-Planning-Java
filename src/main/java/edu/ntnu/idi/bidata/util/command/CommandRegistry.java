@@ -25,6 +25,18 @@ public class CommandRegistry {
   private CommandRegistry() {
   }
 
+  public static ValidCommand getCommand(int input) {
+    return switch (input) {
+      case 1 -> ValidCommand.LIST;
+      case 2 -> ValidCommand.GO;
+      case 3 -> ValidCommand.FIND;
+      case 4 -> ValidCommand.STATS;
+      case 0 -> ValidCommand.EXIT;
+      default -> ValidCommand.UNKNOWN;
+    };
+
+  }
+
   /**
    * Finds and returns the corresponding ValidCommand for the given input string.
    * If the input is not associated with a valid command, returns ValidCommand.UNKNOWN.

@@ -1,4 +1,4 @@
-package edu.ntnu.idi.bidata.util;
+package edu.ntnu.idi.bidata;
 
 import edu.ntnu.idi.bidata.user.User;
 import edu.ntnu.idi.bidata.user.inventory.Ingredient;
@@ -7,6 +7,9 @@ import edu.ntnu.idi.bidata.user.inventory.InventoryManager;
 import edu.ntnu.idi.bidata.user.inventory.Measurement;
 import edu.ntnu.idi.bidata.user.recipe.RecipeBuilder;
 import edu.ntnu.idi.bidata.user.recipe.Step;
+import edu.ntnu.idi.bidata.util.AbortException;
+import edu.ntnu.idi.bidata.util.InputScanner;
+import edu.ntnu.idi.bidata.util.OutputHandler;
 import edu.ntnu.idi.bidata.util.command.Command;
 import edu.ntnu.idi.bidata.util.command.IllegalCommandCombinationException;
 import edu.ntnu.idi.bidata.util.unit.ValidUnit;
@@ -14,60 +17,25 @@ import edu.ntnu.idi.bidata.util.unit.ValidUnit;
 import java.util.List;
 
 /**
- * The Application class represents the main execution for the meal planning application.
- * It initializes user data, including storage, and manages user inputs to process commands.
+ * This is the main skeleton of how the application is running.
+ * Both simple and advanced applications is an extension of this class.
  *
  * @author Nick Heggø
- * @version 2024-12-12
+ * @version 03-01-2025
  */
-public class Application {
-  private final User user;
-  private final InputScanner inputScanner;
-  private final OutputHandler outputHandler;
-  private boolean running;
+public abstract class Application {
+  protected final User user;
+  protected final InputScanner inputScanner;
+  protected final OutputHandler outputHandler;
+  protected boolean running;
 
-  /**
-   * Initializes a new instance of the Application
-   * Sets up the user, input scanner, and output handler.
-   */
-  public Application() {
-    user = userSetup();
+  protected Application(User user) {
+    if (user == null) {
+      throw new IllegalArgumentException("User cannot be null!");
+    }
+    this.user = user;
     inputScanner = user.getInputScanner();
     outputHandler = user.getOutputHandler();
-    userSetup();
-  }
-
-  /**
-   * Starts the application by displaying the help string
-   * and entering a loop to process user commands.
-   * The loop continues until a command causes the application to exit.
-   * It handles any exceptions by printing the error messages.
-   */
-  public void run() {
-    outputHandler.printWelcomeMessage(user.getName());
-    outputHandler.printHelpMessage();
-    startUpCondition(); // If wish to start as a blank app, remove this method.
-    running = true;
-    engine();
-  }
-
-  /**
-   * Terminates the application by displaying a goodbye message and stopping the execution loop.
-   */
-  public void terminate() {
-    outputHandler.printGoodbyeMessage();
-    running = false;
-  }
-
-  /**
-   * Instantiates and executes a user command.
-   * Uses the user instance and the current application context
-   * to determine and perform the relevant command action.
-   */
-  private Command getCommand() {
-    outputHandler.printCommandPrompt();
-    user.setCommandInput(inputScanner.fetchCommand());
-    return Command.of(user, this);
   }
 
   /**
@@ -132,6 +100,35 @@ public class Application {
   }
 
   /**
+   * Starts the application by displaying the help string
+   * and entering a loop to process user commands.
+   * The loop continues until a command causes the application to exit.
+   * It handles any exceptions by printing the error messages.
+   */
+  public void run() {
+    outputHandler.printWelcomeMessage(user.getName());
+    outputHandler.printHelpMessage();
+    startUpCondition(); // If wish to start as a blank app, remove this method.
+    running = true;
+    engine();
+  }
+
+  /**
+   * Terminates the application by displaying a goodbye message and stopping the execution loop.
+   */
+  public void terminate() {
+    outputHandler.printGoodbyeMessage();
+    running = false;
+  }
+
+  /**
+   * Instantiates and executes a user command.
+   * Uses the user instance and the current application context
+   * to determine and perform the relevant command action.
+   */
+  protected abstract Command getCommand(); 
+
+  /**
    * Continuously processes and executes user commands while the application is running.
    * Catches and handles exceptions related to invalid commands or aborted operations.
    * Uses the output handler to display error messages and command help.
@@ -150,14 +147,4 @@ public class Application {
     }
   }
 
-  /**
-   * Sets up and initializes a new User instance with default configurations.
-   *
-   * @return a User object with the default name set to "User".
-   */
-  private User userSetup() {
-    User createdUser = new User();
-    createdUser.setName("User");
-    return createdUser;
-  }
 }

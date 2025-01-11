@@ -1,7 +1,7 @@
 package edu.ntnu.idi.bidata.util.command;
 
 import edu.ntnu.idi.bidata.user.User;
-import edu.ntnu.idi.bidata.util.Application;
+import edu.ntnu.idi.bidata.Application;
 
 /**
  * The ExitCommand class is responsible for terminating the application

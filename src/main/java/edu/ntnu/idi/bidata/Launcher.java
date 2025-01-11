@@ -1,6 +1,6 @@
 package edu.ntnu.idi.bidata;
 
-import edu.ntnu.idi.bidata.util.Application;
+import edu.ntnu.idi.bidata.user.User;
 
 /**
  * The Launcher class serves as the entry point for the meal planning application.
@@ -18,7 +18,8 @@ public class Launcher {
    * The main entry point of the application. Instantiates and runs the Application.
    */
   public static void main(String[] args) {
-    Application app = new Application();
+    User user = new User();
+    Application app = new AdvancedApplication(user);
     app.run();
   }
 
