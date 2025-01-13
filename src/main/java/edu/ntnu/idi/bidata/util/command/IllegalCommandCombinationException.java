@@ -25,6 +25,7 @@ public class IllegalCommandCombinationException extends RuntimeException {
   public IllegalCommandCombinationException(ValidCommand command, String subcommand) {
     super("Invalid command combination: '"
         + Utility.createKey(command.name()) + "' + '" + subcommand + "'");
+        // Invalid command combination: '{command}' + '{subcommand}'
   }
 
   /**
@@ -36,5 +37,6 @@ public class IllegalCommandCombinationException extends RuntimeException {
   public IllegalCommandCombinationException(CommandInput commandInput) {
     super("Invalid command combination: '" + Utility.createKey(commandInput.getCommand().name())
         + "' + '" + commandInput.getSubcommand() + "'");
+        // Invalid command combination: '{command}' + '{subcommand}'
   }
 }

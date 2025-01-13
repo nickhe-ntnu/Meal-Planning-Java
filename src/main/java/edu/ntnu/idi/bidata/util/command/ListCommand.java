@@ -52,16 +52,16 @@ public class ListCommand extends Command {
    */
   private void processSubcommand() {
     switch (getSubcommand()) {
-      case "all" -> listAll();
-      case "storage" -> listStorage();
-      case "recipe" -> listRecipe();
-      case "ingredient" -> listIngredient();
-      case "expired" -> listExpired();
-      case "available" -> listAvailableRecipe();
+      case "all"                 -> listAll();
+      case "storage"             -> listStorage();
+      case "recipe"              -> listRecipe();
+      case "ingredient"          -> listIngredient();
+      case "expired"             -> listExpired();
+      case "available"           -> listAvailableRecipe();
       case "command", "commands" -> getOutputHandler().printHelpMessage();
-      case "name" -> listName();
-      case "value", "values" -> listValue();
-      default -> illegalCommand();
+      case "name"                -> listName();
+      case "value", "values"     -> listValue();
+      default                    -> illegalCommand();
     }
   }
 
