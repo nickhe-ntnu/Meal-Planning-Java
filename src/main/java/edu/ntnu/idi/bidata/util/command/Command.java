@@ -44,15 +44,15 @@ public abstract class Command {
   public static Command of(User user, Application app) {
     ValidCommand command = user.getCommandInput().getCommand();
     return switch (command) {
-      case HELP -> new HelpCommand(user);
-      case ADD -> new AddCommand(user);
-      case FIND -> new FindCommand(user);
-      case GO -> new GoCommand(user);
-      case LIST -> new ListCommand(user);
-      case REMOVE -> new RemoveCommand(user);
-      case CLEAR -> new ClearCommand(user);
-      case STATS -> new StatsCommand(user);
-      case EXIT -> new ExitCommand(user, app);
+      case HELP    -> new HelpCommand(user);
+      case ADD     -> new AddCommand(user);
+      case FIND    -> new FindCommand(user);
+      case GO      -> new GoCommand(user);
+      case LIST    -> new ListCommand(user);
+      case REMOVE  -> new RemoveCommand(user);
+      case CLEAR   -> new ClearCommand(user);
+      case STATS   -> new StatsCommand(user);
+      case EXIT    -> new ExitCommand(user, app);
       case UNKNOWN -> new UnknownCommand(user);
     };
   }
@@ -215,6 +215,3 @@ public abstract class Command {
   }
 
 }
-
-
-

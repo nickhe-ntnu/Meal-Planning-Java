@@ -34,7 +34,7 @@ public class Application {
     user = userSetup();
     inputScanner = user.getInputScanner();
     outputHandler = user.getOutputHandler();
-    userSetup();
+    // userSetup();??
   }
 
   /**
